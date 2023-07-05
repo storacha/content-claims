@@ -1,6 +1,6 @@
 # Content Claims
 
-[![Build](https://github.com/web3-storage/content-claims/actions/workflows/build.yml/badge.svg)](https://github.com/web3-storage/content-claims/actions/workflows/build.yml)
+[![Test](https://github.com/web3-storage/content-claims/actions/workflows/test.yml/badge.svg)](https://github.com/web3-storage/content-claims/actions/workflows/test.yml)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 Implementation of the Content Claims Protocol.
