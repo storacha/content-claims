@@ -8,6 +8,7 @@ export interface LocationClaim {
 
 export interface LocationClaimStore {
   put (claim: LocationClaim): Promise<void>
+  get (content: UnknownLink): Promise<LocationClaim|undefined>
   getMany (contents: UnknownLink[]): Promise<LocationClaim[]>
 }
 
@@ -19,6 +20,7 @@ export interface InclusionClaim {
 
 export interface InclusionClaimStore {
   put (claim: InclusionClaim): Promise<void>
+  get (content: UnknownLink): Promise<InclusionClaim|undefined>
 }
 
 export interface PartitionClaim {
@@ -29,6 +31,7 @@ export interface PartitionClaim {
 
 export interface PartitionClaimStore {
   put (claim: PartitionClaim): Promise<void>
+  get (content: UnknownLink): Promise<PartitionClaim|undefined>
 }
 
 export interface RelationClaim {
@@ -38,4 +41,5 @@ export interface RelationClaim {
 
 export interface RelationClaimStore {
   put (claim: RelationClaim): Promise<void>
+  get (parent: UnknownLink): Promise<RelationClaim|undefined>
 }

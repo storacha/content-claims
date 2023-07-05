@@ -1,5 +1,5 @@
 import * as Server from '@ucanto/server'
-import * as Assert from '../../capabilities.js'
+import * as Assert from '../../capability/assert.js'
 
 /** @typedef {{ locationStore: import('../../store').LocationClaimStore }} AssertLocationServiceContext */
 
@@ -7,7 +7,7 @@ import * as Assert from '../../capabilities.js'
 export const provide = context => Server.provide(Assert.location, input => handler(input, context))
 
 /**
- * @param {import('@ucanto/server').ProviderInput<import('../../capabilities.js').AssertLocation>} input
+ * @param {import('@ucanto/server').ProviderInput<import('../../capability/assert.js').AssertLocation>} input
  * @param {AssertLocationServiceContext} context
  * @returns {Promise<import('@ucanto/server').Result<{}, import('@ucanto/server').Failure>>}
  */

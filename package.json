@@ -22,7 +22,6 @@
   },
   "devDependencies": {
     "@types/git-rev-sync": "^2.0.0",
-    "ava": "^5.2.0",
     "aws-cdk-lib": "2.79.1",
     "constructs": "10.1.156",
     "sst": "^2.8.28",

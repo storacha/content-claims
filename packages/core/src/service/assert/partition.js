@@ -1,5 +1,5 @@
 import * as Server from '@ucanto/server'
-import * as Assert from '../../capabilities.js'
+import * as Assert from '../../capability/assert.js'
 
 /** @typedef {{ partitionStore: import('../../store').PartitionClaimStore }} AssertPartitionServiceContext */
 
@@ -7,7 +7,7 @@ import * as Assert from '../../capabilities.js'
 export const provide = context => Server.provide(Assert.partition, input => handler(input, context))
 
 /**
- * @param {import('@ucanto/server').ProviderInput<import('../../capabilities.js').AssertPartition>} input
+ * @param {import('@ucanto/server').ProviderInput<import('../../capability/assert.js').AssertPartition>} input
  * @param {AssertPartitionServiceContext} context
  * @returns {Promise<import('@ucanto/server').Result<{}, import('@ucanto/server').Failure>>}
  */

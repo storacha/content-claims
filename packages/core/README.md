@@ -12,6 +12,28 @@ npm install @web3-storage/content-claims
 
 ## Usage
 
+### Client
+
+```js
+import * as Client from '@web3-storage/content-claims/client'
+import { Assert } from '@web3-storage/content-claims/capability'
+
+const result = await Client
+  .invoke({
+    issuer,
+    audience,
+    capability: {
+      with: 'did:web:claims.web3.storage',
+      can: Assert.relation.can,
+      nb: {
+        parent: root.cid,
+        child: [child.cid]
+      }
+    }
+  })
+  .execute(Client.connection)
+```
+
 ### Server
 
 ```js
@@ -50,10 +72,6 @@ http.createServer(async (request, response) => {
   response.end()
 }).listen(3000)
 ```
-
-### Client
-
-TODO
 
 ## Contributing
 

@@ -6,10 +6,10 @@ import * as Relation from './relation.js'
 /**
  * @typedef {import('./inclusion').AssertInclusionServiceContext & import('./location').AssertLocationServiceContext & import('./partition').AssertPartitionServiceContext & import('./relation').AssertRelationServiceContext} AssertServiceContext
  * @typedef {{
- *   location: import('@ucanto/server').ServiceMethod<import('../../capabilities').AssertLocation, {}, import('@ucanto/server').Failure>
- *   inclusion: import('@ucanto/server').ServiceMethod<import('../../capabilities').AssertInclusion, {}, import('@ucanto/server').Failure>
- *   partition: import('@ucanto/server').ServiceMethod<import('../../capabilities').AssertPartition, {}, import('@ucanto/server').Failure>
- *   relation: import('@ucanto/server').ServiceMethod<import('../../capabilities').AssertRelation, {}, import('@ucanto/server').Failure>
+ *   location: import('@ucanto/server').ServiceMethod<import('../../capability/assert.js').AssertLocation, {}, import('@ucanto/server').Failure>
+ *   inclusion: import('@ucanto/server').ServiceMethod<import('../../capability/assert.js').AssertInclusion, {}, import('@ucanto/server').Failure>
+ *   partition: import('@ucanto/server').ServiceMethod<import('../../capability/assert.js').AssertPartition, {}, import('@ucanto/server').Failure>
+ *   relation: import('@ucanto/server').ServiceMethod<import('../../capability/assert.js').AssertRelation, {}, import('@ucanto/server').Failure>
  * }} AssertService
  */
 
