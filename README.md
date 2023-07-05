@@ -1,5 +1,8 @@
 # Content Claims
 
+[![Build](https://github.com/web3-storage/content-claims/actions/workflows/build.yml/badge.svg)](https://github.com/web3-storage/content-claims/actions/workflows/build.yml)
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+
 Implementation of the Content Claims Protocol.
 
 Read the [spec](https://hackmd.io/@gozala/content-claims).
@@ -114,3 +117,11 @@ Input:
   ]
 }
 ```
+
+## Contributing
+
+Feel free to join in. All welcome. Please [open an issue](https://github.com/web3-storage/content-claims/issues)!
+
+## License
+
+Dual-licensed under [MIT + Apache 2.0](https://github.com/web3-storage/content-claims/blob/main/LICENSE.md)
