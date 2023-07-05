@@ -1,0 +1,10 @@
+node_modules
+types
+
+# sst
+.sst
+.build
+
+# local env files
+.env*.local
+.env

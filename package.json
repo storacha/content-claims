@@ -1,0 +1,48 @@
+{
+  "name": "content-claims",
+  "version": "0.0.0",
+  "description": "Implementation of the Content Claims Protocol.",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0 OR MIT",
+  "scripts": {
+    "start": "sst dev",
+    "test": "npm run test --workspaces",
+    "pretest": "standard && tsc",
+    "lint": "standard",
+    "build": "sst build",
+    "deploy": "sst deploy",
+    "remove": "sst remove",
+    "console": "sst console",
+    "tsc": "tsc"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "git-rev-sync": "^3.0.2"
+  },
+  "devDependencies": {
+    "@types/git-rev-sync": "^2.0.0",
+    "ava": "^5.2.0",
+    "aws-cdk-lib": "2.79.1",
+    "constructs": "10.1.156",
+    "sst": "^2.8.28",
+    "standard": "^17.0.0",
+    "typescript": "^5.0.4"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "standard": {
+    "ignore": [
+      "*.ts"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/web3-storage/content-claims.git"
+  },
+  "bugs": {
+    "url": "https://github.com/web3-storage/content-claims/issues"
+  },
+  "homepage": "https://github.com/web3-storage/content-claims"
+}

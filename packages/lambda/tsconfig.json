@@ -1,0 +1,23 @@
+{
+  "include": ["src"],
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist",
+    "allowJs": true,
+    "checkJs": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "lib": ["ES2021", "DOM"],
+    "target": "ES2021",
+    "module": "es2022",
+    "baseUrl": ".",
+    "paths": {
+      "@web3-storage/content-claims/*": ["../core/src/*"]
+    }
+  }
+}
