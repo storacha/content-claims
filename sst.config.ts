@@ -1,11 +1,12 @@
 import { SSTConfig } from 'sst'
 import { Tags } from 'aws-cdk-lib'
 import { API } from './stacks/api.js'
+import { DB } from './stacks/db.js'
 
 export default {
   config(_input) {
     return {
-      name: 'autobahn',
+      name: 'content-claims',
       region: 'us-west-2'
     }
   },
@@ -17,6 +18,7 @@ export default {
     Tags.of(app).add('Environment', `${app.stage}`)
     Tags.of(app).add('ManagedBy', 'SST')
 
+    app.stack(DB)
     app.stack(API)
   }
 } satisfies SSTConfig

@@ -2,8 +2,9 @@ import * as Sentry from '@sentry/serverless'
 import { createServer } from '@web3-storage/content-claims/server'
 import * as CAR from '@ucanto/transport/car'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { Config } from 'sst/node/config'
 import { getServiceSigner, notNully } from './lib/config.js'
-import { BlocklyStorage, InclusionClaimStorage, LocationClaimStorage, PartitionClaimStorage, RelationClaimStorage } from './lib/stores.js'
+import { InclusionClaimStorage, LocationClaimStorage, PartitionClaimStorage, RelationClaimStorage } from './lib/stores.js'
 
 Sentry.AWSLambda.init({
   environment: process.env.SST_STAGE,
@@ -76,7 +77,8 @@ export const postUcanInvocation = async event => {
   }
 
   const region = notNully('DYNAMO_REGION', process.env)
-  const pk = notNully('PRIVATE_KEY', process.env)
+  // @ts-expect-error
+  const pk = Config.PRIVATE_KEY
   const signer = getServiceSigner({ serviceDID: process.env.SERVICE_DID, privateKey: pk })
   const dynamo = new DynamoDBClient({ region })
 
@@ -84,18 +86,18 @@ export const postUcanInvocation = async event => {
   const relationStore = new RelationClaimStorage(dynamo, notNully('RELATION_CLAIM_TABLE', process.env))
   const locationStore = new LocationClaimStorage(dynamo, notNully('LOCATION_CLAIM_TABLE', process.env))
   const partitionStore = new PartitionClaimStorage(dynamo, notNully('PARTITION_CLAIM_TABLE', process.env))
-  const blocklyStore = new BlocklyStorage(
-    dynamo,
-    notNully('BLOCKLY_TABLE', process.env),
-    partitionStore,
-    locationStore
-  )
+  // const blocklyStore = new BlocklyStorage(
+  //   dynamo,
+  //   notNully('BLOCKLY_TABLE', process.env),
+  //   partitionStore,
+  //   locationStore
+  // )
 
   const server = createServer({
     id: signer,
     codec: CAR.inbound,
     inclusionStore,
-    partitionStore: blocklyStore,
+    partitionStore,
     locationStore,
     relationStore
   })

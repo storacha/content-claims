@@ -1,5 +1,6 @@
 import { BatchGetItemCommand, PutItemCommand } from '@aws-sdk/client-dynamodb'
-import { marshall } from '@aws-sdk/util-dynamodb'
+import { marshall, unmarshall } from '@aws-sdk/util-dynamodb'
+import * as Link from 'multiformats/link'
 
 class DynamoDBStorage {
   /** @type {import('@aws-sdk/client-dynamodb').DynamoDBClient} */
@@ -39,15 +40,39 @@ export class LocationClaimStorage extends DynamoDBStorage {
     await this.dynamoClient.send(cmd)
   }
 
+  /** @param {import('@ucanto/server').UnknownLink[]} contents */
   async getMany (contents) {
-    const cmd = new BatchGetItemCommand({
-      RequestItems: {
-        [this.tableName]: {
-          Keys: contents.map(c => marshall({  }))
+    const batches = []
+    for (let i = 0; i < contents.length; i += 100) {
+      const batch = contents.slice(i, i + 100)
+      if (!batch.length) break
+      batches.push(batch)
+    }
+
+    const results = await Promise.all(batches.map(async batch => {
+      const cmd = new BatchGetItemCommand({
+        RequestItems: {
+          [this.tableName]: {
+            Keys: batch.map(c => marshall({ content: c.toString() }))
+          }
         }
-      }
-    })
-    await this.dynamoClient.send(cmd)
+      })
+      const res = await this.dynamoClient.send(cmd)
+      if (!res.Responses) throw new Error('missing responses')
+
+      /** @type {import('@web3-storage/content-claims/store').LocationClaim[]} */
+      const claims = res.Responses[this.tableName].map(item => {
+        const { content, location, proof } = unmarshall(item)
+        return {
+          content: Link.parse(content),
+          location: location.map((/** @type {string} */ url) => new URL(url)),
+          proof: proof ? Link.parse(proof) : undefined
+        }
+      })
+      return claims
+    }))
+
+    return results.flat()
   }
 }
 
@@ -95,29 +120,29 @@ export class RelationClaimStorage extends DynamoDBStorage {
   }
 }
 
-export class BlocklyStorage extends DynamoDBStorage {
-  /** @type {import('@web3-storage/content-claims/store').PartitionClaimStore} */
-  #partitionStore
-  /** @type {import('@web3-storage/content-claims/store').LocationClaimStore} */
-  #locationStore
+// export class BlocklyStorage extends DynamoDBStorage {
+//   /** @type {import('@web3-storage/content-claims/store').PartitionClaimStore} */
+//   #partitionStore
+//   /** @type {import('@web3-storage/content-claims/store').LocationClaimStore} */
+//   #locationStore
 
-  /**
-   * @param {import('@aws-sdk/client-dynamodb').DynamoDBClient} client
-   * @param {string} tableName
-   * @param {import('@web3-storage/content-claims/store').PartitionClaimStore} partitionStore
-   * @param {import('@web3-storage/content-claims/store').LocationClaimStore} locationStore
-   */
-  constructor (client, tableName, partitionStore, locationStore) {
-    super(client, tableName)
-    this.#partitionStore = partitionStore
-    this.#locationStore = locationStore
-  }
+//   /**
+//    * @param {import('@aws-sdk/client-dynamodb').DynamoDBClient} client
+//    * @param {string} tableName
+//    * @param {import('@web3-storage/content-claims/store').PartitionClaimStore} partitionStore
+//    * @param {import('@web3-storage/content-claims/store').LocationClaimStore} locationStore
+//    */
+//   constructor (client, tableName, partitionStore, locationStore) {
+//     super(client, tableName)
+//     this.#partitionStore = partitionStore
+//     this.#locationStore = locationStore
+//   }
 
-  /** @param {import('@web3-storage/content-claims/store').PartitionClaim} claim */
-  async put ({ content, blocks, parts }) {
-    await this.#partitionStore.put({ content, blocks, parts })
+//   /** @param {import('@web3-storage/content-claims/store').PartitionClaim} claim */
+//   async put ({ content, blocks, parts }) {
+//     await this.#partitionStore.put({ content, blocks, parts })
 
-    const locations = await this.#locationStore.getMany(parts)
+//     const locations = await this.#locationStore.getMany(parts)
 
-  }
-}
+//   }
+// }
