@@ -56,10 +56,9 @@ export const getVersion = () => {
  * Handler for GET /
  */
 export const getHome = () => {
-  const { VERSION, BRANCH, STAGE, REPO } = process.env
+  const { NAME, VERSION, STAGE, REPO } = process.env
   const env = STAGE === 'prod' ? '' : `(${STAGE})`
-  const repo = BRANCH === 'main' ? REPO : `${REPO}/tree/${BRANCH}`
-  const body = `⁂ content-claims v${VERSION} ${env}\n- ${repo}`
+  const body = `⁂ ${NAME} v${VERSION} ${env}\n- ${REPO}`
   return { statusCode: 200, headers: { 'Content-Type': text }, body }
 }
 
