@@ -30,7 +30,7 @@ export function DB ({ stack }) {
       invocation: 'string',
       content: 'string'
     },
-    primaryIndex: { partitionKey: 'content' }
+    primaryIndex: { partitionKey: 'content', sortKey: 'invocation' }
   })
 
   return {
