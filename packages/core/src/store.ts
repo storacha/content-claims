@@ -10,7 +10,6 @@ export interface LocationClaim {
 export interface LocationClaimStore {
   put (claim: LocationClaim): Promise<void>
   get (content: UnknownLink): Promise<LocationClaim|undefined>
-  getMany (contents: UnknownLink[]): Promise<LocationClaim[]>
 }
 
 export interface InclusionClaim {

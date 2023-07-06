@@ -60,10 +60,7 @@ export function API ({ stack }) {
   fun.attachPermissions([
     's3:GetObject',
     'dynamodb:Query',
-    'dynamodb:GetItem',
-    'dynamodb:PutItem',
-    'dynamodb:BatchGetItem',
-    'dynamodb:BatchWriteItem'
+    'dynamodb:UpdateItem'
   ])
 
   if (!fun.url) {

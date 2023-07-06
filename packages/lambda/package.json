@@ -4,13 +4,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "test": "echo 'moar tests are here needed'",
-    "tsc": "tsc"
-  },
-  "devDependencies": {
-    "@types/aws-lambda": "^8.10.115",
-    "lambda-stream": "^0.3.0",
-    "sst": "^2.8.28"
+    "lint": "standard",
+    "test": "ava --verbose"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.363.0",
@@ -21,5 +16,12 @@
     "@ucanto/server": "^8.0.1",
     "@ucanto/transport": "^8.0.0",
     "multiformats": "^12.0.1"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.115",
+    "ava": "^5.3.1",
+    "nanoid": "^4.0.2",
+    "sst": "^2.8.28",
+    "testcontainers": "^9.9.1"
   }
 }
