@@ -5,19 +5,31 @@ import { Table } from 'sst/constructs'
  */
 export function DB ({ stack }) {
   const locationTable = new Table(stack, 'locationClaim', {
-    fields: { content: 'string' },
-    primaryIndex: { partitionKey: 'content' }
+    fields: {
+      invocation: 'string',
+      content: 'string'
+    },
+    primaryIndex: { partitionKey: 'content', sortKey: 'invocation' }
   })
   const partitionTable = new Table(stack, 'partitionClaim', {
-    fields: { content: 'string' },
-    primaryIndex: { partitionKey: 'content' }
+    fields: {
+      invocation: 'string',
+      content: 'string'
+    },
+    primaryIndex: { partitionKey: 'content', sortKey: 'invocation' }
   })
   const inclusionTable = new Table(stack, 'inclusionClaim', {
-    fields: { content: 'string' },
-    primaryIndex: { partitionKey: 'content' }
+    fields: {
+      invocation: 'string',
+      content: 'string'
+    },
+    primaryIndex: { partitionKey: 'content', sortKey: 'invocation' }
   })
   const relationTable = new Table(stack, 'relationClaim', {
-    fields: { parent: 'string' },
+    fields: {
+      invocation: 'string',
+      content: 'string'
+    },
     primaryIndex: { partitionKey: 'parent' }
   })
 

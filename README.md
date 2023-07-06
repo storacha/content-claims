@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>🛄<br/>Content Claims</h1>
+  <h1>🦪<br/>Content Claims</h1>
 </div>
 
 [![Test](https://github.com/web3-storage/content-claims/actions/workflows/test.yml/badge.svg)](https://github.com/web3-storage/content-claims/actions/workflows/test.yml)
@@ -111,12 +111,78 @@ Input:
 
 ```js
 {
-  "parent": CID /* Block CID */,
+  "content": CID /* Block CID */,
   "child": [
     CID /* Linked block CID */,
     CID /* Linked block CID */,
     ...
   ]
+}
+```
+
+
+## Dynamo tables
+
+```ts
+// Common fields for the claim tables - THIS IS NOT A TABLE ITSELF
+interface ClaimTable {
+  /** CID of the UCAN invocation we received this claim in. */
+  invocation: string
+
+  /** We currently don't have a task CID but when implemented we'll store. */
+  // task: string
+
+  /** The subject of the claim. */
+  content: string // Note: partition key
+}
+```
+
+### `locationClaim`
+
+```ts
+interface LocationClaimTable extends ClaimTable {
+  location: string[]
+  range: Array<{ offset: number, length?: number }>
+}
+```
+
+### `inclusionClaim`
+
+```ts
+interface InclusionClaimTable extends ClaimTable {
+  includes: string
+  proof?: string
+}
+```
+
+### `partitionClaim`
+
+```ts
+interface PartitionClaimTable extends ClaimTable {
+  blocks?: string
+  parts: string[]
+}
+```
+
+### `relationClaim`
+
+```ts
+interface RelationClaimTable extends ClaimTable {
+  child: string[]
+}
+```
+
+### `blockly`
+
+TBC
+
+```ts
+interface Blockly {
+  multihash: string
+  part: string
+  offset: number
+  length: number
+  links: Array<{ multihash: string, part: string, offset: number, length: number }>
 }
 ```
 

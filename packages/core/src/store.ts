@@ -1,6 +1,7 @@
-import { UnknownLink } from '@ucanto/server'
+import { UnknownLink, Link } from 'multiformats/link'
 
 export interface LocationClaim {
+  invocation: Link
   content: UnknownLink
   location: URL[]
   range?: { offset: number, length?: number }
@@ -13,6 +14,7 @@ export interface LocationClaimStore {
 }
 
 export interface InclusionClaim {
+  invocation: Link
   content: UnknownLink
   includes: UnknownLink
   proof?: UnknownLink
@@ -24,6 +26,7 @@ export interface InclusionClaimStore {
 }
 
 export interface PartitionClaim {
+  invocation: Link
   content: UnknownLink
   blocks?: UnknownLink
   parts: UnknownLink[]
@@ -35,7 +38,8 @@ export interface PartitionClaimStore {
 }
 
 export interface RelationClaim {
-  parent: UnknownLink
+  invocation: Link
+  content: UnknownLink
   child: UnknownLink[]
 }
 

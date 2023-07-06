@@ -11,9 +11,9 @@ export const provide = context => Server.provide(Assert.location, input => handl
  * @param {AssertLocationServiceContext} context
  * @returns {Promise<import('@ucanto/server').Result<{}, import('@ucanto/server').Failure>>}
  */
-export const handler = async ({ capability }, { locationStore }) => {
+export const handler = async ({ capability, invocation }, { locationStore }) => {
   const { content, location, range } = capability.nb
-  const claim = { content, location: location.map(s => new URL(s)), range }
+  const claim = { invocation: invocation.cid, content, location: location.map(s => new URL(s)), range }
   await locationStore.put(claim)
   return { ok: {} }
 }

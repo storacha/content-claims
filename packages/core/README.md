@@ -26,7 +26,7 @@ const result = await Client
       with: 'did:web:claims.web3.storage',
       can: Assert.relation.can,
       nb: {
-        parent: root.cid,
+        content: root.cid,
         child: [child.cid]
       }
     }

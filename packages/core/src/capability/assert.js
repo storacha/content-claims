@@ -67,7 +67,7 @@ export const relation = capability({
   can: 'assert/relation',
   with: URI.match({ protocol: 'did:' }),
   nb: Schema.struct({
-    parent: Link,
+    content: Link,
     child: Schema.array(Link)
   })
 })

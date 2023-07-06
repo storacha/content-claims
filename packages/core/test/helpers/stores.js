@@ -11,8 +11,8 @@ class MemoryStorage {
 /** @extends {MemoryStorage<import('@web3-storage/content-claims/store').LocationClaim>} */
 export class LocationClaimStorage extends MemoryStorage {
   /** @param {import('@web3-storage/content-claims/store').LocationClaim} claim */
-  async put ({ content, location, range }) {
-    this.data.set(content, { content, location, range })
+  async put (claim) {
+    this.data.set(claim.content, claim)
   }
 
   /** @param {import('@ucanto/server').UnknownLink} content */
@@ -34,8 +34,8 @@ export class LocationClaimStorage extends MemoryStorage {
 /** @extends {MemoryStorage<import('@web3-storage/content-claims/store').InclusionClaim>} */
 export class InclusionClaimStorage extends MemoryStorage {
   /** @param {import('@web3-storage/content-claims/store').InclusionClaim} claim */
-  async put ({ content, includes, proof }) {
-    this.data.set(content, { content, includes, proof })
+  async put (claim) {
+    this.data.set(claim.content, claim)
   }
 
   /** @param {import('@ucanto/server').UnknownLink} content */
@@ -47,8 +47,8 @@ export class InclusionClaimStorage extends MemoryStorage {
 /** @extends {MemoryStorage<import('@web3-storage/content-claims/store').PartitionClaim>} */
 export class PartitionClaimStorage extends MemoryStorage {
   /** @param {import('@web3-storage/content-claims/store').PartitionClaim} claim */
-  async put ({ content, blocks, parts }) {
-    this.data.set(content, { content, blocks, parts })
+  async put (claim) {
+    this.data.set(claim.content, claim)
   }
 
   /** @param {import('@ucanto/server').UnknownLink} content */
@@ -60,8 +60,8 @@ export class PartitionClaimStorage extends MemoryStorage {
 /** @extends {MemoryStorage<import('@web3-storage/content-claims/store').RelationClaim>} */
 export class RelationClaimStorage extends MemoryStorage {
   /** @param {import('@web3-storage/content-claims/store').RelationClaim} claim */
-  async put ({ parent, child }) {
-    this.data.set(parent, { parent, child })
+  async put (claim) {
+    this.data.set(claim.content, claim)
   }
 
   /** @param {import('@ucanto/server').UnknownLink} parent */

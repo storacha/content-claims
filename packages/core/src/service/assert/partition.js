@@ -11,9 +11,9 @@ export const provide = context => Server.provide(Assert.partition, input => hand
  * @param {AssertPartitionServiceContext} context
  * @returns {Promise<import('@ucanto/server').Result<{}, import('@ucanto/server').Failure>>}
  */
-export const handler = async ({ capability }, { partitionStore }) => {
+export const handler = async ({ capability, invocation }, { partitionStore }) => {
   const { content, blocks, parts } = capability.nb
-  const claim = { content, blocks, parts }
+  const claim = { invocation: invocation.cid, content, blocks, parts }
   await partitionStore.put(claim)
   return { ok: {} }
 }

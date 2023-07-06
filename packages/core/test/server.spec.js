@@ -59,7 +59,7 @@ test('should claim relation', async t => {
         with: t.context.signer.did(),
         can: Assert.relation.can,
         nb: {
-          parent: root.cid,
+          content: root.cid,
           child: [child.cid]
         }
       }
@@ -72,7 +72,7 @@ test('should claim relation', async t => {
   t.is(relationPut.mock.callCount(), 1)
 
   const claim = await t.context.relationStore.get(root.cid)
-  t.is(claim?.parent.toString(), root.cid.toString())
+  t.is(claim?.content.toString(), root.cid.toString())
   t.is(claim?.child.length, 1)
   t.is(claim?.child[0].toString(), child.cid.toString())
 })

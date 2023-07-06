@@ -11,9 +11,9 @@ export const provide = context => Server.provide(Assert.inclusion, input => hand
  * @param {AssertInclusionServiceContext} context
  * @returns {Promise<import('@ucanto/server').Result<{}, import('@ucanto/server').Failure>>}
  */
-export const handler = async ({ capability }, { inclusionStore }) => {
+export const handler = async ({ capability, invocation }, { inclusionStore }) => {
   const { content, includes, proof } = capability.nb
-  const claim = { content, includes, proof }
+  const claim = { invocation: invocation.cid, content, includes, proof }
   await inclusionStore.put(claim)
   return { ok: {} }
 }

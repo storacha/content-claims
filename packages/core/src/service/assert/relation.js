@@ -11,9 +11,9 @@ export const provide = context => Server.provide(Assert.relation, input => handl
  * @param {AssertRelationServiceContext} context
  * @returns {Promise<import('@ucanto/server').Result<{}, import('@ucanto/server').Failure>>}
  */
-export const handler = async ({ capability }, { relationStore }) => {
-  const { parent, child } = capability.nb
-  const claim = { parent, child }
+export const handler = async ({ capability, invocation }, { relationStore }) => {
+  const { content, child } = capability.nb
+  const claim = { invocation: invocation.cid, content, child }
   await relationStore.put(claim)
   return { ok: {} }
 }
