@@ -75,7 +75,7 @@ Set production secrets in AWS SSM via [`sst secrets`](https://docs.sst.dev/confi
 $ npx sst secrets set --region us-west-2 --stage prod PRIVATE_KEY "MgCblCY...="
 ```
 
-To set a fallback value for `staging` or an ephmeral PR build use [`sst secrets --fallback`](https://docs.sst.dev/config#fallback-values)
+To set a fallback value for `staging` or an ephemeral PR build use [`sst secrets set --fallback`](https://docs.sst.dev/config#fallback-values)
 
 ```sh
 # set `PRIVATE_KEY` for any stage in us-east-2
