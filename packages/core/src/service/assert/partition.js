@@ -13,7 +13,7 @@ export const provide = context => Server.provide(Assert.partition, input => hand
  */
 export const handler = async ({ capability, invocation }, { partitionStore }) => {
   const { content, blocks, parts } = capability.nb
-  const claim = { invocation: invocation.cid, content, blocks, parts }
+  const claim = { claim: invocation.cid, content, blocks, parts }
   await partitionStore.put(claim)
   return { ok: {} }
 }

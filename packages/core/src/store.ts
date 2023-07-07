@@ -1,7 +1,7 @@
 import { UnknownLink, Link } from 'multiformats/link'
 
 export interface LocationClaim {
-  invocation: Link
+  claim: Link
   content: UnknownLink
   location: URL[]
   range?: { offset: number, length?: number }
@@ -13,7 +13,7 @@ export interface LocationClaimStore {
 }
 
 export interface InclusionClaim {
-  invocation: Link
+  claim: Link
   content: UnknownLink
   includes: UnknownLink
   proof?: UnknownLink
@@ -25,7 +25,7 @@ export interface InclusionClaimStore {
 }
 
 export interface PartitionClaim {
-  invocation: Link
+  claim: Link
   content: UnknownLink
   blocks?: UnknownLink
   parts: UnknownLink[]
@@ -37,7 +37,7 @@ export interface PartitionClaimStore {
 }
 
 export interface RelationClaim {
-  invocation: Link
+  claim: Link
   content: UnknownLink
   child: UnknownLink[]
 }

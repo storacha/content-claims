@@ -28,11 +28,11 @@ class DynamoDBStorage {
 
 export class LocationClaimStorage extends DynamoDBStorage {
   /** @param {import('@web3-storage/content-claims/store').LocationClaim} claim */
-  async put ({ invocation, content, location, range }) {
+  async put ({ claim, content, location, range }) {
     const cmd = new UpdateItemCommand({
       TableName: this.tableName,
       Key: marshall({
-        invocation: invocation.toString(),
+        claim: claim.toString(),
         content: content.toString()
       }),
       ExpressionAttributeValues: marshall({
@@ -59,9 +59,9 @@ export class LocationClaimStorage extends DynamoDBStorage {
     const result = await this.dynamoClient.send(cmd)
     if (!result.Items?.length) return
     return result.Items.map(item => {
-      const { invocation, content, location, range } = unmarshall(item)
+      const { claim, content, location, range } = unmarshall(item)
       return /** @type {import('@web3-storage/content-claims/store').LocationClaim} */ ({
-        invocation: Link.parse(invocation),
+        claim: Link.parse(claim),
         content: Link.parse(content),
         location: [...location].map((/** @type {string} */ url) => new URL(url)),
         range
@@ -72,11 +72,11 @@ export class LocationClaimStorage extends DynamoDBStorage {
 
 export class InclusionClaimStorage extends DynamoDBStorage {
   /** @param {import('@web3-storage/content-claims/store').InclusionClaim} claim */
-  async put ({ invocation, content, includes, proof }) {
+  async put ({ claim, content, includes, proof }) {
     const cmd = new UpdateItemCommand({
       TableName: this.tableName,
       Key: marshall({
-        invocation: invocation.toString(),
+        claim: claim.toString(),
         content: content.toString()
       }),
       ExpressionAttributeValues: marshall({
@@ -103,9 +103,9 @@ export class InclusionClaimStorage extends DynamoDBStorage {
     const result = await this.dynamoClient.send(cmd)
     if (!result.Items?.length) return
     return result.Items.map(item => {
-      const { invocation, content, includes, proof } = unmarshall(item)
+      const { claim, content, includes, proof } = unmarshall(item)
       return /** @type {import('@web3-storage/content-claims/store').InclusionClaim} */ ({
-        invocation: Link.parse(invocation),
+        claim: Link.parse(claim),
         content: Link.parse(content),
         includes: Link.parse(includes),
         proof: proof ? Link.parse(proof) : undefined
@@ -116,11 +116,11 @@ export class InclusionClaimStorage extends DynamoDBStorage {
 
 export class PartitionClaimStorage extends DynamoDBStorage {
   /** @param {import('@web3-storage/content-claims/store').PartitionClaim} claim */
-  async put ({ invocation, content, blocks, parts }) {
+  async put ({ claim, content, blocks, parts }) {
     const cmd = new UpdateItemCommand({
       TableName: this.tableName,
       Key: marshall({
-        invocation: invocation.toString(),
+        claim: claim.toString(),
         content: content.toString()
       }),
       ExpressionAttributeValues: marshall({
@@ -147,9 +147,9 @@ export class PartitionClaimStorage extends DynamoDBStorage {
     const result = await this.dynamoClient.send(cmd)
     if (!result.Items?.length) return
     return result.Items.map(item => {
-      const { invocation, content, parts, blocks } = unmarshall(item)
+      const { claim, content, parts, blocks } = unmarshall(item)
       return /** @type {import('@web3-storage/content-claims/store').PartitionClaim} */ ({
-        invocation: Link.parse(invocation),
+        claim: Link.parse(claim),
         content: Link.parse(content),
         parts: [...parts].map(p => Link.parse(p)),
         blocks: blocks ? Link.parse(blocks) : undefined
@@ -160,11 +160,11 @@ export class PartitionClaimStorage extends DynamoDBStorage {
 
 export class RelationClaimStorage extends DynamoDBStorage {
   /** @param {import('@web3-storage/content-claims/store').RelationClaim} claim */
-  async put ({ invocation, content, child }) {
+  async put ({ claim, content, child }) {
     const cmd = new UpdateItemCommand({
       TableName: this.tableName,
       Key: marshall({
-        invocation: invocation.toString(),
+        claim: claim.toString(),
         content: content.toString()
       }),
       ExpressionAttributeValues: marshall({ ':ch': child.map(c => c.toString()) }),
@@ -188,9 +188,9 @@ export class RelationClaimStorage extends DynamoDBStorage {
     const result = await this.dynamoClient.send(cmd)
     if (!result.Items?.length) return
     return result.Items.map(item => {
-      const { invocation, content, child } = unmarshall(item)
+      const { claim, content, child } = unmarshall(item)
       return /** @type {import('@web3-storage/content-claims/store').RelationClaim} */ ({
-        invocation: Link.parse(invocation),
+        claim: Link.parse(claim),
         content: Link.parse(content),
         child: [...child].map(c => Link.parse(c))
       })

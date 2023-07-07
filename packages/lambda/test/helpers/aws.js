@@ -50,11 +50,11 @@ export async function createDynamoTable (dynamo) {
       TableName: name,
       AttributeDefinitions: [
         { AttributeName: 'content', AttributeType: 'S' },
-        { AttributeName: 'invocation', AttributeType: 'S' }
+        { AttributeName: 'claim', AttributeType: 'S' }
       ],
       KeySchema: [
         { AttributeName: 'content', KeyType: 'HASH' },
-        { AttributeName: 'invocation', KeyType: 'RANGE' }
+        { AttributeName: 'claim', KeyType: 'RANGE' }
       ],
       ProvisionedThroughput: {
         ReadCapacityUnits: 1,

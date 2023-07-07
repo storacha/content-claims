@@ -13,7 +13,7 @@ export const provide = context => Server.provide(Assert.inclusion, input => hand
  */
 export const handler = async ({ capability, invocation }, { inclusionStore }) => {
   const { content, includes, proof } = capability.nb
-  const claim = { invocation: invocation.cid, content, includes, proof }
+  const claim = { claim: invocation.cid, content, includes, proof }
   await inclusionStore.put(claim)
   return { ok: {} }
 }

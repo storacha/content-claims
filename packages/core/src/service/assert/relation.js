@@ -13,7 +13,7 @@ export const provide = context => Server.provide(Assert.relation, input => handl
  */
 export const handler = async ({ capability, invocation }, { relationStore }) => {
   const { content, child } = capability.nb
-  const claim = { invocation: invocation.cid, content, child }
+  const claim = { claim: invocation.cid, content, child }
   await relationStore.put(claim)
   return { ok: {} }
 }

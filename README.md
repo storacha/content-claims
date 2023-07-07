@@ -174,11 +174,8 @@ Input:
 ```ts
 // Common fields for the claim tables - THIS IS NOT A TABLE ITSELF
 interface ClaimTable {
-  /** CID of the UCAN invocation we received this claim in. */
-  invocation: string
-
-  /** We currently don't have a task CID but when implemented we'll store. */
-  // task: string
+  /** CID of the UCAN invocation task we received this claim in. */
+  claim: string
 
   /** The subject of the claim. */
   content: string // Note: partition key
