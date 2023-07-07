@@ -1,7 +1,7 @@
 import * as Server from '@ucanto/server'
 import * as Assert from '../../capability/assert.js'
 
-/** @typedef {{ relationStore: import('../../store').RelationClaimStore }} AssertRelationServiceContext */
+/** @typedef {{ claimStore: import('../../store').ClaimStore }} AssertRelationServiceContext */
 
 /** @param {AssertRelationServiceContext} context */
 export const provide = context => Server.provide(Assert.relation, input => handler(input, context))
@@ -11,9 +11,17 @@ export const provide = context => Server.provide(Assert.relation, input => handl
  * @param {AssertRelationServiceContext} context
  * @returns {Promise<import('@ucanto/server').Result<{}, import('@ucanto/server').Failure>>}
  */
-export const handler = async ({ capability, invocation }, { relationStore }) => {
-  const { content, child } = capability.nb
-  const claim = { claim: invocation.cid, content, child }
-  await relationStore.put(claim)
+export const handler = async ({ capability, invocation }, { claimStore }) => {
+  const { content } = capability.nb
+  const archive = await invocation.archive()
+  if (archive.error) throw new Error('failed invocation archive', { cause: archive.error })
+  const claim = {
+    type: 'relation',
+    claim: invocation.cid,
+    bytes: archive.ok,
+    content,
+    expiration: invocation.expiration
+  }
+  await claimStore.put(claim)
   return { ok: {} }
 }

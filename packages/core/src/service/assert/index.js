@@ -4,7 +4,7 @@ import * as Partition from './partition.js'
 import * as Relation from './relation.js'
 
 /**
- * @typedef {import('./inclusion').AssertInclusionServiceContext & import('./location').AssertLocationServiceContext & import('./partition').AssertPartitionServiceContext & import('./relation').AssertRelationServiceContext} AssertServiceContext
+ * @typedef {{ claimStore: import('../../store').ClaimStore }} AssertServiceContext
  * @typedef {{
  *   location: import('@ucanto/server').ServiceMethod<import('../../capability/assert.js').AssertLocation, {}, import('@ucanto/server').Failure>
  *   inclusion: import('@ucanto/server').ServiceMethod<import('../../capability/assert.js').AssertInclusion, {}, import('@ucanto/server').Failure>

@@ -32,7 +32,7 @@ export function API ({ stack }) {
     timeout: '15 minutes'
   })
 
-  const { locationTable, partitionTable, inclusionTable, relationTable } = use(DB)
+  const { claimsTable } = use(DB)
 
   const fun = new Function(stack, 'fn', {
     handler: 'packages/lambda/src/content-claims.handler',
@@ -49,10 +49,7 @@ export function API ({ stack }) {
       STAGE: stack.stage,
       SENTRY_DSN: SENTRY_DSN ?? '',
       DYNAMO_REGION,
-      LOCATION_CLAIM_TABLE: locationTable.tableName,
-      PARTITION_CLAIM_TABLE: partitionTable.tableName,
-      INCLUSION_CLAIM_TABLE: inclusionTable.tableName,
-      RELATION_CLAIM_TABLE: relationTable.tableName
+      CLAIM_TABLE: claimsTable.tableName
     },
     bind: [privateKey]
   })

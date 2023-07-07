@@ -1,25 +1,20 @@
+import { ReadableStream, WritableStream } from 'node:stream/web'
 import * as Sentry from '@sentry/serverless'
 import { createServer } from '@web3-storage/content-claims/server'
 import * as CAR from '@ucanto/transport/car'
+import * as Delegation from '@ucanto/core/delegation'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { Config } from 'sst/node/config'
-import * as dagJSON from '@ipld/dag-json'
 import * as Link from 'multiformats/link'
+import { CARWriterStream } from 'carstream'
 import { getServiceSigner, notNully } from './lib/config.js'
-import { InclusionClaimStorage, LocationClaimStorage, PartitionClaimStorage, RelationClaimStorage } from './lib/stores.js'
-
-/**
- * @typedef {import('@web3-storage/content-claims/store.js').LocationClaim|import('@web3-storage/content-claims/store.js').PartitionClaim|import('@web3-storage/content-claims/store.js').InclusionClaim|import('@web3-storage/content-claims/store.js').RelationClaim} Claim
- */
+import { ClaimStorage } from './lib/store.js'
 
 Sentry.AWSLambda.init({
   environment: process.env.SST_STAGE,
   dsn: process.env.SENTRY_DSN,
   tracesSampleRate: 1.0
 })
-
-/** CAR CID code */
-const carCode = 0x0202
 
 const text = 'text/plain; charset=utf-8'
 const json = 'application/json'
@@ -93,10 +88,7 @@ export const postUcanInvocation = async event => {
   const signer = getServiceSigner({ serviceDID: process.env.SERVICE_DID, privateKey: pk })
   const dynamo = new DynamoDBClient({ region })
 
-  const inclusionStore = new InclusionClaimStorage(dynamo, notNully('INCLUSION_CLAIM_TABLE', process.env))
-  const relationStore = new RelationClaimStorage(dynamo, notNully('RELATION_CLAIM_TABLE', process.env))
-  const locationStore = new LocationClaimStorage(dynamo, notNully('LOCATION_CLAIM_TABLE', process.env))
-  const partitionStore = new PartitionClaimStorage(dynamo, notNully('PARTITION_CLAIM_TABLE', process.env))
+  const claimStore = new ClaimStorage(dynamo, notNully('CLAIM_TABLE', process.env))
   // const blocklyStore = new BlocklyStorage(
   //   dynamo,
   //   notNully('BLOCKLY_TABLE', process.env),
@@ -107,10 +99,7 @@ export const postUcanInvocation = async event => {
   const server = createServer({
     id: signer,
     codec: CAR.inbound,
-    inclusionStore,
-    partitionStore,
-    locationStore,
-    relationStore
+    claimStore
   })
 
   const response = await server.request({
@@ -134,71 +123,75 @@ export const postUcanInvocation = async event => {
 export const getClaims = async event => {
   const region = notNully('DYNAMO_REGION', process.env)
   const dynamo = new DynamoDBClient({ region })
-
-  const inclusionStore = new InclusionClaimStorage(dynamo, notNully('INCLUSION_CLAIM_TABLE', process.env))
-  const relationStore = new RelationClaimStorage(dynamo, notNully('RELATION_CLAIM_TABLE', process.env))
-  const locationStore = new LocationClaimStorage(dynamo, notNully('LOCATION_CLAIM_TABLE', process.env))
-  const partitionStore = new PartitionClaimStorage(dynamo, notNully('PARTITION_CLAIM_TABLE', process.env))
-
+  const claimStore = new ClaimStorage(dynamo, notNully('CLAIM_TABLE', process.env))
   const walkcsv = new URL(`http://localhost${event.rawPath}?${event.rawQueryString}`).searchParams.get('walk')
   const walk = new Set(walkcsv ? walkcsv.split(',') : [])
+  const content = Link.parse(event.rawPath.split('/')[2])
 
-  /** @type {Claim[]} */
-  const claims = []
+  const iterator = (async function * () {
+    const queue = [content]
+    while (true) {
+      const content = queue.shift()
+      if (!content) return
 
-  /** @param {Claim} claim */
-  const walkKeys = async claim => {
-    for (const key of Object.keys(claim).filter(k => k !== 'invocation' && k !== 'content')) {
-      // @ts-expect-error
-      const content = claim[key]
-      if (walk.has(key)) {
-        if (Array.isArray(content)) {
-          for (const c of content) {
-            if (Link.isLink(c)) {
-              await fetchClaims(c)
+      const result = await claimStore.get(content)
+      if (!result) continue
+
+      yield { cid: result.claim, bytes: result.bytes }
+
+      if (walk.size) {
+        const claim = await Delegation.extract(result.bytes)
+        if (claim.error) {
+          console.error(claim.error)
+          continue
+        }
+
+        const nb = claim.ok.capabilities[0].nb
+        if (!nb) continue
+
+        for (const key of Object.keys(nb).filter(k => k !== 'content')) {
+          // @ts-expect-error
+          const content = nb[key]
+          if (walk.has(key)) {
+            if (Array.isArray(content)) {
+              for (const c of content) {
+                if (Link.isLink(c)) {
+                  queue.push(c)
+                }
+              }
+            } else if (Link.isLink(content)) {
+              queue.push(content)
             }
           }
-        } else if (Link.isLink(content)) {
-          await fetchClaims(content)
         }
       }
     }
-  }
-
-  /**
-   * // TODO: getAll instead of get first
-   * @param {import('multiformats').UnknownLink} content
-   */
-  const fetchClaims = async content => {
-    if (content.code === carCode) {
-      const results = await Promise.all([
-        locationStore.get(content),
-        inclusionStore.get(content)
-      ])
-      for (const claim of results) {
-        if (!claim) continue
-        claims.push(claim)
-        await walkKeys(claim)
-      }
-    } else {
-      const results = await Promise.all([
-        partitionStore.get(content),
-        relationStore.get(content)
-      ])
-      for (const claim of results) {
-        if (!claim) continue
-        claims.push(claim)
-        await walkKeys(claim)
+  })()
+  /** @type {ReadableStream<import('carstream/api').Block>} */
+  const readable = new ReadableStream({
+    async pull (controller) {
+      const { value, done } = await iterator.next()
+      if (done) {
+        controller.close()
+      } else {
+        controller.enqueue(value)
       }
     }
-  }
+  })
 
-  const content = Link.parse(event.rawPath.split('/')[2])
-  await fetchClaims(content)
+  /** @type {Uint8Array[]} */
+  const chunks = []
+  readable
+    // @ts-expect-error
+    .pipeThrough(new CARWriterStream())
+    // TODO: stream response
+    // @ts-expect-error
+    .pipeTo(new WritableStream({ write: chunk => { chunks.push(chunk) } }))
 
   return {
     statusCode: 200,
-    body: Buffer.from(dagJSON.encode(claims)).toString('base64'),
+    headers: { 'Content-Type': 'application/vnd.ipld.car; version=1;' },
+    body: Buffer.concat(chunks).toString('base64'),
     isBase64Encoded: true
   }
 }

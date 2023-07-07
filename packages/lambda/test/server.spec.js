@@ -1,7 +1,9 @@
 /* eslint-env browser */
 import anyTest from 'ava'
+import assert from 'node:assert'
 import * as CAR from '@ucanto/transport/car'
 import * as ed25519 from '@ucanto/principal/ed25519'
+import * as Delegation from '@ucanto/core/delegation'
 import { mock } from 'node:test'
 import * as Block from 'multiformats/block'
 import { sha256 } from 'multiformats/hashes/sha2'
@@ -9,15 +11,12 @@ import * as dagCBOR from '@ipld/dag-cbor'
 import * as Client from '@web3-storage/content-claims/client'
 import * as Server from '@web3-storage/content-claims/server'
 import { Assert } from '@web3-storage/content-claims/capability'
-import { InclusionClaimStorage, LocationClaimStorage, PartitionClaimStorage, RelationClaimStorage } from '../src/lib/stores.js'
+import { ClaimStorage } from '../src/lib/store.js'
 import { createDynamo, createDynamoTable } from './helpers/aws.js'
 
 /**
  * @typedef {{
- *   inclusionStore: import('@web3-storage/content-claims/store').InclusionClaimStore
- *   locationStore: import('@web3-storage/content-claims/store').LocationClaimStore
- *   partitionStore: import('@web3-storage/content-claims/store').PartitionClaimStore
- *   relationStore: import('@web3-storage/content-claims/store').RelationClaimStore
+ *   claimStore: import('@web3-storage/content-claims/store').ClaimStore
  *   signer: import('@ucanto/interface').Signer
  *   server: import('@web3-storage/content-claims/server').Server
  *   dynamo: import('./helpers/aws').TestAwsService<import('@aws-sdk/client-dynamodb').DynamoDBClient>
@@ -31,18 +30,12 @@ test.before(async t => {
 })
 
 test.beforeEach(async t => {
-  t.context.inclusionStore = new InclusionClaimStorage(t.context.dynamo.client, await createDynamoTable(t.context.dynamo.client))
-  t.context.locationStore = new LocationClaimStorage(t.context.dynamo.client, await createDynamoTable(t.context.dynamo.client))
-  t.context.partitionStore = new PartitionClaimStorage(t.context.dynamo.client, await createDynamoTable(t.context.dynamo.client))
-  t.context.relationStore = new RelationClaimStorage(t.context.dynamo.client, await createDynamoTable(t.context.dynamo.client))
+  t.context.claimStore = new ClaimStorage(t.context.dynamo.client, await createDynamoTable(t.context.dynamo.client))
   t.context.signer = await ed25519.generate()
   t.context.server = Server.createServer({
     id: t.context.signer,
     codec: CAR.inbound,
-    inclusionStore: t.context.inclusionStore,
-    locationStore: t.context.locationStore,
-    partitionStore: t.context.partitionStore,
-    relationStore: t.context.relationStore
+    claimStore: t.context.claimStore
   })
 })
 
@@ -54,7 +47,7 @@ test('should claim relation', async t => {
   const child = await Block.encode({ value: 'children are great', hasher: sha256, codec: dagCBOR })
   const root = await Block.encode({ value: { child: child.cid }, hasher: sha256, codec: dagCBOR })
 
-  const relationPut = mock.method(t.context.relationStore, 'put')
+  const claimPut = mock.method(t.context.claimStore, 'put')
 
   const connection = Client.connect({
     id: t.context.signer,
@@ -80,10 +73,22 @@ test('should claim relation', async t => {
   t.falsy(result.out.error)
   t.truthy(result.out.ok)
 
-  t.is(relationPut.mock.callCount(), 1)
+  t.is(claimPut.mock.callCount(), 1)
 
-  const claim = await t.context.relationStore.get(root.cid)
-  t.is(claim?.content.toString(), root.cid.toString())
-  t.is(claim?.child.length, 1)
-  t.is(claim?.child[0].toString(), child.cid.toString())
+  const claim = await t.context.claimStore.get(root.cid)
+  assert(claim)
+
+  t.is(claim.content.toString(), root.cid.toString())
+  assert(claim.claim)
+
+  const delegation = await Delegation.extract(claim.bytes)
+
+  /** @type {Assert.AssertRelation|undefined} */
+  // @ts-expect-error
+  const cap = delegation?.ok?.capabilities[0]
+
+  t.truthy(cap)
+  assert(cap)
+  t.is(cap.nb.child.length, 1)
+  t.is(cap.nb.child[0].toString(), child.cid.toString())
 })
