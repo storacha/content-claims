@@ -134,33 +134,35 @@ export const getClaims = async event => {
       const content = queue.shift()
       if (!content) return
 
-      const result = await claimStore.get(content)
-      if (!result) continue
+      const results = await claimStore.list(content)
+      if (!results.length) continue
 
-      yield { cid: result.claim, bytes: result.bytes }
+      for (const result of results) {
+        yield { cid: result.claim, bytes: result.bytes }
 
-      if (walk.size) {
-        const claim = await Delegation.extract(result.bytes)
-        if (claim.error) {
-          console.error(claim.error)
-          continue
-        }
+        if (walk.size) {
+          const claim = await Delegation.extract(result.bytes)
+          if (claim.error) {
+            console.error(claim.error)
+            continue
+          }
 
-        const nb = claim.ok.capabilities[0].nb
-        if (!nb) continue
+          const nb = claim.ok.capabilities[0].nb
+          if (!nb) continue
 
-        for (const key of Object.keys(nb).filter(k => k !== 'content')) {
-          // @ts-expect-error
-          const content = nb[key]
-          if (walk.has(key)) {
-            if (Array.isArray(content)) {
-              for (const c of content) {
-                if (Link.isLink(c)) {
-                  queue.push(c)
+          for (const key of Object.keys(nb).filter(k => k !== 'content')) {
+            // @ts-expect-error
+            const content = nb[key]
+            if (walk.has(key)) {
+              if (Array.isArray(content)) {
+                for (const c of content) {
+                  if (Link.isLink(c)) {
+                    queue.push(c)
+                  }
                 }
+              } else if (Link.isLink(content)) {
+                queue.push(content)
               }
-            } else if (Link.isLink(content)) {
-              queue.push(content)
             }
           }
         }

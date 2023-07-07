@@ -70,6 +70,32 @@ export class ClaimStorage extends DynamoDBStorage {
       })
     })[0]
   }
+
+  /** @param {import('@ucanto/server').UnknownLink} content */
+  async list (content) {
+    const cmd = new QueryCommand({
+      TableName: this.tableName,
+      KeyConditions: {
+        content: {
+          ComparisonOperator: 'EQ',
+          AttributeValueList: [{ S: content.toString() }]
+        }
+      },
+      Limit: 100
+    })
+    const result = await this.dynamoClient.send(cmd)
+    if (!result.Items?.length) return []
+    return result.Items.map(item => {
+      const { typ, claim, bytes, content, expiration } = unmarshall(item)
+      return /** @type {import('@web3-storage/content-claims/store').Claim} */ ({
+        type: typ,
+        claim: Link.parse(claim),
+        content: Link.parse(content),
+        bytes,
+        expiration
+      })
+    })
+  }
 }
 
 // export class BlocklyStorage extends DynamoDBStorage {

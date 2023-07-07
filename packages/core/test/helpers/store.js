@@ -15,4 +15,10 @@ export class ClaimStorage {
   async get (content) {
     return this.data.get(content)
   }
+
+  /** @param {import('@ucanto/server').UnknownLink} content */
+  async list (content) {
+    const claim = this.data.get(content)
+    return claim ? [claim] : []
+  }
 }

@@ -11,4 +11,5 @@ export interface Claim {
 export interface ClaimStore {
   put (claim: Claim): Promise<void>
   get (content: UnknownLink): Promise<Claim|undefined>
+  list (content: UnknownLink): Promise<Claim[]>
 }
