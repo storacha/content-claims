@@ -106,7 +106,7 @@ export function API ({ stack }) {
     defaultBehavior: {
       compress: true,
       viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-      allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD,
+      allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
       cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
       originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
       // fun.url is a placeholder at synth time...
