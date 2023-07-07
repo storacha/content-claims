@@ -181,7 +181,7 @@ export const getClaims = async event => {
 
   /** @type {Uint8Array[]} */
   const chunks = []
-  readable
+  await readable
     // @ts-expect-error
     .pipeThrough(new CARWriterStream())
     // TODO: stream response
