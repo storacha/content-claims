@@ -18,14 +18,13 @@ npm install @web3-storage/content-claims
 import * as Client from '@web3-storage/content-claims/client'
 import { Assert } from '@web3-storage/content-claims/capability'
 
-const result = await Assert.relation
+const result = await Assert.partition
   .invoke({
     issuer,
     audience,
     with: 'did:web:claims.web3.storage',
     nb: {
       content: rootCID,
-      children: [childCID],
       parts: [partCID]
     }
   })
