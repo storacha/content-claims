@@ -47,7 +47,7 @@ test.after(async t => {
 test('should claim relation', async t => {
   const child = await Block.encode({ value: 'children are great', hasher: sha256, codec: dagCBOR })
   const root = await Block.encode({ value: { child: child.cid }, hasher: sha256, codec: dagCBOR })
-  const car = await linkCAR(encodeCAR({ roots: [root], blocks: new Map([[root.toString(), root], [child.toString(), child]]) }))
+  const part = await linkCAR(encodeCAR({ roots: [root], blocks: new Map([[root.toString(), root], [child.toString(), child]]) }))
 
   const claimPut = mock.method(t.context.claimStore, 'put')
 
@@ -57,18 +57,15 @@ test('should claim relation', async t => {
     channel: t.context.server
   })
 
-  const result = await Client
+  const result = await Assert.relation
     .invoke({
       issuer: t.context.signer,
       audience: t.context.signer,
-      capability: {
-        with: t.context.signer.did(),
-        can: Assert.relation.can,
-        nb: {
-          content: root.cid,
-          children: [child.cid],
-          parts: [car]
-        }
+      with: t.context.signer.did(),
+      nb: {
+        content: root.cid,
+        children: [child.cid],
+        parts: [part]
       }
     })
     .execute(connection)

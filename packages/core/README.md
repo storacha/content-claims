@@ -18,17 +18,15 @@ npm install @web3-storage/content-claims
 import * as Client from '@web3-storage/content-claims/client'
 import { Assert } from '@web3-storage/content-claims/capability'
 
-const result = await Client
+const result = await Assert.relation
   .invoke({
     issuer,
     audience,
-    capability: {
-      with: 'did:web:claims.web3.storage',
-      can: Assert.relation.can,
-      nb: {
-        content: root.cid,
-        child: [child.cid]
-      }
+    with: 'did:web:claims.web3.storage',
+    nb: {
+      content: rootCID,
+      children: [childCID],
+      parts: [partCID]
     }
   })
   .execute(Client.connection)
@@ -42,18 +40,16 @@ import { Signer } from '@ucanto/server'
 import * as CAR from '@ucanto/transport/car'
 import http from 'node:http'
 
-// Storage for claims submitted to the service.
-const stores = {
-  inclusionStore,
-  partitionStore,
-  locationStore,
-  relationStore
+const claimStore = {
+  async put (claim) { /* ... */ }
+  async get (content) { /* ... */ }
+  async list (content)  { /* ... */ }
 }
 
 const server = createServer({
   id: await Signer.generate(),
   codec: CAR.inbound,
-  ...stores
+  claimStore
 })
 
 http.createServer(async (request, response) => {
