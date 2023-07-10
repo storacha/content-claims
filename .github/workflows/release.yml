@@ -31,8 +31,8 @@ jobs:
           node-version: 18
           registry-url: 'https://registry.npmjs.org'
           cache: 'npm'
-      - run: npm install
-      - run: npm run build
+      - run: npm ci
+      - run: npm run build --workspace=packages/core
       - run: npm publish --access=public --workspace=packages/core
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
