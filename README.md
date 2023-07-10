@@ -160,7 +160,7 @@ Input:
 ```js
 {
   content: CID /* Block CID */,
-  child: [
+  children: [
     CID /* Linked block CID */,
     CID /* Linked block CID */,
     ...
