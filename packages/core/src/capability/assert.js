@@ -70,7 +70,7 @@ export const relation = capability({
   with: URI.match({ protocol: 'did:' }),
   nb: Schema.struct({
     content: Link,
-    child: Schema.array(Link),
+    children: Schema.array(Link),
     parts: Schema.array(Link)
   })
 })

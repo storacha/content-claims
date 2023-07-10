@@ -55,7 +55,7 @@ test('should claim relation', async t => {
         can: Assert.relation.can,
         nb: {
           content: root.cid,
-          child: [child.cid],
+          children: [child.cid],
           parts: [car]
         }
       }
@@ -81,6 +81,6 @@ test('should claim relation', async t => {
 
   t.truthy(cap)
   assert(cap)
-  t.is(cap.nb.child.length, 1)
-  t.is(cap.nb.child[0].toString(), child.cid.toString())
+  t.is(cap.nb.children.length, 1)
+  t.is(cap.nb.children[0].toString(), child.cid.toString())
 })
