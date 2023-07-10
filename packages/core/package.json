@@ -1,7 +1,7 @@
 {
   "name": "@web3-storage/content-claims",
   "version": "1.0.0",
-  "description": "Implementation of the Content Claims Protocol",
+  "description": "Implementation of the Content Claims Protocol.",
   "main": "src/index.js",
   "types": "./types/index.d.ts",
   "type": "module",
