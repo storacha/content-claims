@@ -10,6 +10,87 @@ Implementation of the Content Claims Protocol.
 Read the [spec](https://hackmd.io/@gozala/content-claims).
 
 
+## Background
+
+## Supported claims
+
+These are the types of claim that we're interested in from the spec:
+
+### Location claim
+
+Capability: `assert/location`
+
+Input:
+
+```js
+{
+  content: CID /* CAR CID */, 
+  location: ['https://r2.cf/bag...car', 's3://bucket/bag...car'],
+  range?: { offset: number, length?: number } /* Optional: Byte Range in URL */
+}
+```
+
+### Inclusion claim
+
+Claims that a CID includes the contents claimed in another CID.
+
+Capability: `assert/inclusion`
+
+Input:
+
+```js
+{
+  content: CID /* CAR CID */,
+  includes: CID /* CARv2 Index CID */,
+  proof?: CID /* Optional: zero-knowledge proof */
+}
+```
+
+### Partition claim
+
+Claims that a CID's graph can be read from the blocks found in parts.
+
+Capability: `assert/partition`
+
+Input:
+
+```js
+{
+  content: CID /* Content Root CID */,
+  blocks?: CID, /* CIDs CID */
+  parts: [
+    CID /* CAR CID */,
+    CID /* CAR CID */,
+    ...
+  ]
+}
+```
+
+### Relation claim 🆕
+
+Claims that a block of content links to other blocks. Similar to a [partition claim](#partition-claim), a relation claim asserts that a block of content links to other blocks and, that the block and it's links may be found in the specified parts.
+
+Capability: `assert/relation`
+
+Input:
+
+```js
+{
+  content: CID /* Block CID */,
+  children: [
+    CID /* Linked block CID */,
+    CID /* Linked block CID */,
+    ...
+  ],
+  parts: [
+    CID, /* CAR CID */
+    CID, /* CAR CID */
+    ...
+  ]
+}
+```
+
+
 ## Getting Started
 
 The repo contains the infra deployment code and the service implementation.
@@ -92,85 +173,6 @@ PRIVATE_KEY MgCZG7...= (fallback)
 
 $ npx sst secrets list --region us-west-2 --stage prod
 PRIVATE_KEY M...=
-```
-
-
-## Supported claims
-
-These are the types of claim that we're interested in from the spec:
-
-### Location claim
-
-Capability: `assert/location`
-
-Input:
-
-```js
-{
-  content: CID /* CAR CID */, 
-  location: ['https://r2.cf/bag...car', 's3://bucket/bag...car'],
-  range?: { offset: number, length?: number } /* Optional: Byte Range in URL */
-}
-```
-
-### Inclusion claim
-
-Claims that within a CAR, there are a bunch of CIDs (and their offsets).
-
-Capability: `assert/inclusion`
-
-Input:
-
-```js
-{
-  content: CID /* CAR CID */,
-  includes: CID /* CARv2 Index CID */,
-  proof?: CID /* Optional: zero-knowledge proof */
-}
-```
-
-### Partition claim
-
-Claims that a DAG can be found in a bunch of CAR files.
-
-Capability: `assert/partition`
-
-Input:
-
-```js
-{
-  content: CID /* Content Root CID */,
-  blocks?: CID, /* CIDs CID */
-  parts: [
-    CID /* CAR CID */,
-    CID /* CAR CID */,
-    ...
-  ]
-}
-```
-
-### Relation claim 🆕
-
-Claims that a block of content links to other blocks. Similar to a partition claim, a relation claim asserts that a block of content links to other blocks and, that the block and it's links may be found in the specified parts.
-
-Capability: `assert/relation`
-
-Input:
-
-```js
-{
-  content: CID /* Block CID */,
-  children: [
-    CID /* Linked block CID */,
-    CID /* Linked block CID */,
-    ...
-  ],
-  parts: [
-    CID, /* CAR CID */
-    CID, /* CAR CID */
-    ...
-  ]
-}
 ```
 
 
