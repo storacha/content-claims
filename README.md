@@ -7,16 +7,16 @@
 
 Implementation of the Content Claims Protocol.
 
-Read the [spec](https://hackmd.io/@gozala/content-claims).
-
 
 ## Background
 
-## Supported claims
+Read the [spec](https://hackmd.io/@gozala/content-claims).
+
+### Supported claims
 
 These are the types of claim that we're interested in from the spec:
 
-### Location claim
+#### Location claim
 
 Capability: `assert/location`
 
@@ -30,7 +30,7 @@ Input:
 }
 ```
 
-### Inclusion claim
+#### Inclusion claim
 
 Claims that a CID includes the contents claimed in another CID.
 
@@ -46,7 +46,7 @@ Input:
 }
 ```
 
-### Partition claim
+#### Partition claim
 
 Claims that a CID's graph can be read from the blocks found in parts.
 
@@ -66,7 +66,7 @@ Input:
 }
 ```
 
-### Relation claim 🆕
+#### Relation claim 🆕
 
 Claims that a block of content links to other blocks. Similar to a [partition claim](#partition-claim), a relation claim asserts that a block of content links to other blocks and, that the block and it's links may be found in the specified parts.
 
