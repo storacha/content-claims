@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/web3-storage/content-claims/compare/content-claims-v1.0.0...content-claims-v1.0.1) (2023-07-10)
+
+
+### Bug Fixes
+
+* trigger release ([1c76b16](https://github.com/web3-storage/content-claims/commit/1c76b16aeb4d48e43f7543eff2dabbe166442229))
+
 ## 1.0.0 (2023-07-10)
 
 
