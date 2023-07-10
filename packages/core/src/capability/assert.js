@@ -61,13 +61,16 @@ export const partition = capability({
 })
 
 /**
- * Claim that a block links to other block(s).
+ * Claim that a block links to other block(s). Similar to a partition claim
+ * a relation claim asserts that a block of content links to other blocks and
+ * that the block and it's links may be found in the specified parts.
  */
 export const relation = capability({
   can: 'assert/relation',
   with: URI.match({ protocol: 'did:' }),
   nb: Schema.struct({
     content: Link,
-    child: Schema.array(Link)
+    child: Schema.array(Link),
+    parts: Schema.array(Link)
   })
 })

@@ -4,6 +4,7 @@ import assert from 'node:assert'
 import * as CAR from '@ucanto/transport/car'
 import * as ed25519 from '@ucanto/principal/ed25519'
 import * as Delegation from '@ucanto/core/delegation'
+import { encode as encodeCAR, link as linkCAR } from '@ucanto/core/car'
 import { mock } from 'node:test'
 import * as Block from 'multiformats/block'
 import { sha256 } from 'multiformats/hashes/sha2'
@@ -46,6 +47,7 @@ test.after(async t => {
 test('should claim relation', async t => {
   const child = await Block.encode({ value: 'children are great', hasher: sha256, codec: dagCBOR })
   const root = await Block.encode({ value: { child: child.cid }, hasher: sha256, codec: dagCBOR })
+  const car = await linkCAR(encodeCAR({ roots: [root], blocks: new Map([[root.toString(), root], [child.toString(), child]]) }))
 
   const claimPut = mock.method(t.context.claimStore, 'put')
 
@@ -64,7 +66,8 @@ test('should claim relation', async t => {
         can: Assert.relation.can,
         nb: {
           content: root.cid,
-          child: [child.cid]
+          child: [child.cid],
+          parts: [car]
         }
       }
     })

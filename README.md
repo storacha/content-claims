@@ -107,9 +107,9 @@ Input:
 
 ```js
 {
-  "content": CID /* CAR CID */, 
-  "location": ["https://r2.cf/bag...car", "s3://bucket/bag...car"],
-  "range": { "offset": 0 } /* Optional: Byte Range in URL */
+  content: CID /* CAR CID */, 
+  location: ['https://r2.cf/bag...car', 's3://bucket/bag...car'],
+  range?: { offset: number, length?: number } /* Optional: Byte Range in URL */
 }
 ```
 
@@ -123,9 +123,9 @@ Input:
 
 ```js
 {
-  "content": CID /* CAR CID */,
-  "includes": CID /* CARv2 Index CID */,
-  "proof": CID /* Optional: zero-knowledge proof */
+  content: CID /* CAR CID */,
+  includes: CID /* CARv2 Index CID */,
+  proof?: CID /* Optional: zero-knowledge proof */
 }
 ```
 
@@ -139,9 +139,9 @@ Input:
 
 ```js
 {
-  "content": CID /* Content Root CID */,
-  "blocks": CID, /* CIDs CID */
-  "parts": [
+  content: CID /* Content Root CID */,
+  blocks?: CID, /* CIDs CID */
+  parts: [
     CID /* CAR CID */,
     CID /* CAR CID */,
     ...
@@ -151,7 +151,7 @@ Input:
 
 ### Relation claim 🆕
 
-Claims that a block of content links to other blocks.
+Claims that a block of content links to other blocks. Similar to a partition claim, a relation claim asserts that a block of content links to other blocks and, that the block and it's links may be found in the specified parts.
 
 Capability: `assert/relation`
 
@@ -159,75 +159,39 @@ Input:
 
 ```js
 {
-  "content": CID /* Block CID */,
-  "child": [
+  content: CID /* Block CID */,
+  child: [
     CID /* Linked block CID */,
     CID /* Linked block CID */,
+    ...
+  ],
+  parts: [
+    CID, /* CAR CID */
+    CID, /* CAR CID */
     ...
   ]
 }
 ```
 
 
-## Dynamo tables
+## DynamoDB tables
 
 ```ts
-// Common fields for the claim tables - THIS IS NOT A TABLE ITSELF
 interface ClaimTable {
+  /** Claim type: "location"|"inclusion"|"partition"|"relation" */
+  type: string
+
   /** CID of the UCAN invocation task we received this claim in. */
-  claim: string
+  claim: string // Note: sort key
+
+  /** Content of the claim */
+  bytes: Uint8Array
 
   /** The subject of the claim. */
   content: string // Note: partition key
-}
-```
 
-### `locationClaim`
-
-```ts
-interface LocationClaimTable extends ClaimTable {
-  location: string[]
-  range: Array<{ offset: number, length?: number }>
-}
-```
-
-### `inclusionClaim`
-
-```ts
-interface InclusionClaimTable extends ClaimTable {
-  includes: string
-  proof?: string
-}
-```
-
-### `partitionClaim`
-
-```ts
-interface PartitionClaimTable extends ClaimTable {
-  blocks?: string
-  parts: string[]
-}
-```
-
-### `relationClaim`
-
-```ts
-interface RelationClaimTable extends ClaimTable {
-  child: string[]
-}
-```
-
-### `blockly`
-
-TBC
-
-```ts
-interface Blockly {
-  multihash: string
-  part: string
-  offset: number
-  length: number
-  links: Array<{ multihash: string, part: string, offset: number, length: number }>
+  /** UCAN expiration */
+  expiration: number
 }
 ```
 
