@@ -1,0 +1,26 @@
+{
+  "name": "@web3-storage/content-claims-cli",
+  "version": "0.0.0",
+  "description": "CLI for generating and submitting content claims.",
+  "main": "bin.js",
+  "type": "module",
+  "bin": {
+    "claim": "bin.js"
+  },
+  "scripts": {
+    "test": "echo \"moar tests are here needed\""
+  },
+  "author": "Alan Shaw",
+  "license": "Apache-2.0 OR MIT",
+  "dependencies": {
+    "@ucanto/core": "^8.0.0",
+    "@ucanto/principal": "^8.0.0",
+    "@ucanto/transport": "^8.0.0",
+    "@web3-storage/content-claims": "^0.0.0",
+    "carstream": "^1.0.2",
+    "dotenv": "^16.3.1",
+    "multiformats": "^12.0.1",
+    "sade": "^1.8.1",
+    "typescript": "^5.1.6"
+  }
+}
