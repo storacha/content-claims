@@ -11,7 +11,7 @@ npm i -g @web3-storage/content-claims-cli
 ## Usage
 
 ```sh
-ccs --help
+claim --help
 ```
 
 ### Generate
@@ -28,26 +28,26 @@ ipfs-car hash my.car
 bagycar
 
 # generate location claim
-ccs location bagycar https://s3.url/bagycar.car -o location.claim
+claim location bagycar https://s3.url/bagycar.car -o location.claim
 bafkpartition
 
 # generate partition claim
-ccs partition bafyroot bagycar -o partition.claim
+claim partition bafyroot bagycar -o partition.claim
 bafkpartition
 
 cardex build my.car -o my.car.idx
 bafkindex
 
 # generate inclusion claim
-ccs inclusion bagycar bafkindex -o inclusion.claim
+claim inclusion bagycar bafkindex -o inclusion.claim
 bafkinclusion
 
 # generate relation claims
-ccs relation bafyroot bafyblock0 bafyblock1 -o relation.claim
+claim relation bafyroot --child bafyblock0 --child bafyblock1 --part bagycar -o relation.claim
 bafkrelation
 
 # Write claims to `claims.web3.storage`
-ccs write *.claim
+claim write *.claim
 ```
 
 ### Write
@@ -55,7 +55,7 @@ ccs write *.claim
 Write claims to `claims.web3.storage`:
 
 ```sh
-ccs write *.claim
+claim write *.claim
 ```
 
 ### Read
@@ -63,5 +63,13 @@ ccs write *.claim
 Read claims from `claims.web3.storage`:
 
 ```sh
-ccs read bagycar --walk=parts,includes
+claim read bagycar --walk=parts,includes
 ```
+
+## Contributing
+
+Feel free to join in. All welcome. Please [open an issue](https://github.com/web3-storage/content-claims/issues)!
+
+## License
+
+Dual-licensed under [MIT + Apache 2.0](https://github.com/web3-storage/content-claims/blob/main/LICENSE.md)
