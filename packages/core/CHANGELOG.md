@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/web3-storage/content-claims/compare/content-claims-v1.0.2...content-claims-v1.0.3) (2023-07-10)
+
+
+### Bug Fixes
+
+* switch up example capability ([53b43e2](https://github.com/web3-storage/content-claims/commit/53b43e25374c75669a12facfd3ec312262e4d600))
+
 ## [1.0.2](https://github.com/web3-storage/content-claims/compare/content-claims-v1.0.1...content-claims-v1.0.2) (2023-07-10)
 
 
