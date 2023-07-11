@@ -8,7 +8,7 @@
   "scripts": {
     "build": "tsc --build",
     "lint": "standard",
-    "test": "ava --verbose"
+    "test": "entail"
   },
   "author": "Alan Shaw",
   "license": "Apache-2.0 OR MIT",
@@ -20,6 +20,17 @@
     "url": "https://github.com/web3-storage/content-claims/issues"
   },
   "homepage": "https://github.com/web3-storage/content-claims/tree/main/packages/core",
+  "keywords": [
+    "claims",
+    "content",
+    "location",
+    "inclusion",
+    "partition",
+    "relation",
+    "UCAN",
+    "IPLD",
+    "IPFS"
+  ],
   "files": [
     "src",
     "types"
@@ -27,7 +38,7 @@
   "exports": {
     ".": "./src/index.js",
     "./server": "./src/server.js",
-    "./client": "./src/client.js",
+    "./client": "./src/client/index.js",
     "./capability": "./src/capability/index.js",
     "./capability/assert": "./src/capability/assert.js",
     "./store": "./src/store.js"
@@ -41,7 +52,7 @@
         "types/server.d.ts"
       ],
       "client": [
-        "types/client.d.ts"
+        "types/client/index.d.ts"
       ],
       "capability": [
         "types/capability/index.d.ts"
@@ -57,15 +68,17 @@
   "dependencies": {
     "@ucanto/client": "^8.0.0",
     "@ucanto/server": "^8.0.1",
-    "@ucanto/transport": "^8.0.0"
+    "@ucanto/transport": "^8.0.0",
+    "carstream": "^1.0.2",
+    "multiformats": "^12.0.1"
   },
   "devDependencies": {
     "@ipld/dag-cbor": "^9.0.3",
     "@ucanto/interface": "^8.0.0",
     "@ucanto/principal": "^8.0.0",
-    "ava": "^5.3.1",
+    "entail": "^2.1.1",
     "lnmap": "^1.0.1",
-    "multiformats": "^12.0.1",
+    "lnset": "^1.2.0",
     "standard": "^17.1.0"
   }
 }

@@ -31,7 +31,7 @@ const connection = Client.connect({
   })
 })
 
-const prog = sade('ccs').version('0.0.0')
+const prog = sade('claim').version('0.0.0')
 
 prog
   .command('location <content> <url>')
@@ -43,14 +43,11 @@ prog
     const urls = [urlArg, ...opts._]
     const signer = getSigner()
 
-    const invocation = Client.invoke({
+    const invocation = Assert.location.invoke({
       issuer: signer,
       audience: servicePrincipal,
-      capability: {
-        with: signer.did(),
-        can: Assert.location.can,
-        nb: { content, location: urls }
-      }
+      with: signer.did(),
+      nb: { content, location: urls }
     })
     await archiveClaim(invocation, opts.output)
   })
@@ -60,17 +57,14 @@ prog
   .example('bafybeiefif6pfs25c6g5r4lcvsk7l6f3vnnsuziitrlca3g6rhjkhmysna bagbaierae3n6cey3feykv3h5imue3eustl656dajifuddj3zedhpdofje3za -o partition.claim')
   .action(async (contentArg, partArg, opts) => {
     const content = Link.parse(contentArg)
-    const parts = [partArg, ...opts._].map(p => Link.parse(p))
+    const parts = [partArg, ...opts._].map(p => Link.parse(p).toV1())
     const signer = getSigner()
 
-    const invocation = Client.invoke({
+    const invocation = Assert.partition.invoke({
       issuer: signer,
       audience: servicePrincipal,
-      capability: {
-        with: signer.did(),
-        can: Assert.partition.can,
-        nb: { content, parts }
-      }
+      with: signer.did(),
+      nb: { content, parts }
     })
     await archiveClaim(invocation, opts.output)
   })
@@ -80,17 +74,14 @@ prog
   .example('bagbaierae3n6cey3feykv3h5imue3eustl656dajifuddj3zedhpdofje3za bafkreihyikwmd6vlp5g6snhqipvigffx3w52l322dtqlrf4phanxisa34m -o inclusion.claim')
   .action(async (contentArg, includesArg, opts) => {
     const content = Link.parse(contentArg)
-    const includes = Link.parse(includesArg)
+    const includes = Link.parse(includesArg).toV1()
     const signer = getSigner()
 
-    const invocation = Client.invoke({
+    const invocation = Assert.inclusion.invoke({
       issuer: signer,
       audience: servicePrincipal,
-      capability: {
-        with: signer.did(),
-        can: Assert.inclusion.can,
-        nb: { content, includes }
-      }
+      with: signer.did(),
+      nb: { content, includes }
     })
     await archiveClaim(invocation, opts.output)
   })
@@ -106,14 +97,11 @@ prog
     const parts = (Array.isArray(opts.part) ? opts.part : [opts.part]).map(p => Link.parse(p))
     const signer = getSigner()
 
-    const invocation = Client.invoke({
+    const invocation = Assert.relation.invoke({
       issuer: signer,
       audience: servicePrincipal,
-      capability: {
-        with: signer.did(),
-        can: Assert.relation.can,
-        nb: { content, children, parts }
-      }
+      with: signer.did(),
+      nb: { content, children, parts }
     })
     await archiveClaim(invocation, opts.output)
   })
@@ -151,8 +139,7 @@ prog
   .option('-o, --output', 'Write output to this file.')
   .action(async (contentArg, opts) => {
     const content = Link.parse(contentArg)
-    const url = new URL(`/claims/${content}${opts.walk ? `?walk=${opts.walk}` : ''}`, serviceURL)
-    const res = await fetch(url)
+    const res = await Client.fetch(content, { walk: opts.walk, serviceURL })
     if (!res.ok) throw new Error(`unexpected service status: ${res.status}`, { cause: await res.text() })
     if (!res.body) throw new Error('missing response body')
 
@@ -163,11 +150,12 @@ prog
         body0.pipeTo(writable),
         body1
           .pipeThrough(new CARReaderStream())
+          .pipeThrough(new Client.ClaimReaderStream())
           .pipeTo(new WritableStream({
-            async write (block) {
-              const claim = await Delegation.extract(block.bytes)
-              if (claim.error) throw new Error(`failed to decode: ${block.cid}`, { cause: claim.error })
-              console.warn(inspect(JSON.parse(JSON.stringify(claim.ok)), false, Infinity, process.stdout.isTTY))
+            async write (claim) {
+              const raw = await Delegation.extract(await claim.archive())
+              if (raw.error) throw new Error(`failed to decode claim for: ${claim.content}`, { cause: raw.error })
+              console.warn(inspect(JSON.parse(JSON.stringify(raw.ok)), false, Infinity, process.stdout.isTTY))
             }
           }))
       ])

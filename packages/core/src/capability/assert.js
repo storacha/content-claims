@@ -40,8 +40,8 @@ export const inclusion = capability({
     /** CAR CID */
     content: Link,
     /** CARv2 index CID */
-    includes: Link,
-    proof: Link.optional()
+    includes: Link.match({ version: 1 }),
+    proof: Link.match({ version: 1 }).optional()
   })
 })
 
@@ -55,8 +55,8 @@ export const partition = capability({
     /** Content root CID */
     content: Link,
     /** CIDs CID */
-    blocks: Link.optional(), // TODO: do we need/can we generate?
-    parts: Schema.array(Link)
+    blocks: Link.match({ version: 1 }).optional(), // TODO: do we need/can we generate?
+    parts: Schema.array(Link.match({ version: 1 }))
   })
 })
 
@@ -70,7 +70,7 @@ export const relation = capability({
   with: URI.match({ protocol: 'did:' }),
   nb: Schema.struct({
     content: Link,
-    children: Schema.array(Link),
-    parts: Schema.array(Link)
+    children: Schema.array(Link.match({ version: 1 })),
+    parts: Schema.array(Link.match({ version: 1 }))
   })
 })

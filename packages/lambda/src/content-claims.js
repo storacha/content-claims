@@ -6,6 +6,7 @@ import * as Delegation from '@ucanto/core/delegation'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { Config } from 'sst/node/config'
 import * as Link from 'multiformats/link'
+import { sha256 } from 'multiformats/hashes/sha2'
 import { CARWriterStream } from 'carstream'
 import { getServiceSigner, notNully } from './lib/config.js'
 import { ClaimStorage } from './lib/store.js'
@@ -138,7 +139,10 @@ export const getClaims = async event => {
       if (!results.length) continue
 
       for (const result of results) {
-        yield { cid: result.claim, bytes: result.bytes }
+        yield {
+          cid: Link.create(0x0202, await sha256.digest(result.bytes)),
+          bytes: result.bytes
+        }
 
         if (walk.size) {
           const claim = await Delegation.extract(result.bytes)
