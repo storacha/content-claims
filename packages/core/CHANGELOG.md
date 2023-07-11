@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/web3-storage/content-claims/compare/content-claims-v1.0.3...content-claims-v1.1.0) (2023-07-11)
+
+
+### Features
+
+* client claim reader ([5395620](https://github.com/web3-storage/content-claims/commit/5395620926a7c6da325a3b617d0fd9d8bba09bac))
+
 ## [1.0.3](https://github.com/web3-storage/content-claims/compare/content-claims-v1.0.2...content-claims-v1.0.3) (2023-07-10)
 
 
