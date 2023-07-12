@@ -1,4 +1,4 @@
-import { Link, URI, UnknownLink } from '@ucanto/client'
+import { Link, URI, UnknownLink, Block } from '@ucanto/client'
 import * as Assert from '../capability/assert'
 
 /** A verifiable claim about data. */
@@ -7,6 +7,10 @@ export interface ContentClaim<T extends string> {
   readonly content: UnknownLink
   /** Discriminator for different types of claims. */
   readonly type: T
+  /**
+   * Returns an iterable of all IPLD blocks that are included in this claim.
+   */
+  export (): IterableIterator<Block>
   /**
    * Writes the UCAN `Delegation` chain for this claim into a content addressed
    * archive (CAR) buffer and returns it.

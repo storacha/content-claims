@@ -11,6 +11,7 @@ import * as dagCBOR from '@ipld/dag-cbor'
 import { Server } from '../src/index.js'
 import * as Assert from '../src/capability/assert.js'
 import { ClaimStorage } from './helpers/store.js'
+import * as CARv2Index from './helpers/carv2-index.js'
 
 const beforeEach = async () => {
   const claimStore = new ClaimStorage()
@@ -25,6 +26,7 @@ export const test = {
     const child = await Block.encode({ value: 'children are great', hasher: sha256, codec: dagCBOR })
     const root = await Block.encode({ value: { child: child.cid }, hasher: sha256, codec: dagCBOR })
     const part = await linkCAR(encodeCAR({ roots: [root], blocks: new Map([[root.toString(), root], [child.toString(), child]]) }))
+    const index = await CARv2Index.encode([{ cid: root.cid, offset: 1 }, { cid: child.cid, offset: 2 }])
 
     const claimPut = mock.method(claimStore, 'put')
 
@@ -42,7 +44,10 @@ export const test = {
         nb: {
           content: root.cid,
           children: [child.cid],
-          parts: [part]
+          parts: [{
+            content: part,
+            includes: index.cid
+          }]
         }
       })
       .execute(connection)

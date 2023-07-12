@@ -85,6 +85,7 @@
     "@ipld/dag-cbor": "^9.0.3",
     "@ucanto/interface": "^8.0.0",
     "@ucanto/principal": "^8.0.0",
+    "cardex": "^2.3.0",
     "entail": "^2.1.1",
     "lnmap": "^1.0.1",
     "lnset": "^1.2.0",

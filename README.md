@@ -70,7 +70,7 @@ Input:
 
 #### Relation claim 🆕
 
-Claims that a CID links to other CIDs. Similar to a [partition claim](#partition-claim), a relation claim asserts that a block of content links to other blocks and, that the block and it's links may be found in the specified parts.
+Claims that a CID links to other CIDs. Like a [partition claim](#partition-claim) crossed with an [inclusion claim](#inclusion-claim), a relation claim asserts that a block of content links to other blocks and, that the block and it's links may be found in the specified parts.
 
 Capability: `assert/relation`
 
@@ -85,9 +85,10 @@ Input:
     ...
   ],
   parts: [
-    CID, /* CAR CID */
-    CID, /* CAR CID */
-    ...
+    {
+      content: CID /* CAR CID */
+      includes: CID /* CID of CARv2 index that lists the blocks this part includes */
+    }
   ]
 }
 ```

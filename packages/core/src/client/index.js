@@ -35,7 +35,12 @@ const fromArchive = async bytes => {
     throw new Error('invalid claim')
   }
   // @ts-expect-error
-  return { ...cap.nb, type: claimType(cap.can), archive: async () => bytes }
+  return {
+    ...cap.nb,
+    type: claimType(cap.can),
+    export: () => delegation.ok.export(),
+    archive: async () => bytes
+  }
 }
 
 /** @param {string} can */

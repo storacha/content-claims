@@ -11,6 +11,7 @@ import { CARWriterStream } from 'carstream'
 import { Set as LinkSet } from 'lnset'
 import { Client } from '../src/index.js'
 import * as Assert from '../src/capability/assert.js'
+import * as CARv2Index from './helpers/carv2-index.js'
 
 const beforeEach = async () => {
   const signer = await ed25519.generate()
@@ -23,6 +24,7 @@ export const test = {
     const child = await Block.encode({ value: 'children are great', hasher: sha256, codec: dagCBOR })
     const root = await Block.encode({ value: { child: child.cid }, hasher: sha256, codec: dagCBOR })
     const part = await linkCAR(encodeCAR({ roots: [root], blocks: new Map([[root.toString(), root], [child.toString(), child]]) }))
+    const index = await CARv2Index.encode([{ cid: root.cid, offset: 1 }, { cid: child.cid, offset: 2 }])
 
     const partitionClaim = Assert.partition.invoke({
       issuer: signer,
@@ -41,9 +43,14 @@ export const test = {
       nb: {
         content: root.cid,
         children: [child.cid],
-        parts: [part]
+        parts: [{
+          content: part,
+          includes: index.cid
+        }]
       }
     })
+    relationClaim.attach(index)
+
     const claims = [partitionClaim, relationClaim]
 
     const server = http.createServer((_, res) => {
@@ -80,12 +87,22 @@ export const test = {
       }
     }
     assert.equal(partitionClaims.length, 1)
-    assert.equal(relationClaims.length, 1)
     assert.equal(partitionClaims[0].content.toString(), partitionClaim.capabilities[0].nb.content.toString())
     assert.equal(partitionClaims[0].blocks?.toString(), partitionClaim.capabilities[0].nb.blocks?.toString())
     assert.equal(partitionClaims[0].parts.map(p => p.toString()).toString(), partitionClaim.capabilities[0].nb.parts.map(p => p.toString()).toString())
+
+    assert.equal(relationClaims.length, 1)
     assert.equal(relationClaims[0].content.toString(), relationClaim.capabilities[0].nb.content.toString())
     assert.equal(relationClaims[0].children.map(p => p.toString()).toString(), relationClaim.capabilities[0].nb.children.map(p => p.toString()).toString())
     assert.equal(relationClaims[0].parts.map(p => p.toString()).toString(), relationClaim.capabilities[0].nb.parts.map(p => p.toString()).toString())
+
+    const indexBlock = [...relationClaims[0].export()].find(b => b.cid.toString() === index.cid.toString())
+    assert.ok(indexBlock)
+
+    console.log(index.bytes)
+    console.log(indexBlock.bytes)
+
+    const items = await CARv2Index.decode(indexBlock.bytes)
+    assert.equal(items.length, 2)
   }
 }

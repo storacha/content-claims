@@ -31,7 +31,7 @@ export const location = capability({
 })
 
 /**
- * Claim that within a CAR, there are a bunch of CIDs (and their offsets).
+ * Claims that a CID includes the contents claimed in another CID.
  */
 export const inclusion = capability({
   can: 'assert/inclusion',
@@ -46,7 +46,7 @@ export const inclusion = capability({
 })
 
 /**
- * Claims that a DAG can be found in a bunch of CAR files.
+ * Claims that a CID's graph can be read from the blocks found in parts.
  */
 export const partition = capability({
   can: 'assert/partition',
@@ -55,22 +55,23 @@ export const partition = capability({
     /** Content root CID */
     content: Link,
     /** CIDs CID */
-    blocks: Link.match({ version: 1 }).optional(), // TODO: do we need/can we generate?
+    blocks: Link.match({ version: 1 }).optional(),
     parts: Schema.array(Link.match({ version: 1 }))
   })
 })
 
 /**
- * Claim that a block links to other block(s). Similar to a partition claim
- * a relation claim asserts that a block of content links to other blocks and
- * that the block and it's links may be found in the specified parts.
+ * Claims that a CID links to other CIDs.
  */
 export const relation = capability({
   can: 'assert/relation',
   with: URI.match({ protocol: 'did:' }),
   nb: Schema.struct({
     content: Link,
-    children: Schema.array(Link.match({ version: 1 })),
-    parts: Schema.array(Link.match({ version: 1 }))
+    children: Schema.array(Link),
+    parts: Schema.array(Schema.struct({
+      content: Link.match({ version: 1 }),
+      includes: Link.match({ version: 1 })
+    }))
   })
 })
