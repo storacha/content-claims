@@ -59,7 +59,7 @@ Input:
 ```js
 {
   content: CID /* Content Root CID */,
-  blocks?: CID, /* CIDs CID */
+  blocks?: CID /* CIDs CID */,
   parts: [
     CID /* CAR CID */,
     CID /* CAR CID */,
@@ -86,7 +86,7 @@ Input:
   ],
   parts: [
     {
-      content: CID /* CAR CID */
+      content: CID /* CAR CID */,
       includes: CID /* CID of CARv2 index that lists the blocks this part includes */
     }
   ]
