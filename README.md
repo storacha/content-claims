@@ -18,6 +18,8 @@ These are the types of claim that we're interested in from the spec:
 
 #### Location claim
 
+Claims that a CID is available at a URL.
+
 Capability: `assert/location`
 
 Input:
@@ -68,7 +70,7 @@ Input:
 
 #### Relation claim 🆕
 
-Claims that a block of content links to other blocks. Similar to a [partition claim](#partition-claim), a relation claim asserts that a block of content links to other blocks and, that the block and it's links may be found in the specified parts.
+Claims that a CID links to other CIDs. Similar to a [partition claim](#partition-claim), a relation claim asserts that a block of content links to other blocks and, that the block and it's links may be found in the specified parts.
 
 Capability: `assert/relation`
 
