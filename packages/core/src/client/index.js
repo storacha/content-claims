@@ -7,14 +7,12 @@ import { equals } from 'multiformats/bytes'
 import { CARReaderStream } from 'carstream/reader'
 import * as Assert from '../capability/assert.js'
 
-export * from './api.js'
-
 export const serviceURL = new URL('https://claims.web3.storage')
 
 /** @type {import('@ucanto/interface').Principal} */
 export const servicePrincipal = { did: () => 'did:web:claims.web3.storage' }
 
-/** @type {import('@ucanto/interface').ConnectionView<import('../service/index.js').Service>} */
+/** @type {import('@ucanto/interface').ConnectionView<import('../server/service/api').Service>} */
 export const connection = connect({
   id: servicePrincipal,
   codec: CAR.outbound,

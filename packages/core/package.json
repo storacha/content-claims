@@ -37,11 +37,14 @@
   ],
   "exports": {
     ".": "./src/index.js",
-    "./server": "./src/server.js",
+    "./server": "./src/server/index.js",
+    "./server/api": "./src/server/api.js",
+    "./server/service": "./src/server/service/index.js",
+    "./server/service/api": "./src/server/service/api.js",
     "./client": "./src/client/index.js",
+    "./client/api": "./src/client/api.js",
     "./capability": "./src/capability/index.js",
-    "./capability/assert": "./src/capability/assert.js",
-    "./store": "./src/store.js"
+    "./capability/assert": "./src/capability/assert.js"
   },
   "typesVersions": {
     "*": {
@@ -49,7 +52,16 @@
         "types/*"
       ],
       "server": [
-        "types/server.d.ts"
+        "types/server/index.d.ts"
+      ],
+      "server/api": [
+        "types/server/api.d.ts"
+      ],
+      "server/service": [
+        "types/server/service/index.d.ts"
+      ],
+      "server/service/api": [
+        "types/server/service/api.d.ts"
       ],
       "client": [
         "types/client/index.d.ts"
@@ -59,9 +71,6 @@
       ],
       "capability/assert": [
         "types/capability/assert.d.ts"
-      ],
-      "store": [
-        "types/store.d.ts"
       ]
     }
   },

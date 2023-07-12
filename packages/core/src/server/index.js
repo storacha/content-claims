@@ -1,10 +1,10 @@
 import * as Server from '@ucanto/server'
 import { createService } from './service/index.js'
 
-/** @typedef {import('@ucanto/interface').ServerView<import('./service').Service>} Server */
+/** @typedef {import('@ucanto/interface').ServerView<import('./service/api').Service>} Server */
 
 /**
- * @param {import('./service/index').ServiceContext & {
+ * @param {import('./service/api').ServiceContext & {
  *   id: import('@ucanto/server').Signer
  *   codec: import('@ucanto/server').InboundCodec
  *   errorReporter?: { catch: (err: import('@ucanto/server').HandlerExecutionError) => void }

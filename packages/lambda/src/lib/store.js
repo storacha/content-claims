@@ -27,7 +27,7 @@ class DynamoDBStorage {
 }
 
 export class ClaimStorage extends DynamoDBStorage {
-  /** @param {import('@web3-storage/content-claims/store').Claim} claim */
+  /** @param {import('@web3-storage/content-claims/server/api').Claim} claim */
   async put ({ claim, bytes, content, expiration }) {
     const cmd = new UpdateItemCommand({
       TableName: this.tableName,
@@ -60,7 +60,7 @@ export class ClaimStorage extends DynamoDBStorage {
     if (!result.Items?.length) return
     return result.Items.map(item => {
       const { claim, bytes, content, expiration } = unmarshall(item)
-      return /** @type {import('@web3-storage/content-claims/store').Claim} */ ({
+      return /** @type {import('@web3-storage/content-claims/server/api').Claim} */ ({
         claim: Link.parse(claim),
         content: Link.parse(content),
         bytes,
@@ -85,7 +85,7 @@ export class ClaimStorage extends DynamoDBStorage {
     if (!result.Items?.length) return []
     return result.Items.map(item => {
       const { claim, bytes, content, expiration } = unmarshall(item)
-      return /** @type {import('@web3-storage/content-claims/store').Claim} */ ({
+      return /** @type {import('@web3-storage/content-claims/server/api').Claim} */ ({
         claim: Link.parse(claim),
         content: Link.parse(content),
         bytes,
