@@ -182,13 +182,10 @@ PRIVATE_KEY M...=
 
 ```ts
 interface ClaimTable {
-  /** Claim type: "location"|"inclusion"|"partition"|"relation" */
-  type: string
-
   /** CID of the UCAN invocation task we received this claim in. */
   claim: string // Note: sort key
 
-  /** Content of the claim */
+  /** Archive of the claim invocation */
   bytes: Uint8Array
 
   /** The subject of the claim. */

@@ -1,4 +1,4 @@
-import { ReadableStream, WritableStream } from 'node:stream/web'
+/* global ReadableStream, WritableStream */
 import * as Sentry from '@sentry/serverless'
 import { createServer } from '@web3-storage/content-claims/server'
 import * as CAR from '@ucanto/transport/car'
@@ -90,12 +90,6 @@ export const postUcanInvocation = async event => {
   const dynamo = new DynamoDBClient({ region })
 
   const claimStore = new ClaimStorage(dynamo, notNully('CLAIM_TABLE', process.env))
-  // const blocklyStore = new BlocklyStorage(
-  //   dynamo,
-  //   notNully('BLOCKLY_TABLE', process.env),
-  //   partitionStore,
-  //   locationStore
-  // )
 
   const server = createServer({
     id: signer,
@@ -129,20 +123,21 @@ export const getClaims = async event => {
   const walk = new Set(walkcsv ? walkcsv.split(',') : [])
   const content = Link.parse(event.rawPath.split('/')[2])
 
-  const iterator = (async function * () {
-    const queue = [content]
-    while (true) {
+  const queue = [content]
+  /** @type {ReadableStream<import('carstream/api').Block>} */
+  const readable = new ReadableStream({
+    async pull (controller) {
       const content = queue.shift()
-      if (!content) return
+      if (!content) return controller.close()
 
       const results = await claimStore.list(content)
-      if (!results.length) continue
+      if (!results.length) return
 
       for (const result of results) {
-        yield {
+        controller.enqueue({
           cid: Link.create(0x0202, await sha256.digest(result.bytes)),
           bytes: result.bytes
-        }
+        })
 
         if (walk.size) {
           const claim = await Delegation.extract(result.bytes)
@@ -172,26 +167,13 @@ export const getClaims = async event => {
         }
       }
     }
-  })()
-  /** @type {ReadableStream<import('carstream/api').Block>} */
-  const readable = new ReadableStream({
-    async pull (controller) {
-      const { value, done } = await iterator.next()
-      if (done) {
-        controller.close()
-      } else {
-        controller.enqueue(value)
-      }
-    }
   })
 
   /** @type {Uint8Array[]} */
   const chunks = []
   await readable
-    // @ts-expect-error
     .pipeThrough(new CARWriterStream())
     // TODO: stream response
-    // @ts-expect-error
     .pipeTo(new WritableStream({ write: chunk => { chunks.push(chunk) } }))
 
   return {

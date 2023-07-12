@@ -16,7 +16,6 @@ export const handler = async ({ capability, invocation }, { claimStore }) => {
   const archive = await invocation.archive()
   if (archive.error) throw new Error('failed invocation archive', { cause: archive.error })
   const claim = {
-    type: 'partition',
     claim: invocation.cid,
     bytes: archive.ok,
     content,

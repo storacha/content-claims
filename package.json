@@ -26,7 +26,7 @@
     "constructs": "10.1.156",
     "sst": "^2.8.28",
     "standard": "^17.0.0",
-    "typescript": "^5.0.4"
+    "typescript": "^5.1.6"
   },
   "workspaces": [
     "packages/*"
