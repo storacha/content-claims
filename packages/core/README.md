@@ -14,6 +14,36 @@ npm install @web3-storage/content-claims
 
 ### Client
 
+#### Read claims
+
+```js
+import { read } from '@web3-storage/content-claims/client'
+
+// Fetch claims, read them all and group by claim type
+const claims = await read(rootCID)
+
+console.log(claims.partition)
+```
+
+```js
+import { fetch, ClaimReaderStream } from '@web3-storage/content-claims/client'
+import { CARReaderStream } from 'carstream'
+
+// Fetch a CAR of claims
+const response = await fetch(rootCID)
+
+await response.body
+  .pipeThrough(new CARReaderStream()) // bytes in and blocks out
+  .pipeThrough(new ClaimReaderStream()) // blocks in and claims out
+  .pipeTo(new WritableStream({
+    write (claim) {
+      console.log(claim)
+    }
+  }))
+```
+
+#### Write claims
+
 ```js
 import * as Client from '@web3-storage/content-claims/client'
 import { Assert } from '@web3-storage/content-claims/capability'
@@ -26,7 +56,8 @@ const result = await Assert.partition
     nb: {
       content: rootCID,
       parts: [partCID]
-    }
+    },
+    expiration: Math.floor((Date.now() / 1000) + 5) // expire in 5 seconds
   })
   .execute(Client.connection)
 ```
