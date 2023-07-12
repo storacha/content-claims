@@ -14,10 +14,11 @@ import * as Server from '@web3-storage/content-claims/server'
 import { Assert } from '@web3-storage/content-claims/capability'
 import { ClaimStorage } from '../src/lib/store.js'
 import { createDynamo, createDynamoTable } from './helpers/aws.js'
+import * as CARv2Index from './helpers/carv2-index.js'
 
 /**
  * @typedef {{
- *   claimStore: import('@web3-storage/content-claims/store').ClaimStore
+ *   claimStore: import('@web3-storage/content-claims/server/api').ClaimStore
  *   signer: import('@ucanto/interface').Signer
  *   server: import('@web3-storage/content-claims/server').Server
  *   dynamo: import('./helpers/aws').TestAwsService<import('@aws-sdk/client-dynamodb').DynamoDBClient>
@@ -48,6 +49,7 @@ test('should claim relation', async t => {
   const child = await Block.encode({ value: 'children are great', hasher: sha256, codec: dagCBOR })
   const root = await Block.encode({ value: { child: child.cid }, hasher: sha256, codec: dagCBOR })
   const part = await linkCAR(encodeCAR({ roots: [root], blocks: new Map([[root.toString(), root], [child.toString(), child]]) }))
+  const index = await CARv2Index.encode([{ cid: root.cid, offset: 1 }, { cid: child.cid, offset: 2 }])
 
   const claimPut = mock.method(t.context.claimStore, 'put')
 
@@ -65,7 +67,10 @@ test('should claim relation', async t => {
       nb: {
         content: root.cid,
         children: [child.cid],
-        parts: [part]
+        parts: [{
+          content: part,
+          includes: index.cid
+        }]
       }
     })
     .execute(connection)
