@@ -19,10 +19,10 @@ npm install @web3-storage/content-claims
 ```js
 import { read } from '@web3-storage/content-claims/client'
 
-// Fetch claims, read them all and group by claim type
+// Fetch claims and read them all, returning an array.
 const claims = await read(rootCID)
 
-console.log(claims.partition)
+console.log(claims)
 ```
 
 ```js

@@ -68,14 +68,24 @@ export const test = {
     const serviceURL = new URL(`http://127.0.0.1:${server.address().port}`)
 
     const out = await Client.read(root.cid, { serviceURL })
-    assert.equal(out.partition.length, 1)
-    assert.equal(out.relation.length, 1)
-
-    assert.equal(out.partition[0].content.toString(), partitionClaim.capabilities[0].nb.content.toString())
-    assert.equal(out.partition[0].blocks?.toString(), partitionClaim.capabilities[0].nb.blocks?.toString())
-    assert.equal(out.partition[0].parts.map(p => p.toString()).toString(), partitionClaim.capabilities[0].nb.parts.map(p => p.toString()).toString())
-    assert.equal(out.relation[0].content.toString(), relationClaim.capabilities[0].nb.content.toString())
-    assert.equal(out.relation[0].children.map(p => p.toString()).toString(), relationClaim.capabilities[0].nb.children.map(p => p.toString()).toString())
-    assert.equal(out.relation[0].parts.map(p => p.toString()).toString(), relationClaim.capabilities[0].nb.parts.map(p => p.toString()).toString())
+    const partitionClaims = []
+    const relationClaims = []
+    for (const claim of out) {
+      if (claim.type === Assert.partition.can) {
+        partitionClaims.push(claim)
+      } else if (claim.type === Assert.relation.can) {
+        relationClaims.push(claim)
+      } else {
+        assert.fail(`unexpected claim type: ${claim.type}`)
+      }
+    }
+    assert.equal(partitionClaims.length, 1)
+    assert.equal(relationClaims.length, 1)
+    assert.equal(partitionClaims[0].content.toString(), partitionClaim.capabilities[0].nb.content.toString())
+    assert.equal(partitionClaims[0].blocks?.toString(), partitionClaim.capabilities[0].nb.blocks?.toString())
+    assert.equal(partitionClaims[0].parts.map(p => p.toString()).toString(), partitionClaim.capabilities[0].nb.parts.map(p => p.toString()).toString())
+    assert.equal(relationClaims[0].content.toString(), relationClaim.capabilities[0].nb.content.toString())
+    assert.equal(relationClaims[0].children.map(p => p.toString()).toString(), relationClaim.capabilities[0].nb.children.map(p => p.toString()).toString())
+    assert.equal(relationClaims[0].parts.map(p => p.toString()).toString(), relationClaim.capabilities[0].nb.parts.map(p => p.toString()).toString())
   }
 }

@@ -43,16 +43,21 @@ const fromArchive = async bytes => {
 /** @param {string} can */
 const claimType = can =>
   can === Assert.location.can
-    ? 'location'
+    ? Assert.location.can
     : can === Assert.partition.can
-      ? 'partition'
+      ? Assert.partition.can
       : can === Assert.inclusion.can
-        ? 'inclusion'
+        ? Assert.inclusion.can
         : can === Assert.relation.can
-          ? 'relation'
+          ? Assert.relation.can
           : 'unknown'
 
-/** @extends {TransformStream<import('carstream/api').Block, import('./api').Claim>} */
+/**
+ * Extracts content claims from blocks, verifying hashes.
+ * TODO: verify claim signatures.
+ *
+ * @extends {TransformStream<import('carstream/api').Block, import('./api').Claim>}
+ */
 export class ClaimReaderStream extends TransformStream {
   /**
    * @param {QueuingStrategy<import('carstream/api').Block>} [writableStrategy]
@@ -72,6 +77,9 @@ export class ClaimReaderStream extends TransformStream {
 }
 
 /**
+ * Fetch a CAR archive of claims from the service. Note: no verification is
+ * performed on the response data.
+ *
  * @typedef {{
 *   walk?: Array<'parts'|'includes'|'children'>
 *   serviceURL?: URL
@@ -86,31 +94,30 @@ export const fetch = async (content, options) => {
 }
 
 /**
+ * Read content claims from the service for the given content CID.
+ *
  * @param {import('@ucanto/client').UnknownLink} content
  * @param {FetchOptions} [options]
- * @returns {Promise<import('./api').ClaimGroups>}
+ * @returns {Promise<import('./api').Claim[]>}
  */
 export const read = async (content, options) => {
   const res = await fetch(content, options)
   if (!res.ok) throw new Error(`unexpected service status: ${res.status}`, { cause: await res.text() })
   if (!res.body) throw new Error('missing response body')
 
-  /** @type {import('./api').ClaimGroups} */
-  const groups = {
-    location: [],
-    partition: [],
-    inclusion: [],
-    relation: [],
-    unknown: []
+  /** @type {import('./api').Claim[]} */
+  const claims = []
+  try {
+    await res.body
+      .pipeThrough(new CARReaderStream())
+      .pipeThrough(new ClaimReaderStream())
+      .pipeTo(new WritableStream({ write: claim => { claims.push(claim) } }))
+  } catch (/** @type {any} */ err) {
+    if (!claims.length && err.message === 'unexpected end of data') {
+      return claims
+    }
+    throw err
   }
-  await res.body
-    .pipeThrough(new CARReaderStream())
-    .pipeThrough(new ClaimReaderStream())
-    .pipeTo(new WritableStream({
-      write (claim) {
-        // @ts-expect-error
-        groups[claim.type].push(claim)
-      }
-    }))
-  return groups
+
+  return claims
 }
