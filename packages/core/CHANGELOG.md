@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.0.0](https://github.com/web3-storage/content-claims/compare/content-claims-v1.1.0...content-claims-v2.0.0) (2023-07-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* allow index CID to be sent with location claim
+* simplify read method return type
+
+### Features
+
+* allow index CID to be sent with location claim ([8e7efa9](https://github.com/web3-storage/content-claims/commit/8e7efa9fbd5e0842680f08b55faf9d3c7d7cab6f))
+* clean up ([d1015d9](https://github.com/web3-storage/content-claims/commit/d1015d9b2960f750f0eb2b3a8a2d94b6870d4f3f))
+
+
+### Code Refactoring
+
+* simplify read method return type ([2af24e8](https://github.com/web3-storage/content-claims/commit/2af24e8efa72647c49702da020b6f7e3cd896b6d))
+
 ## [1.1.0](https://github.com/web3-storage/content-claims/compare/content-claims-v1.0.3...content-claims-v1.1.0) (2023-07-11)
 
 
