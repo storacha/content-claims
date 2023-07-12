@@ -94,7 +94,28 @@ Input:
 ```
 
 
-## Getting Started
+## Usage
+
+### Client libraries
+
+Client libraries make reading and writing claims easier.
+
+* [JavaScript client](https://www.npmjs.com/package/@web3-storage/content-claims)
+
+### HTTP API
+
+The production deployment is at https://claims.web3.storage.
+
+#### `GET /claims/:cid`
+
+Fetch a CAR full of content claims for the content CID in the URL path.
+
+Query parameters:
+
+* `?walk=` - a CSV list of properties in claims to walk in order to return additional claims about the related CIDs. Any property that is a CID can be walked. e.g. `?walk=parts,includes`.
+
+
+## Getting started
 
 The repo contains the infra deployment code and the service implementation.
 
@@ -119,7 +140,7 @@ npm start
 See: https://docs.sst.dev for more info on how things get deployed.
 
 
-## Environment variables
+### Environment variables
 
 The following should be set in the env when deploying. Copy `.env.tpl` to `.env` to set in dev.
 
@@ -179,7 +200,7 @@ PRIVATE_KEY M...=
 ```
 
 
-## DynamoDB tables
+### DynamoDB tables
 
 ```ts
 interface ClaimTable {
