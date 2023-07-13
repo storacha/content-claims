@@ -12,7 +12,7 @@ import * as dagCBOR from '@ipld/dag-cbor'
 import * as Client from '@web3-storage/content-claims/client'
 import * as Server from '@web3-storage/content-claims/server'
 import { Assert } from '@web3-storage/content-claims/capability'
-import { ClaimStorage } from '../src/lib/store.js'
+import { ClaimStorage } from '../src/lib/store/index.js'
 import { createDynamo, createDynamoTable } from './helpers/aws.js'
 import * as CARv2Index from './helpers/carv2-index.js'
 
@@ -80,7 +80,7 @@ test('should claim relation', async t => {
 
   t.is(claimPut.mock.callCount(), 1)
 
-  const claim = await t.context.claimStore.get(root.cid)
+  const [claim] = await t.context.claimStore.get(root.cid)
   assert(claim)
 
   t.is(claim.content.toString(), root.cid.toString())

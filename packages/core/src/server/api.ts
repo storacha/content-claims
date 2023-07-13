@@ -7,8 +7,10 @@ export interface Claim {
   expiration?: number
 }
 
-export interface ClaimStore {
+export interface ClaimFetcher {
+  get (content: UnknownLink): Promise<Claim[]>
+}
+
+export interface ClaimStore extends ClaimFetcher {
   put (claim: Claim): Promise<void>
-  get (content: UnknownLink): Promise<Claim|undefined>
-  list (content: UnknownLink): Promise<Claim[]>
 }

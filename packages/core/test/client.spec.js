@@ -99,9 +99,6 @@ export const test = {
     const indexBlock = [...relationClaims[0].export()].find(b => b.cid.toString() === index.cid.toString())
     assert.ok(indexBlock)
 
-    console.log(index.bytes)
-    console.log(indexBlock.bytes)
-
     const items = await CARv2Index.decode(indexBlock.bytes)
     assert.equal(items.length, 2)
   }

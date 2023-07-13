@@ -9,13 +9,17 @@ import * as Link from 'multiformats/link'
 import { sha256 } from 'multiformats/hashes/sha2'
 import { CARWriterStream } from 'carstream'
 import { getServiceSigner, notNully } from './lib/config.js'
-import { ClaimStorage } from './lib/store.js'
+import { ClaimStorage, TieredClaimFetcher, BlockIndexClaimFetcher } from './lib/store/index.js'
 
 Sentry.AWSLambda.init({
   environment: process.env.SST_STAGE,
   dsn: process.env.SENTRY_DSN,
   tracesSampleRate: 1.0
 })
+
+// @ts-expect-error
+const pk = Config.PRIVATE_KEY
+const signer = getServiceSigner({ serviceDID: process.env.SERVICE_DID, privateKey: pk })
 
 const text = 'text/plain; charset=utf-8'
 const json = 'application/json'
@@ -84,11 +88,7 @@ export const postUcanInvocation = async event => {
   }
 
   const region = notNully('DYNAMO_REGION', process.env)
-  // @ts-expect-error
-  const pk = Config.PRIVATE_KEY
-  const signer = getServiceSigner({ serviceDID: process.env.SERVICE_DID, privateKey: pk })
   const dynamo = new DynamoDBClient({ region })
-
   const claimStore = new ClaimStorage(dynamo, notNully('CLAIM_TABLE', process.env))
 
   const server = createServer({
@@ -118,7 +118,18 @@ export const postUcanInvocation = async event => {
 export const getClaims = async event => {
   const region = notNully('DYNAMO_REGION', process.env)
   const dynamo = new DynamoDBClient({ region })
-  const claimStore = new ClaimStorage(dynamo, notNully('CLAIM_TABLE', process.env))
+
+  /** @type {import('@web3-storage/content-claims/server/api').ClaimFetcher} */
+  let claimFetcher
+  if (process.env.BLOCK_INDEX_TABLE) {
+    claimFetcher = new TieredClaimFetcher([
+      new ClaimStorage(dynamo, notNully('CLAIM_TABLE', process.env)),
+      new BlockIndexClaimFetcher(dynamo, process.env.BLOCK_INDEX_TABLE, signer)
+    ])
+  } else {
+    claimFetcher = new ClaimStorage(dynamo, notNully('CLAIM_TABLE', process.env))
+  }
+
   const walkcsv = new URL(`http://localhost${event.rawPath}?${event.rawQueryString}`).searchParams.get('walk')
   const walk = new Set(walkcsv ? walkcsv.split(',') : [])
   const content = Link.parse(event.rawPath.split('/')[2])
@@ -130,7 +141,7 @@ export const getClaims = async event => {
       const content = queue.shift()
       if (!content) return controller.close()
 
-      const results = await claimStore.list(content)
+      const results = await claimFetcher.get(content)
       if (!results.length) return
 
       for (const result of results) {

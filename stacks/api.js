@@ -15,7 +15,7 @@ dotenv.config()
  * @param {import('sst/constructs').StackContext} config
  */
 export function API ({ stack }) {
-  const { SENTRY_DSN, DYNAMO_REGION, HOSTED_ZONE, HOSTED_ZONE_ID, SERVICE_DID } = process.env
+  const { SENTRY_DSN, DYNAMO_REGION, HOSTED_ZONE, HOSTED_ZONE_ID, SERVICE_DID, BLOCK_INDEX_TABLE } = process.env
   if (!DYNAMO_REGION) throw new Error('DYNAMO_REGION required in env')
   if ((HOSTED_ZONE && !HOSTED_ZONE_ID) || (!HOSTED_ZONE && HOSTED_ZONE_ID)) {
     throw new Error('Both HOSTED_ZONE and HOSTED_ZONE_ID must be set to enable a custom domain')
@@ -50,6 +50,7 @@ export function API ({ stack }) {
       SENTRY_DSN: SENTRY_DSN ?? '',
       DYNAMO_REGION,
       CLAIM_TABLE: claimsTable.tableName,
+      BLOCK_INDEX_TABLE: BLOCK_INDEX_TABLE ?? '',
       SERVICE_DID: SERVICE_DID ?? ''
     },
     bind: [privateKey]

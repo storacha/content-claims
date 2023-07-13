@@ -57,7 +57,7 @@ export const test = {
 
     assert.equal(claimPut.mock.callCount(), 1)
 
-    const claim = await claimStore.get(root.cid)
+    const [claim] = await claimStore.get(root.cid)
     assert.ok(claim)
 
     assert.equal(claim.content.toString(), root.cid.toString())

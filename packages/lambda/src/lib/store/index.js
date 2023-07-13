@@ -1,32 +1,19 @@
 import { UpdateItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb'
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb'
 import * as Link from 'multiformats/link'
+import retry from 'p-retry'
+import { DynamoTable } from './dynamo-table.js'
 
-class DynamoDBStorage {
-  /** @type {import('@aws-sdk/client-dynamodb').DynamoDBClient} */
-  #dynamoClient
-  /** @type {string} */
-  #tableName
+/**
+ * @typedef {import('@web3-storage/content-claims/server/api').ClaimFetcher} ClaimFetcher
+ * @typedef {import('@web3-storage/content-claims/server/api').ClaimStore} ClaimStore
+ */
 
-  /**
-   * @param {import('@aws-sdk/client-dynamodb').DynamoDBClient} client
-   * @param {string} tableName
-   */
-  constructor (client, tableName) {
-    this.#dynamoClient = client
-    this.#tableName = tableName
-  }
+export { TieredClaimFetcher } from './tiered.js'
+export { BlockIndexClaimFetcher } from './block-index.js'
 
-  get dynamoClient () {
-    return this.#dynamoClient
-  }
-
-  get tableName () {
-    return this.#tableName
-  }
-}
-
-export class ClaimStorage extends DynamoDBStorage {
+/** @implements {ClaimStore} */
+export class ClaimStorage extends DynamoTable {
   /** @param {import('@web3-storage/content-claims/server/api').Claim} claim */
   async put ({ claim, bytes, content, expiration }) {
     const cmd = new UpdateItemCommand({
@@ -54,34 +41,12 @@ export class ClaimStorage extends DynamoDBStorage {
           AttributeValueList: [{ S: content.toString() }]
         }
       },
-      Limit: 1
-    })
-    const result = await this.dynamoClient.send(cmd)
-    if (!result.Items?.length) return
-    return result.Items.map(item => {
-      const { claim, bytes, content, expiration } = unmarshall(item)
-      return /** @type {import('@web3-storage/content-claims/server/api').Claim} */ ({
-        claim: Link.parse(claim),
-        content: Link.parse(content),
-        bytes,
-        expiration
-      })
-    })[0]
-  }
-
-  /** @param {import('@ucanto/server').UnknownLink} content */
-  async list (content) {
-    const cmd = new QueryCommand({
-      TableName: this.tableName,
-      KeyConditions: {
-        content: {
-          ComparisonOperator: 'EQ',
-          AttributeValueList: [{ S: content.toString() }]
-        }
-      },
       Limit: 100
     })
-    const result = await this.dynamoClient.send(cmd)
+    const result = await retry(() => this.dynamoClient.send(cmd), {
+      minTimeout: 100,
+      onFailedAttempt: err => console.warn(`failed DynamoDB query for: ${content}`, err)
+    })
     if (!result.Items?.length) return []
     return result.Items.map(item => {
       const { claim, bytes, content, expiration } = unmarshall(item)
