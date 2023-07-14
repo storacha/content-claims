@@ -66,7 +66,7 @@ export class BlockIndexClaimFetcher extends DynamoTable {
 
     const location = [new URL(`https://${item.bucket}.s3.amazonaws.com/${item.key}`)]
     const offset = item.offset
-    const expiration = (Date.now() / 1000) + (60 * 60) // expire in an hour
+    const expiration = Math.ceil((Date.now() / 1000) + (60 * 60)) // expire in an hour
 
     return Promise.all([
       buildLocationClaim(this.#signer, { content, location }, expiration),
