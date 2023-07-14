@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/web3-storage/content-claims/compare/content-claims-v2.0.0...content-claims-v2.1.0) (2023-07-14)
+
+
+### Features
+
+* materialize claims from block index table ([33c46ff](https://github.com/web3-storage/content-claims/commit/33c46ff241f57b3259b1b0aac62a26c788d3faac))
+
 ## [2.0.0](https://github.com/web3-storage/content-claims/compare/content-claims-v1.1.0...content-claims-v2.0.0) (2023-07-12)
 
 
