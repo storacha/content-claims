@@ -153,6 +153,8 @@ DYNAMO_REGION=us-west-2
 CLAIM_TABLE=claim
 # (optional) Elastic IPFS DynamoDB block index table
 BLOCK_INDEX_TABLE=blocks-cars-position
+# (optional) Elastic IPFS DynamoDB region
+BLOCK_INDEX_REGION=us-west-2
 # (optional) Service DID, if using DID with method other than `key`
 SERVICE_DID=did:web:claims.web3.storage
 # (optional) Error reporting key
@@ -188,6 +190,10 @@ interface BlockIndexTable {
   length: number
 }
 ```
+
+#### `BLOCK_INDEX_REGION` (optional)
+
+Region of the DynamoDB that houses the block index table (set if different from `DYNAMO_REGION`).
 
 #### `SERVICE_DID` (optional)
 

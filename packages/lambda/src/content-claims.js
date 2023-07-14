@@ -120,14 +120,14 @@ export const getClaims = async event => {
   const dynamo = new DynamoDBClient({ region })
 
   /** @type {import('@web3-storage/content-claims/server/api').ClaimFetcher} */
-  let claimFetcher
+  let claimFetcher = new ClaimStorage(dynamo, notNully('CLAIM_TABLE', process.env))
+
   if (process.env.BLOCK_INDEX_TABLE) {
-    claimFetcher = new TieredClaimFetcher([
-      new ClaimStorage(dynamo, notNully('CLAIM_TABLE', process.env)),
-      new BlockIndexClaimFetcher(dynamo, process.env.BLOCK_INDEX_TABLE, signer)
-    ])
-  } else {
-    claimFetcher = new ClaimStorage(dynamo, notNully('CLAIM_TABLE', process.env))
+    const blkIdxTable = process.env.BLOCK_INDEX_TABLE
+    const blkIdxRegion = process.env.BLOCK_INDEX_REGION ?? region
+    const blkIdxDynamo = new DynamoDBClient({ region: blkIdxRegion })
+    const blkIdxClaimFetcher = new BlockIndexClaimFetcher(blkIdxDynamo, blkIdxTable, signer)
+    claimFetcher = new TieredClaimFetcher([claimFetcher, blkIdxClaimFetcher])
   }
 
   const walkcsv = new URL(`http://localhost${event.rawPath}?${event.rawQueryString}`).searchParams.get('walk')
