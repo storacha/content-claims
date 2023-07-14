@@ -6,7 +6,7 @@ export class TieredClaimFetcher {
 
   /** @param {ClaimFetcher[]} tiers */
   constructor (tiers) {
-    if (!tiers?.length) throw new Error('required at least 1 store in tiers')
+    if (!tiers.length) throw new Error('required at least 1 store in tiers')
     this.#tiers = tiers
   }
 

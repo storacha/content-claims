@@ -89,12 +89,24 @@ prog
   .describe('Generate a relation claim that asserts the content (block CID) links directly to the child (block CID).')
   .option('-c, --child', 'One or more child CIDs that this content links to.')
   .option('-p, --part', 'One or more CAR CIDs where the content and it\'s children may be found.')
+  .option('-i, --includes', 'One or more CARv2 CIDs corresponding to the parts.')
   .option('-o, --output', 'Write output to this file.')
   .example('bagbaierae3n6cey3feykv3h5imue3eustl656dajifuddj3zedhpdofje3za --child bafkreihyikwmd6vlp5g6snhqipvigffx3w52l322dtqlrf4phanxisa34m --part -o relation.claim')
   .action(async (contentArg, opts) => {
     const content = Link.parse(contentArg)
+    /** @type {import('multiformats/link').UnknownLink[]} */
     const children = (Array.isArray(opts.child) ? opts.child : [opts.child]).map(c => Link.parse(c))
-    const parts = (Array.isArray(opts.part) ? opts.part : [opts.part]).map(p => Link.parse(p))
+    /** @type {import('multiformats/link').Link[]} */
+    const partContents = (Array.isArray(opts.part) ? opts.part : [opts.part]).map(p => Link.parse(p))
+    /** @type {import('multiformats/link').Link[]} */
+    const partIncludes = (Array.isArray(opts.includes) ? opts.includes : [opts.includes]).map(i => Link.parse(i))
+
+    const parts = partContents.map((content, i) => {
+      const includes = partIncludes[i]
+      if (!includes) throw new Error(`missing index CID for part: ${content}`)
+      return { content, includes }
+    })
+
     const signer = getSigner()
 
     const invocation = Assert.relation.invoke({

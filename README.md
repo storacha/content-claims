@@ -145,19 +145,19 @@ See: https://docs.sst.dev for more info on how things get deployed.
 The following should be set in the env when deploying. Copy `.env.tpl` to `.env` to set in dev.
 
 ```sh
-# Private key for the service
+# Private key for the service.
 PRIVATE_KEY=MgCblCY...
-# Region of the DynamoDB to query
+# Region of the DynamoDB to query.
 DYNAMO_REGION=us-west-2
-# Name of DynamoDB table for storing claims
+# Name of DynamoDB table for storing claims.
 CLAIM_TABLE=claim
-# (optional) Elastic IPFS DynamoDB block index table
+# (optional) Elastic IPFS DynamoDB block index table.
 BLOCK_INDEX_TABLE=blocks-cars-position
-# (optional) Elastic IPFS DynamoDB region
+# (optional) Elastic IPFS DynamoDB region.
 BLOCK_INDEX_REGION=us-west-2
-# (optional) Service DID, if using DID with method other than `key`
+# (optional) Service DID, if using DID with method other than `key`.
 SERVICE_DID=did:web:claims.web3.storage
-# (optional) Error reporting key
+# (optional) Sentry key for error reporting.
 SENTRY_DSN=
 ```
 
@@ -184,12 +184,14 @@ The Elastic IPFS DynamoDB block index table. If set and no other claim is found 
 
 ```ts
 interface BlockIndexTable {
-  multihash: string // base58btc encoded block multihash
-  carpath: string   // bucket key, format: `REGION/BUCKET_NAME/KEY.car`
-  offset: number    // byte offset within CAR file
+  blockmultihash: string // base58btc encoded block multihash (partition key)
+  carpath: string        // bucket key, format: `REGION/BUCKET_NAME/KEY.car`
+  offset: number         // byte offset within CAR file
   length: number
 }
 ```
+
+Note: this table requires read-only access.
 
 #### `BLOCK_INDEX_REGION` (optional)
 
