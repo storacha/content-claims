@@ -48,7 +48,7 @@ export interface RelationClaim extends ContentClaim<typeof Assert.relation.can> 
   /** CIDs of blocks this content directly links to. */
   readonly children: Link[]
   /** List of archives (CAR CIDs) containing the blocks. */
-  readonly parts: Link[]
+  readonly parts: Array<{ content: Link, includes: Link }>
 }
 
 /** Types of claim that are known to this library. */
