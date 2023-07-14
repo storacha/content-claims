@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1](https://github.com/web3-storage/content-claims/compare/content-claims-v2.1.0...content-claims-v2.1.1) (2023-07-14)
+
+
+### Bug Fixes
+
+* **client:** types for relation claim ([1267ad9](https://github.com/web3-storage/content-claims/commit/1267ad920c410745b540a05f765556b509b4194a))
+
 ## [2.1.0](https://github.com/web3-storage/content-claims/compare/content-claims-v2.0.0...content-claims-v2.1.0) (2023-07-14)
 
 
