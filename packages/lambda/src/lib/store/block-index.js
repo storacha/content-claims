@@ -68,6 +68,7 @@ export class BlockIndexClaimFetcher extends DynamoTable {
     // TODO: remove when all content is copied over to R2
     let item = items.find(({ bucket }) => bucket === 'carpark-prod-0')
     item = item ?? items.find(({ bucket, key }) => bucket === 'dotstorage-prod-1' && key.startsWith('raw'))
+    item = item ?? items.find(({ bucket, key }) => bucket === 'dotstorage-prod-0' && key.startsWith('raw'))
     item = item ?? items[0]
     if (!item) return []
 
