@@ -17,6 +17,7 @@ import { DynamoTable } from './dynamo-table.js'
  */
 
 const CAR_CODE = 0x0202
+const LIMIT = 10
 
 /**
  * Materializes claims on demand using block indexes stored in DynamoDB.
@@ -40,7 +41,7 @@ export class BlockIndexClaimFetcher extends DynamoTable {
   async get (content) {
     const command = new QueryCommand({
       TableName: this.tableName,
-      Limit: 5,
+      Limit: LIMIT,
       KeyConditions: {
         blockmultihash: {
           ComparisonOperator: 'EQ',
@@ -55,11 +56,14 @@ export class BlockIndexClaimFetcher extends DynamoTable {
       onFailedAttempt: err => console.warn(`failed DynamoDB query for: ${content}`, err)
     })
 
-    const items = (result.Items ?? []).map(item => {
-      const { carpath, offset, length } = unmarshall(item)
-      const [region, bucket, ...rest] = carpath.split('/')
-      return { region, bucket, key: rest.join('/'), offset, length }
-    })
+    const items = (result.Items ?? [])
+      .map(item => {
+        const { carpath, offset, length } = unmarshall(item)
+        const [region, bucket, ...rest] = carpath.split('/')
+        return { region, bucket, key: rest.join('/'), offset, length }
+      })
+      // cannot extract a CAR CID from keys with "complete" prefix
+      .filter(item => !item.key.startsWith('complete'))
 
     // TODO: remove when all content is copied over to R2
     let item = items.find(({ bucket }) => bucket === 'carpark-prod-0')
