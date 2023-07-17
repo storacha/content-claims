@@ -22,6 +22,10 @@ dotenv.config({ path: join(__dirname, '.env') })
 const serviceURL = new URL(process.env.SERVICE_URL ?? 'https://claims.web3.storage')
 const servicePrincipal = DID.parse(process.env.SERVICE_DID ?? 'did:web:claims.web3.storage')
 
+if (servicePrincipal.did() !== 'did:web:claims.web3.storage') {
+  console.warn(`WARN: using ${servicePrincipal.did()}`)
+}
+
 const connection = Client.connect({
   id: servicePrincipal,
   codec: CAR.outbound,

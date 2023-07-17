@@ -5,6 +5,7 @@ import * as Link from 'multiformats/link'
 import { base58btc } from 'multiformats/bases/base58'
 import { sha256 } from 'multiformats/hashes/sha2'
 import * as Digest from 'multiformats/hashes/digest'
+import varint from 'varint'
 import retry from 'p-retry'
 import { MultihashIndexSortedWriter } from 'cardex/multihash-index-sorted'
 import { Assert } from '@web3-storage/content-claims/capability'
@@ -65,7 +66,8 @@ export class BlockIndexClaimFetcher extends DynamoTable {
     if (!part) return []
 
     const location = [new URL(`https://${item.bucket}.s3.amazonaws.com/${item.key}`)]
-    const offset = item.offset
+    // offsets are block offsets, not CARv2 index offsets
+    const offset = item.offset - (varint.encodingLength(content.bytes.length + item.length) + content.bytes.length)
     const expiration = Math.ceil((Date.now() / 1000) + (60 * 60)) // expire in an hour
 
     return Promise.all([
