@@ -101,5 +101,28 @@ export const test = {
 
     const items = await CARv2Index.decode(indexBlock.bytes)
     assert.equal(items.length, 2)
+  },
+
+  'should decode a claim': async (/** @type {import('entail').assert} */ assert) => {
+    const { signer } = await beforeEach()
+    const child = await Block.encode({ value: 'children are great', hasher: sha256, codec: dagCBOR })
+    const root = await Block.encode({ value: { child: child.cid }, hasher: sha256, codec: dagCBOR })
+    const part = await linkCAR(encodeCAR({ roots: [root], blocks: new Map([[root.toString(), root], [child.toString(), child]]) }))
+
+    const partitionClaim = Assert.partition.invoke({
+      issuer: signer,
+      audience: signer,
+      with: signer.did(),
+      nb: {
+        content: root.cid,
+        parts: [part]
+      }
+    })
+    const view = await partitionClaim.buildIPLDView()
+    const bytes = await view.archive()
+    assert.ok(bytes.ok)
+
+    const decoded = await Client.decode(bytes.ok)
+    assert.equal(decoded.content.toString(), root.cid.toString())
   }
 }

@@ -166,10 +166,10 @@ prog
         body0.pipeTo(writable),
         body1
           .pipeThrough(new CARReaderStream())
-          .pipeThrough(new Client.ClaimReaderStream())
           .pipeTo(new WritableStream({
-            async write (claim) {
-              const raw = await Delegation.extract(await claim.archive())
+            async write (block) {
+              const claim = await Client.decode(block.bytes)
+              const raw = await Delegation.extract(block.bytes)
               if (raw.error) throw new Error(`failed to decode claim for: ${claim.content}`, { cause: raw.error })
               console.warn(inspect(JSON.parse(JSON.stringify(raw.ok)), false, Infinity, process.stdout.isTTY))
             }
