@@ -25,7 +25,7 @@ export { connect, invoke, delegate, CAR, HTTP }
  * @param {Uint8Array} bytes
  * @returns {Promise<import('./api').Claim>}
  */
-const fromArchive = async bytes => {
+export const decode = async bytes => {
   const delegation = await extractDelegation(bytes)
   if (delegation.error) {
     throw new Error('failed to decode claim', { cause: delegation.error })
@@ -54,30 +54,6 @@ const claimType = can =>
         : can === Assert.relation.can
           ? Assert.relation.can
           : 'unknown'
-
-/**
- * Extracts content claims from blocks, verifying hashes.
- * TODO: verify claim signatures.
- *
- * @extends {TransformStream<import('carstream/api').Block, import('./api').Claim>}
- */
-export class ClaimReaderStream extends TransformStream {
-  /**
-   * @param {QueuingStrategy<import('carstream/api').Block>} [writableStrategy]
-   * @param {QueuingStrategy<import('./api').Claim>} [readableStrategy]
-   */
-  constructor (writableStrategy, readableStrategy) {
-    super({
-      async transform (block, controller) {
-        const digest = await sha256.digest(block.bytes)
-        if (!equals(block.cid.multihash.bytes, digest.bytes)) {
-          throw new Error(`hash verification failed: ${block.cid}`)
-        }
-        controller.enqueue(await fromArchive(block.bytes))
-      }
-    }, writableStrategy, readableStrategy)
-  }
-}
 
 /**
  * Fetch a CAR archive of claims from the service. Note: no verification is
@@ -113,8 +89,16 @@ export const read = async (content, options) => {
   try {
     await res.body
       .pipeThrough(new CARReaderStream())
-      .pipeThrough(new ClaimReaderStream())
-      .pipeTo(new WritableStream({ write: claim => { claims.push(claim) } }))
+      .pipeTo(new WritableStream({
+        async write (block) {
+          const digest = await sha256.digest(block.bytes)
+          if (!equals(block.cid.multihash.bytes, digest.bytes)) {
+            throw new Error(`hash verification failed: ${block.cid}`)
+          }
+          const claim = await decode(block.bytes)
+          claims.push(claim)
+        }
+      }))
   } catch (/** @type {any} */ err) {
     if (!claims.length && err.message === 'unexpected end of data') {
       return claims
