@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/web3-storage/content-claims/compare/content-claims-v2.1.1...content-claims-v2.2.0) (2023-07-21)
+
+
+### Features
+
+* export decode claim function ([#12](https://github.com/web3-storage/content-claims/issues/12)) ([17018dc](https://github.com/web3-storage/content-claims/commit/17018dc9de8b14937fff9e5e4cf47bc5c0d55cb7))
+
 ## [2.1.1](https://github.com/web3-storage/content-claims/compare/content-claims-v2.1.0...content-claims-v2.1.1) (2023-07-14)
 
 
