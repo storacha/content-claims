@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.3.0](https://github.com/web3-storage/content-claims/compare/content-claims-v2.2.0...content-claims-v2.3.0) (2023-07-25)
+
+
+### Features
+
+* add descendant claim ([9afb9c0](https://github.com/web3-storage/content-claims/commit/9afb9c097d490c0e6ce4e9364a7b6f85343d89d7))
+* **cli:** add descendant command ([f0581ae](https://github.com/web3-storage/content-claims/commit/f0581ae33e5a5aa7c6c88383be8b952e7155907e))
+
 ## [2.2.0](https://github.com/web3-storage/content-claims/compare/content-claims-v2.1.1...content-claims-v2.2.0) (2023-07-21)
 
 
