@@ -5,6 +5,7 @@ import { capability, URI, Link, Schema } from '@ucanto/server'
  * @typedef {import('@ucanto/server').InferInvokedCapability<typeof location>} AssertLocation
  * @typedef {import('@ucanto/server').InferInvokedCapability<typeof inclusion>} AssertInclusion
  * @typedef {import('@ucanto/server').InferInvokedCapability<typeof partition>} AssertPartition
+ * @typedef {import('@ucanto/server').InferInvokedCapability<typeof descendant>} AssertDescendant
  * @typedef {import('@ucanto/server').InferInvokedCapability<typeof relation>} AssertRelation
  */
 
@@ -60,8 +61,20 @@ export const partition = capability({
   })
 })
 
+export const descendant = capability({
+  can: 'assert/descendant',
+  with: URI.match({ protocol: 'did:' }),
+  nb: Schema.struct({
+    /** Content root CID */
+    content: Link,
+    /** Descendant content CID */
+    descends: Link
+  })
+})
+
 /**
  * Claims that a CID links to other CIDs.
+ * @deprecated
  */
 export const relation = capability({
   can: 'assert/relation',

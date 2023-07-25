@@ -68,7 +68,22 @@ Input:
 }
 ```
 
-#### Relation claim 🆕
+#### Decendant claim 🆕
+
+Claims that a CID is linked to directly or indirectly by another CID.
+
+Capability: `assert/descendant`
+
+Input:
+
+```js
+{
+  content: CID /* Content root CID */,
+  descends: CID /* Descendant content CID */
+}
+```
+
+#### Relation claim (deprecated)
 
 Claims that a CID links to other CIDs. Like a [partition claim](#partition-claim) crossed with an [inclusion claim](#inclusion-claim), a relation claim asserts that a block of content links to other blocks and, that the block and it's links may be found in the specified parts. Furthermore, for each part it specifies which CIDs are included in which parts via reference to a CARv2 index CID.
 

@@ -10,6 +10,7 @@ export function createService (context) {
     inclusion: Server.provide(Assert.inclusion, input => handler(input, context)),
     location: Server.provide(Assert.location, input => handler(input, context)),
     partition: Server.provide(Assert.partition, input => handler(input, context)),
+    descendant: Server.provide(Assert.descendant, input => handler(input, context)),
     relation: Server.provide(Assert.relation, input => handler(input, context))
   }
 }
