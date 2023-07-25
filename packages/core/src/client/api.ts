@@ -43,16 +43,7 @@ export interface InclusionClaim extends ContentClaim<typeof Assert.inclusion.can
   readonly proof?: Link
 }
 
-/** A claim that a CID is linked to directly or indirectly by another CID. */
-export interface DescendantClaim extends ContentClaim<typeof Assert.descendant.can> {
-  /** Ancestor content CID. */
-  readonly ancestor: UnknownLink
-}
-
-/**
- * A claim that a CID links to other CIDs.
- * @deprecated
- */
+/** A claim that a CID links to other CIDs. */
 export interface RelationClaim extends ContentClaim<typeof Assert.relation.can> {
   /** CIDs of blocks this content directly links to. */
   readonly children: Link[]
@@ -65,7 +56,6 @@ export type KnownClaimTypes =
   | typeof Assert.location.can
   | typeof Assert.partition.can
   | typeof Assert.inclusion.can
-  | typeof Assert.descendant.can
   | typeof Assert.relation.can
 
 /** A verifiable claim about data. */
@@ -73,7 +63,6 @@ export type Claim =
   | LocationClaim
   | PartitionClaim
   | InclusionClaim
-  | DescendantClaim
   | RelationClaim
   | UnknownClaim
 
