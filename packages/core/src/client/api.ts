@@ -45,8 +45,8 @@ export interface InclusionClaim extends ContentClaim<typeof Assert.inclusion.can
 
 /** A claim that a CID is linked to directly or indirectly by another CID. */
 export interface DescendantClaim extends ContentClaim<typeof Assert.descendant.can> {
-  /** Descendant content CID. */
-  readonly descends: UnknownLink
+  /** Ancestor content CID. */
+  readonly ancestor: UnknownLink
 }
 
 /**

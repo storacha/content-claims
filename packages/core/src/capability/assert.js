@@ -65,10 +65,10 @@ export const descendant = capability({
   can: 'assert/descendant',
   with: URI.match({ protocol: 'did:' }),
   nb: Schema.struct({
-    /** Content root CID */
+    /** Content CID */
     content: Link,
-    /** Descendant content CID */
-    descends: Link
+    /** Ancestor content CID */
+    ancestor: Link
   })
 })
 

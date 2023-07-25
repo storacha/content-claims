@@ -78,8 +78,8 @@ Input:
 
 ```js
 {
-  content: CID /* Content root CID */,
-  descends: CID /* Descendant content CID */
+  content: CID /* Content CID */,
+  ancestor: CID /* Ancestor content CID */
 }
 ```
 

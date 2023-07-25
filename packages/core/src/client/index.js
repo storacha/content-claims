@@ -51,9 +51,11 @@ const claimType = can =>
       ? Assert.partition.can
       : can === Assert.inclusion.can
         ? Assert.inclusion.can
-        : can === Assert.relation.can
-          ? Assert.relation.can
-          : 'unknown'
+        : can === Assert.descendant.can
+          ? Assert.descendant.can
+          : can === Assert.relation.can
+            ? Assert.relation.can
+            : 'unknown'
 
 /**
  * Fetch a CAR archive of claims from the service. Note: no verification is

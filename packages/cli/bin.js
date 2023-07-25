@@ -89,35 +89,20 @@ prog
     })
     await archiveClaim(invocation, opts.output)
   })
-  .command('relation <content>')
-  .describe('Generate a relation claim that asserts the content (block CID) links directly to the child (block CID).')
-  .option('-c, --child', 'One or more child CIDs that this content links to.')
-  .option('-p, --part', 'One or more CAR CIDs where the content and it\'s children may be found.')
-  .option('-i, --includes', 'One or more CARv2 CIDs corresponding to the parts.')
+  .command('descendant <content> <ancestor>')
+  .describe('Generate a descendant claim that asserts the content is linked to directly or indirectly by the ancestor.')
   .option('-o, --output', 'Write output to this file.')
-  .example('bagbaierae3n6cey3feykv3h5imue3eustl656dajifuddj3zedhpdofje3za --child bafkreihyikwmd6vlp5g6snhqipvigffx3w52l322dtqlrf4phanxisa34m --part -o relation.claim')
-  .action(async (contentArg, opts) => {
+  .example('bafkreidfrmbg7ps5ezghd6aeocexwni7y7yzzj76m5xixnfcf66s3k6a44 bafybeibrqc2se2p3k4kfdwg7deigdggamlumemkiggrnqw3edrjosqhvnm -o descendant.claim')
+  .action(async (contentArg, ancestorArg, opts) => {
     const content = Link.parse(contentArg)
-    /** @type {import('multiformats/link').UnknownLink[]} */
-    const children = (Array.isArray(opts.child) ? opts.child : [opts.child]).map(c => Link.parse(c))
-    /** @type {import('multiformats/link').Link[]} */
-    const partContents = (Array.isArray(opts.part) ? opts.part : [opts.part]).map(p => Link.parse(p))
-    /** @type {import('multiformats/link').Link[]} */
-    const partIncludes = (Array.isArray(opts.includes) ? opts.includes : [opts.includes]).map(i => Link.parse(i))
-
-    const parts = partContents.map((content, i) => {
-      const includes = partIncludes[i]
-      if (!includes) throw new Error(`missing index CID for part: ${content}`)
-      return { content, includes }
-    })
-
+    const ancestor = Link.parse(ancestorArg).toV1()
     const signer = getSigner()
 
-    const invocation = Assert.relation.invoke({
+    const invocation = Assert.descendant.invoke({
       issuer: signer,
       audience: servicePrincipal,
       with: signer.did(),
-      nb: { content, children, parts }
+      nb: { content, ancestor }
     })
     await archiveClaim(invocation, opts.output)
   })
