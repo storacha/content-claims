@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.1](https://github.com/web3-storage/content-claims/compare/content-claims-v2.3.0...content-claims-v2.3.1) (2023-07-25)
+
+
+### Bug Fixes
+
+* revert descendant claim ([1eada28](https://github.com/web3-storage/content-claims/commit/1eada2857b088e6aec81f9ecd5d5a9630597cbd6))
+
 ## [2.3.0](https://github.com/web3-storage/content-claims/compare/content-claims-v2.2.0...content-claims-v2.3.0) (2023-07-25)
 
 
