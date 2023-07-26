@@ -46,9 +46,24 @@ export interface InclusionClaim extends ContentClaim<typeof Assert.inclusion.can
 /** A claim that a CID links to other CIDs. */
 export interface RelationClaim extends ContentClaim<typeof Assert.relation.can> {
   /** CIDs of blocks this content directly links to. */
-  readonly children: Link[]
+  readonly children: UnknownLink[]
   /** List of archives (CAR CIDs) containing the blocks. */
-  readonly parts: Array<{ content: Link, includes: Link }>
+  readonly parts: RelationPart[]
+}
+
+/** Part this content and it's children can be read from. */
+export interface RelationPart {
+  /** Part CID. */
+  content: Link
+  /** CID of contents (CARv2 index) included in this part. */
+  includes?: RelationPartInclusion
+}
+
+export interface RelationPartInclusion {
+  /** Inclusion CID (CARv2 index) */
+  content: Link
+  /** CIDs of parts this index may be found in. */
+  parts?: Link[]
 }
 
 /** Types of claim that are known to this library. */
