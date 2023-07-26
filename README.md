@@ -92,12 +92,13 @@ Input:
         parts?: [
           CID /* CAR CID */,
           ...
-        ] 
+        ]
       }
     },
     ...
   ]
 }
+```
 
 
 ## Usage
