@@ -46,7 +46,9 @@ export const test = {
           children: [child.cid],
           parts: [{
             content: part,
-            includes: index.cid
+            includes: {
+              content: index.cid
+            }
           }]
         }
       })

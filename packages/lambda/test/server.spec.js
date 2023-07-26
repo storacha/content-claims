@@ -69,7 +69,9 @@ test('should claim relation', async t => {
         children: [child.cid],
         parts: [{
           content: part,
-          includes: index.cid
+          includes: {
+            content: index.cid
+          }
         }]
       }
     })

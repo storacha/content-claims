@@ -94,6 +94,7 @@ prog
   .option('-c, --child', 'One or more child CIDs that this content links to.')
   .option('-p, --part', 'One or more CAR CIDs where the content and it\'s children may be found.')
   .option('-i, --includes', 'One or more CARv2 CIDs corresponding to the parts.')
+  .option('-a, --includes-part', 'One or more CAR CIDs where the inclusion CID may be found.')
   .option('-o, --output', 'Write output to this file.')
   .example('bagbaierae3n6cey3feykv3h5imue3eustl656dajifuddj3zedhpdofje3za --child bafkreihyikwmd6vlp5g6snhqipvigffx3w52l322dtqlrf4phanxisa34m --part -o relation.claim')
   .action(async (contentArg, opts) => {
@@ -103,12 +104,16 @@ prog
     /** @type {import('multiformats/link').Link[]} */
     const partContents = (Array.isArray(opts.part) ? opts.part : [opts.part]).map(p => Link.parse(p))
     /** @type {import('multiformats/link').Link[]} */
-    const partIncludes = (Array.isArray(opts.includes) ? opts.includes : [opts.includes]).map(i => Link.parse(i))
+    const partIncludes = (Array.isArray(opts.includes) ? opts.includes : [opts.includes]).filter(Boolean).map(i => Link.parse(i))
+    /** @type {import('multiformats/link').Link[]} */
+    const partIncludesPart = (Array.isArray(opts['includes-part']) ? opts['includes-part'] : [opts['includes-part']]).filter(Boolean).map(i => Link.parse(i))
 
     const parts = partContents.map((content, i) => {
       const includes = partIncludes[i]
-      if (!includes) throw new Error(`missing index CID for part: ${content}`)
-      return { content, includes }
+      if (!includes) return { content }
+      const includesPart = partIncludesPart[i]
+      if (!includesPart) return { content, includes: { content: includes } }
+      return { content, includes: { content: includes, parts: [includesPart] } }
     })
 
     const signer = getSigner()

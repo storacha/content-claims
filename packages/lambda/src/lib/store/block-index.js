@@ -121,7 +121,9 @@ const buildRelationClaim = async (signer, { content, part, offset }, expiration)
       children: [],
       parts: [{
         content: part,
-        includes: index.cid
+        includes: {
+          content: index.cid
+        }
       }]
     },
     expiration
