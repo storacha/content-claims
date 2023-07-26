@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/web3-storage/content-claims/compare/content-claims-v2.3.1...content-claims-v3.0.0) (2023-07-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* allow specify parts in relation part inclusion
+
+### Features
+
+* allow specify parts in relation part inclusion ([dda837f](https://github.com/web3-storage/content-claims/commit/dda837f7177fc66ec2ab0acd126900f442e4637a))
+
 ## [2.3.1](https://github.com/web3-storage/content-claims/compare/content-claims-v2.3.0...content-claims-v2.3.1) (2023-07-25)
 
 
