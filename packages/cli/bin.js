@@ -41,7 +41,7 @@ prog
   .command('location <content> <url>')
   .describe('Generate a location claim that asserts the content (CAR CID) can be found at the URLs.')
   .option('-o, --output', 'Write output to this file.')
-  .example('bagbaierae3n6cey3feykv3h5imue3eustl656dajifuddj3zedhpdofje3za https://s3.url/bagbaierae3n6cey3feykv3h5imue3eustl656dajifuddj3zedhpdofje3za.car -o location.claim')
+  .example('location bagbaierae3n6cey3feykv3h5imue3eustl656dajifuddj3zedhpdofje3za https://s3.url/bagbaierae3n6cey3feykv3h5imue3eustl656dajifuddj3zedhpdofje3za.car -o location.claim')
   .action(async (contentArg, urlArg, opts) => {
     const content = Link.parse(contentArg)
     const urls = [urlArg, ...opts._]
@@ -58,7 +58,7 @@ prog
   .command('partition <content> <part>')
   .describe('Generate a partition claim that asserts the content (DAG root CID) exists in the parts (CAR CIDs).')
   .option('-o, --output', 'Write output to this file.')
-  .example('bafybeiefif6pfs25c6g5r4lcvsk7l6f3vnnsuziitrlca3g6rhjkhmysna bagbaierae3n6cey3feykv3h5imue3eustl656dajifuddj3zedhpdofje3za -o partition.claim')
+  .example('partition bafybeiefif6pfs25c6g5r4lcvsk7l6f3vnnsuziitrlca3g6rhjkhmysna bagbaierae3n6cey3feykv3h5imue3eustl656dajifuddj3zedhpdofje3za -o partition.claim')
   .action(async (contentArg, partArg, opts) => {
     const content = Link.parse(contentArg)
     const parts = [partArg, ...opts._].map(p => Link.parse(p).toV1())
@@ -75,7 +75,7 @@ prog
   .command('inclusion <content> <includes>')
   .describe('Generate an inclusion claim that asserts the content (CAR CID) includes the blocks in the index (CARv2 index CID).')
   .option('-o, --output', 'Write output to this file.')
-  .example('bagbaierae3n6cey3feykv3h5imue3eustl656dajifuddj3zedhpdofje3za bafkreihyikwmd6vlp5g6snhqipvigffx3w52l322dtqlrf4phanxisa34m -o inclusion.claim')
+  .example('inclusion bagbaierae3n6cey3feykv3h5imue3eustl656dajifuddj3zedhpdofje3za bafkreihyikwmd6vlp5g6snhqipvigffx3w52l322dtqlrf4phanxisa34m -o inclusion.claim')
   .action(async (contentArg, includesArg, opts) => {
     const content = Link.parse(contentArg)
     const includes = Link.parse(includesArg).toV1()
@@ -96,7 +96,7 @@ prog
   .option('-i, --includes', 'One or more CARv2 CIDs corresponding to the parts.')
   .option('-a, --includes-part', 'One or more CAR CIDs where the inclusion CID may be found.')
   .option('-o, --output', 'Write output to this file.')
-  .example('bagbaierae3n6cey3feykv3h5imue3eustl656dajifuddj3zedhpdofje3za --child bafkreihyikwmd6vlp5g6snhqipvigffx3w52l322dtqlrf4phanxisa34m --part -o relation.claim')
+  .example('relation bagbaierae3n6cey3feykv3h5imue3eustl656dajifuddj3zedhpdofje3za --child bafkreihyikwmd6vlp5g6snhqipvigffx3w52l322dtqlrf4phanxisa34m --part -o relation.claim')
   .action(async (contentArg, opts) => {
     const content = Link.parse(contentArg)
     /** @type {import('multiformats/link').UnknownLink[]} */
