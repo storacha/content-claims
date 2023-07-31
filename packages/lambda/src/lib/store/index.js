@@ -29,8 +29,8 @@ export class ClaimStorage extends DynamoTable {
         ':ex': hasExpiration ? expiration : undefined
       }, { removeUndefinedValues: true, convertClassInstanceToMap: true }),
       UpdateExpression: hasExpiration
-        ? 'SET bytes=if_not_exists(bytes, :by), expiration=if_not_exists(expiration, :ex)'
-        : 'SET bytes=if_not_exists(bytes, :by) REMOVE expiration'
+        ? 'SET bytes=:by, expiration=:ex'
+        : 'SET bytes=:by REMOVE expiration'
     })
     await this.dynamoClient.send(cmd)
   }
