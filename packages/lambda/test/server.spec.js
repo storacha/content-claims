@@ -9,6 +9,7 @@ import { mock } from 'node:test'
 import * as Block from 'multiformats/block'
 import { sha256 } from 'multiformats/hashes/sha2'
 import * as dagCBOR from '@ipld/dag-cbor'
+import * as dagPB from '@ipld/dag-pb'
 import * as Client from '@web3-storage/content-claims/client'
 import * as Server from '@web3-storage/content-claims/server'
 import { Assert } from '@web3-storage/content-claims/capability'
@@ -98,4 +99,62 @@ test('should claim relation', async t => {
   assert(cap)
   t.is(cap.nb.children.length, 1)
   t.is(cap.nb.children[0].toString(), child.cid.toString())
+})
+
+test('should be CID version agnostic', async t => {
+  const root = await Block.encode({ value: dagPB.prepare(''), hasher: sha256, codec: dagPB })
+  const part = await linkCAR(encodeCAR({ roots: [root], blocks: new Map([[root.toString(), root]]) }))
+
+  const claimPut = mock.method(t.context.claimStore, 'put')
+
+  const connection = Client.connect({
+    id: t.context.signer,
+    codec: CAR.outbound,
+    channel: t.context.server
+  })
+
+  const result = await Assert.partition
+    .invoke({
+      issuer: t.context.signer,
+      audience: t.context.signer,
+      with: t.context.signer.did(),
+      nb: {
+        content: root.cid.toV0(),
+        parts: [part]
+      }
+    })
+    .execute(connection)
+
+  t.falsy(result.out.error)
+  t.truthy(result.out.ok)
+
+  t.is(claimPut.mock.callCount(), 1)
+
+  /**
+   * Ensure passed claim matches created claim.
+   * @param {import('@web3-storage/content-claims/server/api').Claim} claim
+   */
+  const assertClaim = async claim => {
+    t.is(claim.content.toString(), root.cid.toString())
+    assert(claim.claim)
+
+    // ensure `content` in claim is V0 (as created)
+    const delegation0 = await Delegation.extract(claim.bytes)
+
+    /** @type {Assert.AssertPartition|undefined} */
+    // @ts-expect-error
+    const cap0 = delegation0?.ok?.capabilities[0]
+    t.is(cap0?.nb.content.version, 0)
+    t.is(cap0?.nb.content.toString(), root.cid.toV0().toString())
+  }
+
+  // get claim via V1 CID
+  const [claim0] = await t.context.claimStore.get(root.cid)
+  assert(claim0)
+  await assertClaim(claim0)
+
+  // get claim via V0 CID
+  const [claim1] = await t.context.claimStore.get(root.cid.toV0())
+  assert(claim1)
+  await assertClaim(claim1)
 })
