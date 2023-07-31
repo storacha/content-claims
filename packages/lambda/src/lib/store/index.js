@@ -1,6 +1,7 @@
 import { UpdateItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb'
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb'
 import * as Link from 'multiformats/link'
+import { base32 } from 'multiformats/bases/base32'
 import retry from 'p-retry'
 import { DynamoTable } from './dynamo-table.js'
 
@@ -20,7 +21,7 @@ export class ClaimStorage extends DynamoTable {
       TableName: this.tableName,
       Key: marshall({
         claim: claim.toString(),
-        content: content.toString()
+        content: content.toV1().toString(base32)
       }),
       ExpressionAttributeValues: marshall({
         ':by': bytes,
@@ -38,7 +39,7 @@ export class ClaimStorage extends DynamoTable {
       KeyConditions: {
         content: {
           ComparisonOperator: 'EQ',
-          AttributeValueList: [{ S: content.toString() }]
+          AttributeValueList: [{ S: content.toV1().toString(base32) }]
         }
       },
       Limit: 100

@@ -23,6 +23,7 @@
     "varint": "^6.0.0"
   },
   "devDependencies": {
+    "@ipld/dag-pb": "^4.0.4",
     "@types/aws-lambda": "^8.10.115",
     "@types/varint": "^6.0.1",
     "ava": "^5.3.1",

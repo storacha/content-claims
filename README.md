@@ -252,7 +252,7 @@ interface ClaimTable {
   /** Archive of the claim invocation */
   bytes: Uint8Array
 
-  /** The subject of the claim. */
+  /** The subject of the claim (base32 encoded V1 CID). */
   content: string // Note: partition key
 
   /** UCAN expiration */
