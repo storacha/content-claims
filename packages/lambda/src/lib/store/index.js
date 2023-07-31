@@ -17,6 +17,7 @@ export { BlockIndexClaimFetcher } from './block-index.js'
 export class ClaimStorage extends DynamoTable {
   /** @param {import('@web3-storage/content-claims/server/api').Claim} claim */
   async put ({ claim, bytes, content, expiration }) {
+    const hasExpiration = expiration && isFinite(expiration)
     const cmd = new UpdateItemCommand({
       TableName: this.tableName,
       Key: marshall({
@@ -25,9 +26,11 @@ export class ClaimStorage extends DynamoTable {
       }),
       ExpressionAttributeValues: marshall({
         ':by': bytes,
-        ':ex': expiration
+        ':ex': hasExpiration ? expiration : undefined
       }, { removeUndefinedValues: true, convertClassInstanceToMap: true }),
-      UpdateExpression: 'SET bytes=if_not_exists(bytes, :by), expiration=if_not_exists(expiration, :ex)'
+      UpdateExpression: hasExpiration
+        ? 'SET bytes=if_not_exists(bytes, :by), expiration=if_not_exists(expiration, :ex)'
+        : 'SET bytes=if_not_exists(bytes, :by) REMOVE expiration'
     })
     await this.dynamoClient.send(cmd)
   }
