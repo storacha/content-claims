@@ -54,8 +54,8 @@ export class ClaimStorage {
             claim: claim.toString(),
             content: content.toV1().toString(base32)
           }),
-          ExpressionAttributeValues: hasExpiration ? marshall({ ':ex': expiration }) : undefined,
-          UpdateExpression: hasExpiration ? 'SET expiration=:ex' : 'REMOVE expiration'
+          ExpressionAttributeValues: marshall({ ':ex': hasExpiration ? expiration : 0 }),
+          UpdateExpression: 'SET expiration=:ex'
         })
         return this.#table.dynamoClient.send(cmd)
       }, {
