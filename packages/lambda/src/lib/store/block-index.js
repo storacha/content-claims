@@ -140,7 +140,7 @@ const buildClaim = async (content, invocation) => {
   const ipldView = await invocation.buildIPLDView()
   const archive = await ipldView.archive()
   if (!archive.ok) throw new Error('failed to archive invocation', { cause: archive.error })
-  return { claim: ipldView.cid, bytes: archive.ok, content, expiration: ipldView.expiration }
+  return { claim: ipldView.cid, bytes: archive.ok, content: content.toV1(), expiration: ipldView.expiration }
 }
 
 /**

@@ -4,11 +4,14 @@ import { createServer } from '@web3-storage/content-claims/server'
 import * as CAR from '@ucanto/transport/car'
 import * as Delegation from '@ucanto/core/delegation'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { S3Client } from '@aws-sdk/client-s3'
 import { Config } from 'sst/node/config'
 import * as Link from 'multiformats/link'
 import { sha256 } from 'multiformats/hashes/sha2'
 import { CARWriterStream } from 'carstream'
 import { getServiceSigner, notNully } from './lib/config.js'
+import { DynamoTable } from './lib/store/dynamo-table.js'
+import { S3Bucket } from './lib/store/s3-bucket.js'
 import { ClaimStorage, TieredClaimFetcher, BlockIndexClaimFetcher } from './lib/store/index.js'
 
 Sentry.AWSLambda.init({
@@ -87,9 +90,15 @@ export const postUcanInvocation = async event => {
     return { statusCode: 400 }
   }
 
-  const region = notNully('DYNAMO_REGION', process.env)
-  const dynamo = new DynamoDBClient({ region })
-  const claimStore = new ClaimStorage(dynamo, notNully('CLAIM_TABLE', process.env))
+  const dynamoRegion = notNully('CLAIM_TABLE_REGION', process.env)
+  const dynamoClient = new DynamoDBClient({ region: dynamoRegion })
+  const table = new DynamoTable(dynamoClient, notNully('CLAIM_TABLE', process.env))
+
+  const bucketRegion = notNully('CLAIM_BUCKET_REGION', process.env)
+  const bucketClient = new S3Client({ region: bucketRegion })
+  const bucket = new S3Bucket(bucketClient, notNully('CLAIM_BUCKET', process.env))
+
+  const claimStore = new ClaimStorage({ table, bucket })
 
   const server = createServer({
     id: signer,
@@ -116,15 +125,20 @@ export const postUcanInvocation = async event => {
  * @param {import('aws-lambda').APIGatewayProxyEventV2} event
  */
 export const getClaims = async event => {
-  const region = notNully('DYNAMO_REGION', process.env)
-  const dynamo = new DynamoDBClient({ region })
+  const dynamoRegion = notNully('CLAIM_TABLE_REGION', process.env)
+  const dynamoClient = new DynamoDBClient({ region: dynamoRegion })
+  const table = new DynamoTable(dynamoClient, notNully('CLAIM_TABLE', process.env))
+
+  const bucketRegion = notNully('CLAIM_BUCKET_REGION', process.env)
+  const bucketClient = new S3Client({ region: bucketRegion })
+  const bucket = new S3Bucket(bucketClient, notNully('CLAIM_BUCKET', process.env))
 
   /** @type {import('@web3-storage/content-claims/server/api').ClaimFetcher} */
-  let claimFetcher = new ClaimStorage(dynamo, notNully('CLAIM_TABLE', process.env))
+  let claimFetcher = new ClaimStorage({ table, bucket })
 
   if (process.env.BLOCK_INDEX_TABLE) {
     const blkIdxTable = process.env.BLOCK_INDEX_TABLE
-    const blkIdxRegion = process.env.BLOCK_INDEX_REGION ?? region
+    const blkIdxRegion = process.env.BLOCK_INDEX_REGION ?? dynamoRegion
     const blkIdxDynamo = new DynamoDBClient({ region: blkIdxRegion })
     const blkIdxClaimFetcher = new BlockIndexClaimFetcher(blkIdxDynamo, blkIdxTable, signer)
     claimFetcher = new TieredClaimFetcher([claimFetcher, blkIdxClaimFetcher])
@@ -160,21 +174,30 @@ export const getClaims = async event => {
           const nb = claim.ok.capabilities[0].nb
           if (!nb) continue
 
-          for (const key of Object.keys(nb).filter(k => k !== 'content')) {
-            // @ts-expect-error
-            const content = nb[key]
-            if (walk.has(key)) {
-              if (Array.isArray(content)) {
-                for (const c of content) {
-                  if (Link.isLink(c)) {
-                    queue.push(c)
+          /** @param {object} obj */
+          const walkKeys = obj => {
+            for (const key of Object.keys(obj).filter(k => k !== 'content')) {
+              // @ts-expect-error
+              const content = obj[key]
+              if (walk.has(key)) {
+                if (Array.isArray(content)) {
+                  for (const c of content) {
+                    if (Link.isLink(c)) {
+                      queue.push(c)
+                    } else if (content && typeof content === 'object') {
+                      walkKeys(content)
+                    }
                   }
+                } else if (Link.isLink(content)) {
+                  queue.push(content)
+                } else if (content && typeof content === 'object') {
+                  walkKeys(content)
                 }
-              } else if (Link.isLink(content)) {
-                queue.push(content)
               }
             }
           }
+
+          walkKeys(nb)
         }
       }
     }

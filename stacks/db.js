@@ -4,7 +4,7 @@ import { Table } from 'sst/constructs'
  * @param {import('sst/constructs').StackContext} config
  */
 export function DB ({ stack }) {
-  const claimsTable = new Table(stack, 'claim', {
+  const claimsTable = new Table(stack, 'claims', {
     fields: {
       claim: 'string',
       content: 'string',
