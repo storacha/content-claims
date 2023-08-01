@@ -8,6 +8,7 @@ import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets'
 import { Function, Config, use } from 'sst/constructs'
 import { getApiPackageJson, getGitInfo, domainForStage } from './config.js'
 import { DB } from './db.js'
+import { Bucket } from './bucket.js'
 
 dotenv.config()
 
@@ -15,8 +16,9 @@ dotenv.config()
  * @param {import('sst/constructs').StackContext} config
  */
 export function API ({ stack }) {
-  const { SENTRY_DSN, DYNAMO_REGION, HOSTED_ZONE, HOSTED_ZONE_ID, SERVICE_DID, BLOCK_INDEX_TABLE, BLOCK_INDEX_REGION } = process.env
-  if (!DYNAMO_REGION) throw new Error('DYNAMO_REGION required in env')
+  const { SENTRY_DSN, CLAIM_TABLE_REGION, HOSTED_ZONE, HOSTED_ZONE_ID, SERVICE_DID, BLOCK_INDEX_TABLE, BLOCK_INDEX_REGION, CLAIM_BUCKET_REGION } = process.env
+  if (!CLAIM_TABLE_REGION) throw new Error('CLAIM_TABLE_REGION required in env')
+  if (!CLAIM_BUCKET_REGION) throw new Error('CLAIM_BUCKET_REGION required in env')
   if ((HOSTED_ZONE && !HOSTED_ZONE_ID) || (!HOSTED_ZONE && HOSTED_ZONE_ID)) {
     throw new Error('Both HOSTED_ZONE and HOSTED_ZONE_ID must be set to enable a custom domain')
   }
@@ -33,6 +35,7 @@ export function API ({ stack }) {
   })
 
   const { claimsTable } = use(DB)
+  const { claimsBucket } = use(Bucket)
 
   const fun = new Function(stack, 'fn', {
     handler: 'packages/lambda/src/content-claims.handler',
@@ -48,20 +51,19 @@ export function API ({ stack }) {
       COMMIT: git.commit,
       STAGE: stack.stage,
       SENTRY_DSN: SENTRY_DSN ?? '',
-      DYNAMO_REGION,
       CLAIM_TABLE: claimsTable.tableName,
+      CLAIM_TABLE_REGION: CLAIM_TABLE_REGION ?? '',
+      CLAIM_BUCKET: claimsBucket.bucketName,
+      CLAIM_BUCKET_REGION: CLAIM_BUCKET_REGION ?? '',
       BLOCK_INDEX_TABLE: BLOCK_INDEX_TABLE ?? '',
       BLOCK_INDEX_REGION: BLOCK_INDEX_REGION ?? '',
       SERVICE_DID: SERVICE_DID ?? ''
     },
-    bind: [privateKey]
+    bind: [privateKey, claimsTable, claimsBucket]
   })
 
-  fun.attachPermissions([
-    's3:GetObject',
-    'dynamodb:Query',
-    'dynamodb:UpdateItem'
-  ])
+  // for querying block index table
+  fun.attachPermissions(['dynamodb:Query'])
 
   if (!fun.url) {
     throw new Error('Lambda Function URL is required to create cloudfront distribution')

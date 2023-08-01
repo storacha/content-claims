@@ -13,8 +13,10 @@ import * as dagPB from '@ipld/dag-pb'
 import * as Client from '@web3-storage/content-claims/client'
 import * as Server from '@web3-storage/content-claims/server'
 import { Assert } from '@web3-storage/content-claims/capability'
+import { DynamoTable } from '../src/lib/store/dynamo-table.js'
+import { S3Bucket } from '../src/lib/store/s3-bucket.js'
 import { ClaimStorage } from '../src/lib/store/index.js'
-import { createDynamo, createDynamoTable } from './helpers/aws.js'
+import { createDynamo, createDynamoTable, createS3, createS3Bucket } from './helpers/aws.js'
 import * as CARv2Index from './helpers/carv2-index.js'
 
 /**
@@ -23,6 +25,7 @@ import * as CARv2Index from './helpers/carv2-index.js'
  *   signer: import('@ucanto/interface').Signer
  *   server: import('@web3-storage/content-claims/server').Server
  *   dynamo: import('./helpers/aws').TestAwsService<import('@aws-sdk/client-dynamodb').DynamoDBClient>
+ *   s3: import('./helpers/aws').TestAwsService<import('@aws-sdk/client-s3').S3Client>
  * }} TestContext
  */
 
@@ -30,10 +33,14 @@ const test = /** @type {import('ava').TestFn<TestContext>} */ (anyTest)
 
 test.before(async t => {
   t.context.dynamo = await createDynamo()
+  t.context.s3 = await createS3()
 })
 
 test.beforeEach(async t => {
-  t.context.claimStore = new ClaimStorage(t.context.dynamo.client, await createDynamoTable(t.context.dynamo.client))
+  t.context.claimStore = new ClaimStorage({
+    table: new DynamoTable(t.context.dynamo.client, await createDynamoTable(t.context.dynamo.client)),
+    bucket: new S3Bucket(t.context.s3.client, await createS3Bucket(t.context.s3.client))
+  })
   t.context.signer = await ed25519.generate()
   t.context.server = Server.createServer({
     id: t.context.signer,

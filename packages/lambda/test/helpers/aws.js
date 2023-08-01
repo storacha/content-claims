@@ -1,6 +1,7 @@
 import { GenericContainer } from 'testcontainers'
 import { customAlphabet } from 'nanoid'
 import { DynamoDBClient, CreateTableCommand } from '@aws-sdk/client-dynamodb'
+import { S3Client, CreateBucketCommand } from '@aws-sdk/client-s3'
 
 const id = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 10)
 const credentials = { accessKeyId: 'minioadmin', secretAccessKey: 'minioadmin' }
@@ -30,7 +31,7 @@ export async function createDynamo (opts) {
     .start()
 
   const clientOpts = {
-    endpoint: `http://127.0.0.1:${container.getMappedPort(8000)}`,
+    endpoint: `http://127.0.0.1:${container.getMappedPort(port)}`,
     region,
     credentials
   }
@@ -38,9 +39,7 @@ export async function createDynamo (opts) {
   return { container, client: new DynamoDBClient(clientOpts), ...clientOpts }
 }
 
-/**
- * @param {import("@aws-sdk/client-dynamodb").DynamoDBClient} dynamo
- */
+/** @param {DynamoDBClient} dynamo */
 export async function createDynamoTable (dynamo) {
   const name = id()
   console.log(`Creating DynamoDB table "${name}"...`)
@@ -63,5 +62,38 @@ export async function createDynamoTable (dynamo) {
     })
   )
 
+  return name
+}
+
+/**
+ * @param {object} [opts]
+ * @param {number} [opts.port]
+ * @param {string} [opts.region]
+ */
+export async function createS3 (opts = {}) {
+  console.log('Creating local S3...')
+  const region = opts.region || 'us-west-2'
+  const port = opts.port || 9000
+
+  const container = await new GenericContainer('quay.io/minio/minio')
+    .withCommand(['server', '/data'])
+    .withExposedPorts(port)
+    .start()
+
+  const clientOpts = {
+    endpoint: `http://127.0.0.1:${container.getMappedPort(port)}`,
+    forcePathStyle: true,
+    region,
+    credentials
+  }
+
+  return { container, client: new S3Client(clientOpts), ...clientOpts }
+}
+
+/** @param {S3Client} s3 */
+export async function createS3Bucket (s3) {
+  const name = id()
+  console.log(`Creating S3 bucket "${name}"...`)
+  await s3.send(new CreateBucketCommand({ Bucket: name }))
   return name
 }

@@ -1,7 +1,7 @@
 # Private key for the service.
 PRIVATE_KEY=MgCblCY...
 # Region of the DynamoDB to query.
-DYNAMO_REGION=us-west-2
+CLAIM_TABLE_REGION=us-west-2
 # Name of DynamoDB table for storing claims.
 CLAIM_TABLE=claim
 # (optional) Elastic IPFS DynamoDB block index table.
