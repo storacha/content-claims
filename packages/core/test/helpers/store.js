@@ -1,19 +1,19 @@
-import { Map as LinkMap } from 'lnmap'
+import { base58btc } from 'multiformats/bases/base58'
 
 export class ClaimStorage {
   constructor () {
-    /** @type {Map<import('@ucanto/server').UnknownLink, import('../../src/server/api').Claim>} */
-    this.data = new LinkMap()
+    /** @type {Map<string, import('../../src/server/api').Claim>} */
+    this.data = new Map()
   }
 
   /** @param {import('../../src/server/api').Claim} claim */
   async put (claim) {
-    this.data.set(claim.content, claim)
+    this.data.set(base58btc.encode(claim.content.bytes), claim)
   }
 
   /** @param {import('@ucanto/server').UnknownLink} content */
   async get (content) {
-    const claim = this.data.get(content)
+    const claim = this.data.get(base58btc.encode(content.multihash.bytes))
     return claim ? [claim] : []
   }
 }

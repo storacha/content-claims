@@ -7,6 +7,7 @@ import { connect } from '@ucanto/client'
 import { mock } from 'node:test'
 import * as Block from 'multiformats/block'
 import { sha256 } from 'multiformats/hashes/sha2'
+import * as Bytes from 'multiformats/bytes'
 import * as dagCBOR from '@ipld/dag-cbor'
 import { Server } from '../src/index.js'
 import * as Assert from '../src/capability/assert.js'
@@ -62,7 +63,7 @@ export const test = {
     const [claim] = await claimStore.get(root.cid)
     assert.ok(claim)
 
-    assert.equal(claim.content.toString(), root.cid.toString())
+    assert.ok(Bytes.equals(claim.content.bytes, root.cid.multihash.bytes))
     assert.ok(claim.claim)
 
     const delegation = await Delegation.extract(claim.bytes)
