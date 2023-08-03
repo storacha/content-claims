@@ -8,6 +8,7 @@ import { encode as encodeCAR, link as linkCAR } from '@ucanto/core/car'
 import { mock } from 'node:test'
 import * as Block from 'multiformats/block'
 import { sha256 } from 'multiformats/hashes/sha2'
+import * as Bytes from 'multiformats/bytes'
 import * as dagCBOR from '@ipld/dag-cbor'
 import * as dagPB from '@ipld/dag-pb'
 import * as Client from '@web3-storage/content-claims/client'
@@ -93,7 +94,7 @@ test('should claim relation', async t => {
   const [claim] = await t.context.claimStore.get(root.cid)
   assert(claim)
 
-  t.is(claim.content.toString(), root.cid.toString())
+  t.true(Bytes.equals(claim.content.bytes, root.cid.multihash.bytes))
   assert(claim.claim)
 
   const delegation = await Delegation.extract(claim.bytes)
@@ -142,7 +143,7 @@ test('should be CID version agnostic', async t => {
    * @param {import('@web3-storage/content-claims/server/api').Claim} claim
    */
   const assertClaim = async claim => {
-    t.is(claim.content.toString(), root.cid.toString())
+    t.true(Bytes.equals(claim.content.bytes, root.cid.multihash.bytes))
     assert(claim.claim)
 
     // ensure `content` in claim is V0 (as created)

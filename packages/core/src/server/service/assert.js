@@ -30,7 +30,7 @@ export const handler = async ({ capability, invocation }, { claimStore }) => {
   const claim = {
     claim: invocation.cid,
     bytes: archive.ok,
-    content,
+    content: content.multihash,
     expiration: invocation.expiration
   }
   await claimStore.put(claim)

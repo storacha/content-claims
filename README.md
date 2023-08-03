@@ -261,7 +261,7 @@ interface ClaimTable {
   /** CID of the UCAN invocation task we received this claim in. */
   claim: string // Note: sort key
 
-  /** The subject of the claim (base32 encoded V1 CID). */
+  /** The subject of the claim (base58 encoded multihash). */
   content: string // Note: partition key
 
   /** UCAN expiration */

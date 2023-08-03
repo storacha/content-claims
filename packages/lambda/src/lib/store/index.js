@@ -2,7 +2,9 @@ import { UpdateItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb'
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb'
 import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
 import * as Link from 'multiformats/link'
+import * as Multihash from 'multiformats/hashes/digest'
 import { base32 } from 'multiformats/bases/base32'
+import { base58btc } from 'multiformats/bases/base58'
 import retry from 'p-retry'
 
 /**
@@ -52,7 +54,7 @@ export class ClaimStorage {
           TableName: this.#table.tableName,
           Key: marshall({
             claim: claim.toString(),
-            content: content.toV1().toString(base32)
+            content: base58btc.encode(content.bytes)
           }),
           ExpressionAttributeValues: marshall({ ':ex': hasExpiration ? expiration : 0 }),
           UpdateExpression: 'SET expiration=:ex'
@@ -72,7 +74,7 @@ export class ClaimStorage {
       KeyConditions: {
         content: {
           ComparisonOperator: 'EQ',
-          AttributeValueList: [{ S: content.toV1().toString(base32) }]
+          AttributeValueList: [{ S: base58btc.encode(content.multihash.bytes) }]
         }
       },
       Limit: 100
@@ -97,7 +99,7 @@ export class ClaimStorage {
       })
       return /** @type {import('@web3-storage/content-claims/server/api').Claim} */ ({
         claim: Link.parse(claim),
-        content: Link.parse(content),
+        content: Multihash.decode(base58btc.decode(content)),
         bytes,
         expiration
       })
