@@ -66,12 +66,21 @@ export interface RelationPartInclusion {
   parts?: Link[]
 }
 
+/** A claim that the same data is referred to by another CID and/or multihash */
+export interface EqualsClaim extends ContentClaim<typeof Assert.equals.can> {
+  /** CIDs CID - the hash of the binary sorted links in the set. */
+  readonly content: Link
+  /** List of archives (CAR CIDs) containing the blocks. */
+  readonly equals: Link
+}
+
 /** Types of claim that are known to this library. */
 export type KnownClaimTypes = 
   | typeof Assert.location.can
   | typeof Assert.partition.can
   | typeof Assert.inclusion.can
   | typeof Assert.relation.can
+  | typeof Assert.equals.can
 
 /** A verifiable claim about data. */
 export type Claim =
@@ -79,6 +88,7 @@ export type Claim =
   | PartitionClaim
   | InclusionClaim
   | RelationClaim
+  | EqualsClaim
   | UnknownClaim
 
 export interface ByteRange {
