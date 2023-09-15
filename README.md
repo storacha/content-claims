@@ -68,6 +68,21 @@ Input:
 }
 ```
 
+### Equivalency Claim
+
+Claims that the same data is referred to by another CID and/or multihash. For example a CAR CID and it's CommP Piece CID.
+
+Capability: `assert/equals`
+
+Input:
+
+```js
+{
+  content: CID /* CID */,
+  equals: CID /* CID */
+}
+```
+
 #### Relation claim 🆕
 
 Claims that a CID links to other CIDs. Like a [partition claim](#partition-claim) crossed with an [inclusion claim](#inclusion-claim), a relation claim asserts that a block of content links to other blocks, and that the block and it's links may be found in the specified parts. Furthermore, for each part you can optionally specify an inline inclusion claim (specifying what is included in the part) and for each inclusion an optional inline partition claim (specifying parts in which the inclusion CID may be found).

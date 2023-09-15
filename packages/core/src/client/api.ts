@@ -68,9 +68,9 @@ export interface RelationPartInclusion {
 
 /** A claim that the same data is referred to by another CID and/or multihash */
 export interface EqualsClaim extends ContentClaim<typeof Assert.equals.can> {
-  /** CIDs CID - the hash of the binary sorted links in the set. */
+  /** Any CID e.g a CAR CID */
   readonly content: Link
-  /** List of archives (CAR CIDs) containing the blocks. */
+  /** A CID that is equivalent to the content CID e.g the Piece CID for that CAR CID */
   readonly equals: Link
 }
 
