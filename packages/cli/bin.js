@@ -126,6 +126,23 @@ prog
     })
     await archiveClaim(invocation, opts.output)
   })
+  .command('equals <content> <equal>')
+  .describe('Generate an equals claim that asserts the content is referred to by another CID and/or multihash.')
+  .option('-o, --output', 'Write output to this file.')
+  .example('equals QmUNLLsPACCz1vLxQVkXqqLX5R1X345qqfHbsf67hvA3Nn bafybeiczsscdsbs7ffqz55asqdf3smv6klcw3gofszvwlyarci47bgf354 -o equals.claim')
+  .action(async (contentArg, equalsArg, opts) => {
+    const content = Link.parse(contentArg)
+    const equals = Link.parse(equalsArg)
+    const signer = getSigner()
+
+    const invocation = Assert.equals.invoke({
+      issuer: signer,
+      audience: servicePrincipal,
+      with: signer.did(),
+      nb: { content, equals }
+    })
+    await archiveClaim(invocation, opts.output)
+  })
   .command('inspect <claim>')
   .describe('Inspect a generated claim.')
   .action(async path => {

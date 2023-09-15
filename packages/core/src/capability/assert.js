@@ -6,6 +6,7 @@ import { capability, URI, Link, Schema } from '@ucanto/server'
  * @typedef {import('@ucanto/server').InferInvokedCapability<typeof inclusion>} AssertInclusion
  * @typedef {import('@ucanto/server').InferInvokedCapability<typeof partition>} AssertPartition
  * @typedef {import('@ucanto/server').InferInvokedCapability<typeof relation>} AssertRelation
+ * @typedef {import('@ucanto/server').InferInvokedCapability<typeof equals>} AssertEquals
  */
 
 export const assert = capability({
@@ -80,5 +81,17 @@ export const relation = capability({
         parts: Schema.array(Link.match({ version: 1 })).optional()
       }).optional()
     }))
+  })
+})
+
+/**
+ * Claim data is referred to by another CID and/or multihash. e.g CAR CID & CommP CID
+ */
+export const equals = capability({
+  can: 'assert/equals',
+  with: URI.match({ protocol: 'did:' }),
+  nb: Schema.struct({
+    content: Link,
+    equals: Link
   })
 })

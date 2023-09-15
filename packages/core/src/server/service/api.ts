@@ -1,5 +1,5 @@
 import { Failure, ServiceMethod } from '@ucanto/server'
-import { AssertInclusion, AssertLocation, AssertPartition, AssertRelation } from '../../capability/assert.js'
+import { AssertInclusion, AssertLocation, AssertPartition, AssertRelation, AssertEquals } from '../../capability/assert.js'
 import { ClaimStore } from '../api.js'
 
 export interface AssertServiceContext {
@@ -11,6 +11,7 @@ export interface AssertService {
   inclusion: ServiceMethod<AssertInclusion, {}, Failure>
   partition: ServiceMethod<AssertPartition, {}, Failure>
   relation: ServiceMethod<AssertRelation, {}, Failure>
+  equals: ServiceMethod<AssertEquals, {}, Failure>
 }
 
 export interface ServiceContext extends AssertServiceContext {}
