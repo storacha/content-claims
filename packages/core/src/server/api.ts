@@ -1,11 +1,13 @@
 import { MultihashDigest } from 'multiformats/hashes/digest'
 import { UnknownLink, Link } from 'multiformats/link'
+import { AnyAssertCap } from './service/api'
 
 export interface Claim {
   claim: Link
   bytes: Uint8Array
   content: MultihashDigest
-  expiration?: number
+  expiration?: number,
+  value: AnyAssertCap
 }
 
 export interface ClaimFetcher {
