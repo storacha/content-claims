@@ -177,7 +177,8 @@ prog
   .option('-o, --output', 'Write output to this file.')
   .action(async (contentArg, opts) => {
     const content = Link.parse(contentArg)
-    const res = await Client.fetch(content, { walk: opts.walk, serviceURL })
+    const walk = Array.isArray(opts.walk) ? opts.walk : opts.walk?.split(',')
+    const res = await Client.fetch(content, { walk, serviceURL })
     if (!res.ok) throw new Error(`unexpected service status: ${res.status}`, { cause: await res.text() })
     if (!res.body) throw new Error('missing response body')
 
