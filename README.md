@@ -68,7 +68,7 @@ Input:
 }
 ```
 
-### Equivalency Claim
+#### Equivalency Claim
 
 Claims that the same data is referred to by another CID and/or multihash. For example a CAR CID and it's CommP Piece CID.
 
