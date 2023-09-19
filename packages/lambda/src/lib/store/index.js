@@ -124,7 +124,7 @@ async function upsertClaim ({ claim, content, expiration }, { tableName, dynamoC
     const cmd = new UpdateItemCommand({
       TableName: tableName,
       Key: marshall({
-        claim: claim.toString(),
+        claim: claim.toString(base32),
         content: mh
       }),
       ExpressionAttributeValues: marshall({ ':ex': hasExpiration ? expiration : 0 }),
@@ -133,6 +133,6 @@ async function upsertClaim ({ claim, content, expiration }, { tableName, dynamoC
     return dynamoClient.send(cmd)
   }, {
     minTimeout: 100,
-    onFailedAttempt: err => console.warn(`failed DynamoDB update for: ${mh}`, err)
+    onFailedAttempt: err => console.warn(`failed DynamoDB update for content: ${mh} claim: ${claim.toString(base32)}`, err)
   })
 }
