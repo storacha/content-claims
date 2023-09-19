@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.1.0](https://github.com/web3-storage/content-claims/compare/content-claims-v3.0.1...content-claims-v3.1.0) (2023-09-19)
+
+
+### Features
+
+* add `assert/equals` ([#22](https://github.com/web3-storage/content-claims/issues/22)) ([bddd948](https://github.com/web3-storage/content-claims/commit/bddd948db5e1628d20b4d31796690b40b654a720))
+* ensure claim API is CID version agnostic ([#18](https://github.com/web3-storage/content-claims/issues/18)) ([1690c1f](https://github.com/web3-storage/content-claims/commit/1690c1f2bbd6d85a289fcb0ae6a8b524c9022160))
+* store equals for both content and equals multihash ([#23](https://github.com/web3-storage/content-claims/issues/23)) ([715fcd5](https://github.com/web3-storage/content-claims/commit/715fcd5ddb219e77f8573df889f46183c55ce400))
+
+
+### Bug Fixes
+
+* key content on multihash not CID ([#21](https://github.com/web3-storage/content-claims/issues/21)) ([7e737a7](https://github.com/web3-storage/content-claims/commit/7e737a7325bd295db186cc0eaacd7026fbb65986))
+
 ## [3.0.1](https://github.com/web3-storage/content-claims/compare/content-claims-v3.0.0...content-claims-v3.0.1) (2023-07-26)
 
 
