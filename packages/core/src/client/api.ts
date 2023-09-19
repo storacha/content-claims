@@ -69,9 +69,9 @@ export interface RelationPartInclusion {
 /** A claim that the same data is referred to by another CID and/or multihash */
 export interface EqualsClaim extends ContentClaim<typeof Assert.equals.can> {
   /** Any CID e.g a CAR CID */
-  readonly content: Link
+  readonly content: UnknownLink
   /** A CID that is equivalent to the content CID e.g the Piece CID for that CAR CID */
-  readonly equals: Link
+  readonly equals: UnknownLink
 }
 
 /** Types of claim that are known to this library. */

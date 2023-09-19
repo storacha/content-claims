@@ -16,11 +16,9 @@ export function createService (context) {
 }
 
 /**
- * @template {import('@ucanto/interface').Ability} Can
- * @template {import('@ucanto/interface').URI} Resource
- * @template {{ content: import('multiformats').Link }} Caveats
- * @template {import('@ucanto/interface').ParsedCapability<Can, Resource, Caveats>} ParsedCap
- * @param {import('@ucanto/interface').ProviderInput<ParsedCap>} input
+ * @param {object} config
+ * @param {import('./api').AnyAssertCap} config.capability
+ * @param {import('@ucanto/interface').Invocation} config.invocation
  * @param {import('./api').AssertServiceContext} context
  * @returns {Promise<import('@ucanto/server').Result<{}, import('@ucanto/server').Failure>>}
  */
@@ -32,7 +30,8 @@ export const handler = async ({ capability, invocation }, { claimStore }) => {
     claim: invocation.cid,
     bytes: archive.ok,
     content: content.multihash,
-    expiration: invocation.expiration
+    expiration: invocation.expiration,
+    value: capability
   }
   await claimStore.put(claim)
   return { ok: {} }

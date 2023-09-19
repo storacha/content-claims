@@ -7,7 +7,7 @@ import * as Delegation from '@ucanto/core/delegation'
 import { encode as encodeCAR, link as linkCAR } from '@ucanto/core/car'
 import { mock } from 'node:test'
 import * as Block from 'multiformats/block'
-import { sha256 } from 'multiformats/hashes/sha2'
+import { sha256, sha512 } from 'multiformats/hashes/sha2'
 import * as Bytes from 'multiformats/bytes'
 import * as dagCBOR from '@ipld/dag-cbor'
 import * as dagPB from '@ipld/dag-pb'
@@ -165,4 +165,50 @@ test('should be CID version agnostic', async t => {
   const [claim1] = await t.context.claimStore.get(root.cid.toV0())
   assert(claim1)
   await assertClaim(claim1)
+})
+
+test('should return equivalence claim for either cid', async t => {
+  const value = 'two face'
+  const content = await Block.encode({ value, hasher: sha256, codec: dagCBOR })
+  const equals = await Block.encode({ value, hasher: sha512, codec: dagCBOR })
+
+  const claimPut = mock.method(t.context.claimStore, 'put')
+
+  const connection = Client.connect({
+    id: t.context.signer,
+    codec: CAR.outbound,
+    channel: t.context.server
+  })
+
+  const result = await Assert.equals.invoke({
+    issuer: t.context.signer,
+    audience: t.context.signer,
+    with: t.context.signer.did(),
+    nb: {
+      content: content.cid,
+      equals: equals.cid
+    }
+  }).execute(connection)
+
+  t.falsy(result.out.error)
+  t.truthy(result.out.ok)
+
+  t.is(claimPut.mock.callCount(), 1)
+
+  const [claim] = await t.context.claimStore.get(content.cid)
+
+  const delegation = await Delegation.extract(claim.bytes)
+
+  /** @type {Assert.AssertEquals|undefined} */
+  // @ts-expect-error
+  const cap = delegation?.ok?.capabilities[0]
+
+  t.truthy(cap)
+  assert(cap)
+  t.is(cap.nb.content.toString(), content.cid.toString())
+  t.is(cap.nb.equals.toString(), equals.cid.toString())
+
+  const [equivalentClaim] = await t.context.claimStore.get(equals.cid)
+
+  t.true(Bytes.equals(claim.bytes, equivalentClaim.bytes))
 })
