@@ -38,19 +38,9 @@ export class ClaimStorage {
   async put (claim) {
     await Promise.all([
       storeClaimBytes(claim, this.#bucket),
-      upsertClaim(claim, this.#table)
+      upsertClaim(claim, this.#table),
+      maybeUpsertEquivalentClaim(claim, this.#table)
     ])
-    const { content, value } = claim
-    if (value.can === 'assert/equals') {
-      const equivalent = value.nb.equals.multihash
-      if (Bytes.equals(content.bytes, equivalent.bytes)) {
-        // the multihash matches so this claim will appear in queries for either CID already.
-        return
-      }
-      // also add the claim with the `equals` cid as the `content` cid,
-      // so we can provide the equivalent claim for look ups for either.
-      await upsertClaim({ ...claim, content: equivalent }, this.#table)
-    }
   }
 
   /** @param {import('@ucanto/server').UnknownLink} content */
@@ -135,4 +125,21 @@ async function upsertClaim ({ claim, content, expiration }, { tableName, dynamoC
     minTimeout: 100,
     onFailedAttempt: err => console.warn(`failed DynamoDB update for content: ${mh} claim: ${claim.toString(base32)}`, err)
   })
+}
+
+/**
+ * @param {import('@web3-storage/content-claims/server/api').Claim} claim
+ * @param {import('./dynamo-table').DynamoTable} dynamo
+ */
+async function maybeUpsertEquivalentClaim (claim, dynamo) {
+  const { content, value } = claim
+  if (value.can === 'assert/equals') {
+    const equivalent = value.nb.equals.multihash
+    // If the multihash matches this claim will appear in queries for either CID already.
+    if (!Bytes.equals(content.bytes, equivalent.bytes)) {
+      // add claim with the `equals` cid as the `content` cid, so we can
+      // provide the equivalent claim for look ups for either.
+      return upsertClaim({ ...claim, content: equivalent }, dynamo)
+    }
+  }
 }
