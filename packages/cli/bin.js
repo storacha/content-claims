@@ -9,12 +9,13 @@ import { inspect } from 'node:util'
 import { Writable } from 'node:stream'
 import * as Link from 'multiformats/link'
 import * as ed25519 from '@ucanto/principal/ed25519'
-import { DID } from '@ucanto/core'
+import { DID, UCAN } from '@ucanto/core'
 import * as Delegation from '@ucanto/core/delegation'
 import { CAR, HTTP } from '@ucanto/transport'
 import * as Client from '@web3-storage/content-claims/client'
 import { Assert } from '@web3-storage/content-claims/capability'
 import { CARReaderStream } from 'carstream'
+import duration from 'parse-duration'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 dotenv.config({ path: join(__dirname, '.env') })
@@ -41,6 +42,7 @@ prog
   .command('location <content> <url>')
   .describe('Generate a location claim that asserts the content (CAR CID) can be found at the URLs.')
   .option('-o, --output', 'Write output to this file.')
+  .option('-e, --expire', 'Duration after which claim expires e.g \'1min\' or \'1hr\'', '30s')
   .example('location bagbaierae3n6cey3feykv3h5imue3eustl656dajifuddj3zedhpdofje3za https://s3.url/bagbaierae3n6cey3feykv3h5imue3eustl656dajifuddj3zedhpdofje3za.car -o location.claim')
   .action(async (contentArg, urlArg, opts) => {
     const content = Link.parse(contentArg)
@@ -51,13 +53,15 @@ prog
       issuer: signer,
       audience: servicePrincipal,
       with: signer.did(),
-      nb: { content, location: urls }
+      nb: { content, location: urls },
+      expiration: toUcanExpiration(opts.expire)
     })
     await archiveClaim(invocation, opts.output)
   })
   .command('partition <content> <part>')
   .describe('Generate a partition claim that asserts the content (DAG root CID) exists in the parts (CAR CIDs).')
   .option('-o, --output', 'Write output to this file.')
+  .option('-e, --expire', 'Duration after which claim expires e.g \'1min\' or \'1hr\'', '30s')
   .example('partition bafybeiefif6pfs25c6g5r4lcvsk7l6f3vnnsuziitrlca3g6rhjkhmysna bagbaierae3n6cey3feykv3h5imue3eustl656dajifuddj3zedhpdofje3za -o partition.claim')
   .action(async (contentArg, partArg, opts) => {
     const content = Link.parse(contentArg)
@@ -68,13 +72,15 @@ prog
       issuer: signer,
       audience: servicePrincipal,
       with: signer.did(),
-      nb: { content, parts }
+      nb: { content, parts },
+      expiration: toUcanExpiration(opts.expire)
     })
     await archiveClaim(invocation, opts.output)
   })
   .command('inclusion <content> <includes>')
   .describe('Generate an inclusion claim that asserts the content (CAR CID) includes the blocks in the index (CARv2 index CID).')
   .option('-o, --output', 'Write output to this file.')
+  .option('-e, --expire', 'Duration after which claim expires e.g \'1min\' or \'1hr\'', '30s')
   .example('inclusion bagbaierae3n6cey3feykv3h5imue3eustl656dajifuddj3zedhpdofje3za bafkreihyikwmd6vlp5g6snhqipvigffx3w52l322dtqlrf4phanxisa34m -o inclusion.claim')
   .action(async (contentArg, includesArg, opts) => {
     const content = Link.parse(contentArg)
@@ -85,7 +91,8 @@ prog
       issuer: signer,
       audience: servicePrincipal,
       with: signer.did(),
-      nb: { content, includes }
+      nb: { content, includes },
+      expiration: toUcanExpiration(opts.expire)
     })
     await archiveClaim(invocation, opts.output)
   })
@@ -96,6 +103,7 @@ prog
   .option('-i, --includes', 'One or more CARv2 CIDs corresponding to the parts.')
   .option('-a, --includes-part', 'One or more CAR CIDs where the inclusion CID may be found.')
   .option('-o, --output', 'Write output to this file.')
+  .option('-e, --expire', 'Duration after which claim expires e.g \'1min\' or \'1hr\'', '30s')
   .example('relation bagbaierae3n6cey3feykv3h5imue3eustl656dajifuddj3zedhpdofje3za --child bafkreihyikwmd6vlp5g6snhqipvigffx3w52l322dtqlrf4phanxisa34m --part -o relation.claim')
   .action(async (contentArg, opts) => {
     const content = Link.parse(contentArg)
@@ -122,13 +130,15 @@ prog
       issuer: signer,
       audience: servicePrincipal,
       with: signer.did(),
-      nb: { content, children, parts }
+      nb: { content, children, parts },
+      expiration: toUcanExpiration(opts.expire)
     })
     await archiveClaim(invocation, opts.output)
   })
   .command('equals <content> <equal>')
   .describe('Generate an equals claim that asserts the content is referred to by another CID and/or multihash.')
   .option('-o, --output', 'Write output to this file.')
+  .option('-e, --expire', 'Duration after which claim expires e.g \'1min\' or \'1hr\'', '30s')
   .example('equals QmUNLLsPACCz1vLxQVkXqqLX5R1X345qqfHbsf67hvA3Nn bafybeiczsscdsbs7ffqz55asqdf3smv6klcw3gofszvwlyarci47bgf354 -o equals.claim')
   .action(async (contentArg, equalsArg, opts) => {
     const content = Link.parse(contentArg)
@@ -139,7 +149,8 @@ prog
       issuer: signer,
       audience: servicePrincipal,
       with: signer.did(),
-      nb: { content, equals }
+      nb: { content, equals },
+      expiration: toUcanExpiration(opts.expire)
     })
     await archiveClaim(invocation, opts.output)
   })
@@ -223,6 +234,25 @@ const getSigner = () => {
   const pk = process.env.PRIVATE_KEY
   if (!pk) throw new Error('missing PRIVATE_KEY environment variable')
   return ed25519.parse(pk).withDID(servicePrincipal.did())
+}
+
+/**
+ * take a human duration like 1d (one day)
+ * return "the number of integer seconds since the Unix epoch."
+ * > https://github.com/ucan-wg/spec#323-time-bounds
+ * @param {string} str
+ */
+function toUcanExpiration (str, now = UCAN.now()) {
+  if (!str) return undefined
+  const input = str.toLocaleLowerCase()
+  if (input === 'never') {
+    return Infinity
+  }
+  const durationInSeconds = duration(str, 's')
+  if (durationInSeconds === undefined) {
+    return undefined
+  }
+  return now + durationInSeconds
 }
 
 prog.parse(process.argv)
