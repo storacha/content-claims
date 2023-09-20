@@ -235,6 +235,10 @@ Region of the DynamoDB that houses the block index table (set if different from 
 
 The DID of the service, if using DID with method other than `key`.
 
+#### `SERVICE_URL` (optional)
+
+The URL of the deployed service.
+
 #### `SENTRY_DSN` (optional)
 
 Data source name for Sentry application monitoring service.
