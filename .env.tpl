@@ -10,5 +10,7 @@ BLOCK_INDEX_TABLE=blocks-cars-position
 BLOCK_INDEX_REGION=us-west-2
 # (optional) Service DID, if using DID with method other than `key`.
 SERVICE_DID=did:web:dev.claims.web3.storage
+# (optional) Service URL.
+SERVICE_URL=https://staging.claims.web3.storage
 # (optional) Error reporting key.
 SENTRY_DSN=
