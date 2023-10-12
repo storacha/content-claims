@@ -7,14 +7,16 @@ import { createService } from './service/index.js'
  * @param {import('./service/api').ServiceContext & {
  *   id: import('@ucanto/server').Signer
  *   codec: import('@ucanto/server').InboundCodec
+ *   validateAuthorization: import('@ucanto/interface').RevocationChecker['validateAuthorization']
  *   errorReporter?: { catch: (err: import('@ucanto/server').HandlerExecutionError) => void }
  * }} config
  * @returns {Server}
  */
-export const createServer = ({ id, codec, errorReporter: errorHandler, ...context }) =>
+export const createServer = ({ id, codec, errorReporter: errorHandler, validateAuthorization, ...context }) =>
   Server.create({
     id,
     codec,
     service: createService(context),
-    catch: errorHandler?.catch
+    catch: errorHandler?.catch,
+    validateAuthorization
   })

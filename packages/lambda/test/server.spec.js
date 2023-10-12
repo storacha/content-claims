@@ -46,7 +46,8 @@ test.beforeEach(async t => {
   t.context.server = Server.createServer({
     id: t.context.signer,
     codec: CAR.inbound,
-    claimStore: t.context.claimStore
+    claimStore: t.context.claimStore,
+    validateAuthorization: () => ({ ok: {} })
   })
 })
 

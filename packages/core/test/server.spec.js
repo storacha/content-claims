@@ -17,7 +17,12 @@ import * as CARv2Index from './helpers/carv2-index.js'
 const beforeEach = async () => {
   const claimStore = new ClaimStorage()
   const signer = await ed25519.generate()
-  const server = Server.createServer({ id: signer, codec: CAR.inbound, claimStore })
+  const server = Server.createServer({
+    id: signer,
+    codec: CAR.inbound,
+    claimStore,
+    validateAuthorization: () => ({ ok: {} })
+  })
   return { claimStore, signer, server }
 }
 
