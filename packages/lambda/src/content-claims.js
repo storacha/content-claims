@@ -103,7 +103,10 @@ export const postUcanInvocation = async event => {
   const server = createServer({
     id: signer,
     codec: CAR.inbound,
-    claimStore
+    claimStore,
+    // TODO: wire into revocations
+    // https://github.com/web3-storage/content-claims/issues/32
+    validateAuthorization: () => ({ ok: {} })
   })
 
   const response = await server.request({

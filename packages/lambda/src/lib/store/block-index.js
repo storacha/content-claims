@@ -134,13 +134,19 @@ const buildRelationClaim = async (signer, { content, part, offset }, expiration)
 
 /**
  * @param {import('@ucanto/server').UnknownLink} content
- * @param {import('@ucanto/server').IssuedInvocationView} invocation
+ * @param {import('@ucanto/server').IssuedInvocationView<import('@web3-storage/content-claims/server/service/api').AnyAssertCap>} invocation
  */
 const buildClaim = async (content, invocation) => {
   const ipldView = await invocation.buildIPLDView()
   const archive = await ipldView.archive()
   if (!archive.ok) throw new Error('failed to archive invocation', { cause: archive.error })
-  return { claim: ipldView.cid, bytes: archive.ok, content: content.toV1(), expiration: ipldView.expiration }
+  return {
+    claim: ipldView.cid,
+    bytes: archive.ok,
+    content: content.multihash,
+    expiration: ipldView.expiration,
+    value: invocation.capabilities[0]
+  }
 }
 
 /**

@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc --build",
-    "lint": "standard",
+    "lint": "standard && tsc",
     "test": "entail"
   },
   "author": "Alan Shaw",
