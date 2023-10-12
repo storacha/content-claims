@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.0](https://github.com/web3-storage/content-claims/compare/content-claims-v3.1.0...content-claims-v3.2.0) (2023-10-12)
+
+
+### Features
+
+* upgrade to latest ucanto ([#30](https://github.com/web3-storage/content-claims/issues/30)) ([1323df1](https://github.com/web3-storage/content-claims/commit/1323df1a3c034805c2d08733be7349991971c68e))
+
 ## [3.1.0](https://github.com/web3-storage/content-claims/compare/content-claims-v3.0.1...content-claims-v3.1.0) (2023-09-19)
 
 
