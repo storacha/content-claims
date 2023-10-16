@@ -8,7 +8,8 @@
     "claim": "bin.js"
   },
   "scripts": {
-    "test": "echo \"moar tests are here needed\""
+    "test": "echo \"moar tests are here needed\"",
+    "lint": "standard"
   },
   "author": "Alan Shaw",
   "license": "Apache-2.0 OR MIT",

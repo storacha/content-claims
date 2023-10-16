@@ -8,8 +8,8 @@
   "scripts": {
     "start": "sst dev",
     "test": "npm run test --workspaces",
-    "pretest": "standard && tsc",
-    "lint": "standard",
+    "pretest": "npm run lint",
+    "lint": "standard && npm run lint --workspaces",
     "build": "sst build",
     "deploy": "sst deploy",
     "remove": "sst remove",
