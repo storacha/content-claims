@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.2.1](https://github.com/web3-storage/content-claims/compare/content-claims-v3.2.0...content-claims-v3.2.1) (2023-11-27)
+
+
+### Bug Fixes
+
+* add linting and fix type errors ([#33](https://github.com/web3-storage/content-claims/issues/33)) ([5450a8b](https://github.com/web3-storage/content-claims/commit/5450a8bc207fb75b73a25ceed8d5091d0f95be65))
+* exports types ([1d413a8](https://github.com/web3-storage/content-claims/commit/1d413a87429c6b6bc589d52996430a94b61c9e76))
+
 ## [3.2.0](https://github.com/web3-storage/content-claims/compare/content-claims-v3.1.0...content-claims-v3.2.0) (2023-10-12)
 
 
