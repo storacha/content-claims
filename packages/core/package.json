@@ -36,15 +36,42 @@
     "types"
   ],
   "exports": {
-    ".": "./src/index.js",
-    "./server": "./src/server/index.js",
-    "./server/api": "./src/server/api.js",
-    "./server/service": "./src/server/service/index.js",
-    "./server/service/api": "./src/server/service/api.js",
-    "./client": "./src/client/index.js",
-    "./client/api": "./src/client/api.js",
-    "./capability": "./src/capability/index.js",
-    "./capability/assert": "./src/capability/assert.js"
+    ".": {
+      "import": "./src/index.js",
+      "types": "./types/index.d.ts"
+    },
+    "./server": {
+      "import": "./src/server/index.js",
+      "types": "./types/server/index.d.ts"
+    },
+    "./server/api": {
+      "import": "./src/server/api.js",
+      "types": "./types/server/api.d.ts"
+    },
+    "./server/service": {
+      "import": "./src/server/service/index.js",
+      "types": "./types/server/service/index.d.ts"
+    },
+    "./server/service/api": {
+      "import": "./src/server/service/api.js",
+      "types": "./types/server/service/index.d.ts"
+    },
+    "./client": {
+      "import": "./src/client/index.js",
+      "types": "./types/client/index.d.ts"
+    },
+    "./client/api": {
+      "import": "./src/client/api.js",
+      "types": "./types/client/api.d.ts"
+    },
+    "./capability": {
+      "import": "./src/capability/index.js",
+      "types": "./types/capability/index.d.ts"
+    },
+    "./capability/assert": {
+      "import": "./src/capability/assert.js",
+      "types": "./types/capability/assert.d.ts"
+    }
   },
   "typesVersions": {
     "*": {
