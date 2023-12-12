@@ -12,7 +12,7 @@ export const serviceURL = new URL('https://claims.web3.storage')
 /** @type {import('@ucanto/interface').Principal} */
 export const servicePrincipal = { did: () => 'did:web:claims.web3.storage' }
 
-/** @type {import('@ucanto/interface').ConnectionView<import('../server/service/api').Service>} */
+/** @type {import('@ucanto/interface').ConnectionView<import('../server/service/api.js').Service>} */
 export const connection = connect({
   id: servicePrincipal,
   codec: CAR.outbound,
@@ -23,7 +23,7 @@ export { connect, invoke, delegate, CAR, HTTP }
 
 /**
  * @param {Uint8Array} bytes
- * @returns {Promise<import('./api').Claim>}
+ * @returns {Promise<import('./api.js').Claim>}
  */
 export const decode = async bytes => {
   const delegation = await extractDelegation(bytes)
@@ -79,14 +79,14 @@ export const fetch = async (content, options) => {
  *
  * @param {import('@ucanto/client').UnknownLink} content
  * @param {FetchOptions} [options]
- * @returns {Promise<import('./api').Claim[]>}
+ * @returns {Promise<import('./api.js').Claim[]>}
  */
 export const read = async (content, options) => {
   const res = await fetch(content, options)
   if (!res.ok) throw new Error(`unexpected service status: ${res.status}`, { cause: await res.text() })
   if (!res.body) throw new Error('missing response body')
 
-  /** @type {import('./api').Claim[]} */
+  /** @type {import('./api.js').Claim[]} */
   const claims = []
   try {
     await res.body

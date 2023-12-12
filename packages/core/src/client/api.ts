@@ -1,5 +1,5 @@
 import { Link, URI, UnknownLink, Block } from '@ucanto/client'
-import * as Assert from '../capability/assert'
+import * as Assert from '../capability/assert.js'
 
 /** A verifiable claim about data. */
 export interface ContentClaim<T extends string> {

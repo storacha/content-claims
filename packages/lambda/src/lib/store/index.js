@@ -18,15 +18,15 @@ export { BlockIndexClaimFetcher } from './block-index.js'
 
 /** @implements {ClaimStore} */
 export class ClaimStorage {
-  /** @type {import('./dynamo-table').DynamoTable} */
+  /** @type {import('./dynamo-table.js').DynamoTable} */
   #table
-  /** @type {import('./s3-bucket').S3Bucket} */
+  /** @type {import('./s3-bucket.js').S3Bucket} */
   #bucket
 
   /**
    * @param {{
-   *   table: import('./dynamo-table').DynamoTable
-   *   bucket: import('./s3-bucket').S3Bucket
+   *   table: import('./dynamo-table.js').DynamoTable
+   *   bucket: import('./s3-bucket.js').S3Bucket
    * }} config
    */
   constructor ({ table, bucket }) {
@@ -85,7 +85,7 @@ export class ClaimStorage {
 
 /**
  * @param {import('@web3-storage/content-claims/server/api').Claim} claim
- * @param {import('./s3-bucket').S3Bucket} s3
+ * @param {import('./s3-bucket.js').S3Bucket} s3
  **/
 async function storeClaimBytes ({ claim, bytes }, { bucketName, s3Client }) {
   const cidstr = claim.toString(base32)
@@ -105,7 +105,7 @@ async function storeClaimBytes ({ claim, bytes }, { bucketName, s3Client }) {
 
 /**
  * @param {import('@web3-storage/content-claims/server/api').Claim} claim
- * @param {import('./dynamo-table').DynamoTable} dynamo
+ * @param {import('./dynamo-table.js').DynamoTable} dynamo
  */
 async function upsertClaim ({ claim, content, expiration }, { tableName, dynamoClient }) {
   const hasExpiration = expiration && isFinite(expiration)
@@ -129,7 +129,7 @@ async function upsertClaim ({ claim, content, expiration }, { tableName, dynamoC
 
 /**
  * @param {import('@web3-storage/content-claims/server/api').Claim} claim
- * @param {import('./dynamo-table').DynamoTable} dynamo
+ * @param {import('./dynamo-table.js').DynamoTable} dynamo
  */
 async function maybeUpsertEquivalentClaim (claim, dynamo) {
   const { content, value } = claim

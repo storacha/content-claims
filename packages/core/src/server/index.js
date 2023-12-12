@@ -1,10 +1,10 @@
 import * as Server from '@ucanto/server'
 import { createService } from './service/index.js'
 
-/** @typedef {import('@ucanto/interface').ServerView<import('./service/api').Service>} Server */
+/** @typedef {import('@ucanto/interface').ServerView<import('./service/api.js').Service>} Server */
 
 /**
- * @param {import('./service/api').ServiceContext & {
+ * @param {import('./service/api.js').ServiceContext & {
  *   id: import('@ucanto/server').Signer
  *   codec: import('@ucanto/server').InboundCodec
  *   validateAuthorization: import('@ucanto/interface').RevocationChecker['validateAuthorization']
