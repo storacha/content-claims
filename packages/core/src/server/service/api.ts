@@ -1,5 +1,5 @@
 import { Failure, ServiceMethod } from '@ucanto/server'
-import { AssertInclusion, AssertLocation, AssertPartition, AssertRelation, AssertEquals } from '../../capability/assert.js'
+import { AssertInclusion, AssertLocation, AssertPartition, AssertRelation, AssertEquals } from '../../capability/api.js'
 import { ClaimStore } from '../api.js'
 
 export type AnyAssertCap = AssertInclusion | AssertLocation | AssertPartition | AssertRelation | AssertEquals

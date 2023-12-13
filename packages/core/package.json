@@ -2,7 +2,7 @@
   "name": "@web3-storage/content-claims",
   "version": "4.0.0",
   "description": "Implementation of the Content Claims Protocol.",
-  "main": "src/index.js",
+  "main": "./types/index.js",
   "types": "./types/index.d.ts",
   "type": "module",
   "scripts": {
@@ -39,39 +39,39 @@
   ],
   "exports": {
     ".": {
-      "import": "./src/index.js",
+      "import": "./types/index.js",
       "types": "./types/index.d.ts"
     },
     "./server": {
-      "import": "./src/server/index.js",
+      "import": "./types/server/index.js",
       "types": "./types/server/index.d.ts"
     },
     "./server/api": {
-      "import": "./src/server/api.js",
+      "import": "./types/server/api.js",
       "types": "./types/server/api.d.ts"
     },
     "./server/service": {
-      "import": "./src/server/service/index.js",
+      "import": "./types/server/service/index.js",
       "types": "./types/server/service/index.d.ts"
     },
     "./server/service/api": {
-      "import": "./src/server/service/api.js",
+      "import": "./types/server/service/api.js",
       "types": "./types/server/service/index.d.ts"
     },
     "./client": {
-      "import": "./src/client/index.js",
+      "import": "./types/client/index.js",
       "types": "./types/client/index.d.ts"
     },
     "./client/api": {
-      "import": "./src/client/api.js",
+      "import": "./types/client/api.js",
       "types": "./types/client/api.d.ts"
     },
     "./capability": {
-      "import": "./src/capability/index.js",
+      "import": "./types/capability/index.js",
       "types": "./types/capability/index.d.ts"
     },
     "./capability/assert": {
-      "import": "./src/capability/assert.js",
+      "import": "./types/capability/assert.js",
       "types": "./types/capability/assert.d.ts"
     }
   },

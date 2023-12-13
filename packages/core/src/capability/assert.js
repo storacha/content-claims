@@ -1,14 +1,5 @@
 import { capability, URI, Link, Schema } from '@ucanto/server'
 
-/**
- * @typedef {import('@ucanto/server').InferInvokedCapability<typeof assert>} Assert
- * @typedef {import('@ucanto/server').InferInvokedCapability<typeof location>} AssertLocation
- * @typedef {import('@ucanto/server').InferInvokedCapability<typeof inclusion>} AssertInclusion
- * @typedef {import('@ucanto/server').InferInvokedCapability<typeof partition>} AssertPartition
- * @typedef {import('@ucanto/server').InferInvokedCapability<typeof relation>} AssertRelation
- * @typedef {import('@ucanto/server').InferInvokedCapability<typeof equals>} AssertEquals
- */
-
 export const assert = capability({
   can: 'assert/*',
   with: URI.match({ protocol: 'did:' })

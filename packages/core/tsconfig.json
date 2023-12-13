@@ -4,7 +4,7 @@
   "compilerOptions": {
     "declaration": true,
     "declarationMap": true,
-    "emitDeclarationOnly": true,
+    "emitDeclarationOnly": false,
     "outDir": "types",
     "allowJs": true,
     "checkJs": true,
