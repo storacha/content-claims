@@ -8,7 +8,7 @@
   "scripts": {
     "prepare": "npm run build",
     "build": "tsc --build",
-    "lint": "standard && tsc",
+    "lint": "standard src test && tsc",
     "test": "entail"
   },
   "author": "Alan Shaw",
