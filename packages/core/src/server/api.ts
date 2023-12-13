@@ -1,6 +1,6 @@
 import { MultihashDigest } from 'multiformats/hashes/digest'
 import { UnknownLink, Link } from 'multiformats/link'
-import { AnyAssertCap } from './service/api'
+import { AnyAssertCap } from './service/api.js'
 
 export interface Claim {
   claim: Link

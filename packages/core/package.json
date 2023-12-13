@@ -6,6 +6,7 @@
   "types": "./types/index.d.ts",
   "type": "module",
   "scripts": {
+    "prepare": "npm run build",
     "build": "tsc --build",
     "lint": "standard && tsc",
     "test": "entail"
@@ -33,6 +34,7 @@
   ],
   "files": [
     "src",
+    "tsconfig.json",
     "types"
   ],
   "exports": {
@@ -105,12 +107,12 @@
     "@ucanto/client": "^9.0.0",
     "@ucanto/server": "^9.0.1",
     "@ucanto/transport": "^9.0.0",
+    "@ucanto/interface": "^9.0.0",
     "carstream": "^1.0.2",
     "multiformats": "^12.0.1"
   },
   "devDependencies": {
     "@ipld/dag-cbor": "^9.0.3",
-    "@ucanto/interface": "^9.0.0",
     "@ucanto/principal": "^9.0.0",
     "cardex": "^2.3.0",
     "entail": "^2.1.1",

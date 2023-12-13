@@ -2,8 +2,8 @@ import * as Server from '@ucanto/server'
 import * as Assert from '../../capability/assert.js'
 
 /**
- * @param {import('./api').AssertServiceContext} context
- * @returns {import('./api').AssertService}
+ * @param {import('./api.js').AssertServiceContext} context
+ * @returns {import('./api.js').AssertService}
  */
 export function createService (context) {
   return {
@@ -17,9 +17,9 @@ export function createService (context) {
 
 /**
  * @param {object} config
- * @param {import('./api').AnyAssertCap} config.capability
+ * @param {import('./api.js').AnyAssertCap} config.capability
  * @param {import('@ucanto/interface').Invocation} config.invocation
- * @param {import('./api').AssertServiceContext} context
+ * @param {import('./api.js').AssertServiceContext} context
  * @returns {Promise<import('@ucanto/server').Result<{}, import('@ucanto/server').Failure>>}
  */
 export const handler = async ({ capability, invocation }, { claimStore }) => {

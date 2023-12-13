@@ -9,12 +9,12 @@
     "checkJs": true,
     "strict": true,
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "lib": ["ES2022", "DOM"],
     "target": "ES2022",
-    "module": "es2022",
     "baseUrl": ".",
     "paths": {
       "@web3-storage/content-claims/*": ["../core/src/*"]
