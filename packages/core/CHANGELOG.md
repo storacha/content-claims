@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.0.0](https://github.com/web3-storage/content-claims/compare/content-claims-v3.2.1...content-claims-v4.0.0) (2023-12-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* `@web3-storage/content-claims` tsconfig.json uses NodeNext ([#38](https://github.com/web3-storage/content-claims/issues/38))
+
+### Features
+
+* `@web3-storage/content-claims` tsconfig.json uses NodeNext ([#38](https://github.com/web3-storage/content-claims/issues/38)) ([2875e8d](https://github.com/web3-storage/content-claims/commit/2875e8d99d762188019c3e99ce6163e7302b3201))
+
 ## [3.2.1](https://github.com/web3-storage/content-claims/compare/content-claims-v3.2.0...content-claims-v3.2.1) (2023-11-27)
 
 
