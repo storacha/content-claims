@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.0.1](https://github.com/web3-storage/content-claims/compare/content-claims-v4.0.0...content-claims-v4.0.1) (2023-12-13)
+
+
+### Bug Fixes
+
+* fix content-claims package not being importable by ts project by having package.json point to src alongside types ([#41](https://github.com/web3-storage/content-claims/issues/41)) ([9931249](https://github.com/web3-storage/content-claims/commit/9931249030e5c1a2b1616c2ba35a567a64667dee))
+
 ## [4.0.0](https://github.com/web3-storage/content-claims/compare/content-claims-v3.2.1...content-claims-v4.0.0) (2023-12-13)
 
 
