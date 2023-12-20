@@ -136,6 +136,25 @@ Query parameters:
 
 * `?walk=` - a CSV list of properties in claims to walk in order to return additional claims about the related CIDs. Any property that is a CID can be walked. e.g. `?walk=parts,includes`.
 
+### CLI
+
+There is a command line interface for invoking the HTTP API in [./packages/cli](./packages/cli).
+
+It's published to npm, so if you have npm installed, you should be able to:
+* run the cli with
+  ```shell
+  npx @web3-storage/content-claims-cli # args
+  ```
+* install the cli globally with
+  ```shell
+  npm install -g @web3-storage/content-claims-cli
+  ```
+  * then invoke it like this to see CAR bytes on stdout
+    ```shell
+    claim read bafybeifftytx763g6u5gvisyrng5de4wmxhwlc4sjxfhohmab6yjprcmbi --walk=parts,includes
+    ```
+
+For more CLI Usage instructions, see the [content-claims-cli README](./packages/cli/README.md)
 
 ## Getting started
 
