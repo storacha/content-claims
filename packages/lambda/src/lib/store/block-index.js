@@ -69,7 +69,7 @@ export class BlockIndexClaimFetcher extends DynamoTable {
     item = item ?? items.find(({ bucket, key }) => bucket === 'dotstorage-prod-0' && key.startsWith('raw'))
     item = item ?? items[0]
     if (!item) return []
-    
+
     // can derive car cid from /raw keys. not for /complete keys
     const part = bucketKeyToPartCID(item.key)
     const location = [new URL(`https://${item.bucket}.s3.amazonaws.com/${item.key}`)]
