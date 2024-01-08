@@ -8,6 +8,8 @@ import { encode as encodeCAR, link as linkCAR } from '@ucanto/core/car'
 import { mock } from 'node:test'
 import * as Block from 'multiformats/block'
 import { sha256, sha512 } from 'multiformats/hashes/sha2'
+import { base58btc } from 'multiformats/bases/base58'
+import { base32 } from 'multiformats/bases/base32'
 import * as Bytes from 'multiformats/bytes'
 import * as dagCBOR from '@ipld/dag-cbor'
 import * as dagPB from '@ipld/dag-pb'
@@ -16,9 +18,11 @@ import * as Server from '@web3-storage/content-claims/server'
 import { Assert } from '@web3-storage/content-claims/capability'
 import { DynamoTable } from '../src/lib/store/dynamo-table.js'
 import { S3Bucket } from '../src/lib/store/s3-bucket.js'
-import { ClaimStorage } from '../src/lib/store/index.js'
-import { createDynamo, createDynamoTable, createS3, createS3Bucket } from './helpers/aws.js'
+import { ClaimStorage, BlockIndexClaimFetcher } from '../src/lib/store/index.js'
+import { createDynamo, createDynamoTable, createDynamoBlocksTable, createS3, createS3Bucket } from './helpers/aws.js'
 import * as CARv2Index from './helpers/carv2-index.js'
+import { PutItemCommand } from '@aws-sdk/client-dynamodb'
+import { CarIndexer } from '@ipld/car/indexer'
 
 /**
  * @typedef {{
@@ -213,3 +217,98 @@ test('should return equivalence claim for either cid', async t => {
 
   t.true(Bytes.equals(claim.bytes, equivalentClaim.bytes))
 })
+
+test('should materialize location claim from block index', async t => {
+  const { signer } = t.context
+  const dynamo = t.context.dynamo.client
+  const root = await Block.encode({ value: 'go go go', hasher: sha256, codec: dagCBOR })
+  const car = encodeCAR({ roots: [root], blocks: new Map([[root.cid.toString(), root]]) })
+  const carpath = 'region/bucket/pickup/rootCid/rootCid.root.car'
+  const indexer = await CarIndexer.fromBytes(car)
+  const index = new Map()
+  for await (const { cid, offset, blockOffset, blockLength } of indexer) {
+    index.set(cid.toString(), { cid, offset, blockOffset, blockLength })
+  }
+  const offset = index.get(root.cid.toString()).blockOffset
+  const blocksTable = await createDynamoBlocksTable(dynamo)
+  await dynamo.send(new PutItemCommand({
+    TableName: blocksTable,
+    Item: {
+      blockmultihash: { S: base58btc.encode(root.cid.multihash.bytes) },
+      carpath: { S: carpath },
+      offset: { N: offset },
+      length: { N: root.bytes.byteLength }
+    }
+  }))
+
+  const blockClaims = new BlockIndexClaimFetcher(dynamo, blocksTable, signer)
+  const res = await blockClaims.get(root.cid)
+  t.is(res.length, 1)
+  testLocationClaim({ t, value: res[0].value, root, carpath, offset, signer })
+})
+
+test('should materialize location and relation claim from /raw block index', async t => {
+  const { signer } = t.context
+  const dynamo = t.context.dynamo.client
+  const root = await Block.encode({ value: 'go go go', hasher: sha256, codec: dagCBOR })
+  const car = encodeCAR({ roots: [root], blocks: new Map([[root.cid.toString(), root]]) })
+  const carCid = await linkCAR(car)
+  const carpath = `region/bucket/raw/root/uid/${base32.baseEncode(carCid.multihash.bytes)}.car`
+  const indexer = await CarIndexer.fromBytes(car)
+  const index = new Map()
+  for await (const { cid, offset, blockOffset, blockLength } of indexer) {
+    index.set(cid.toString(), { cid, offset, blockOffset, blockLength })
+  }
+  const offset = index.get(root.cid.toString()).blockOffset
+  const blocksTable = await createDynamoBlocksTable(dynamo)
+  await dynamo.send(new PutItemCommand({
+    TableName: blocksTable,
+    Item: {
+      blockmultihash: { S: base58btc.encode(root.cid.multihash.bytes) },
+      carpath: { S: carpath },
+      offset: { N: offset },
+      length: { N: root.bytes.byteLength }
+    }
+  }))
+
+  const blockClaims = new BlockIndexClaimFetcher(dynamo, blocksTable, signer)
+  const res = await blockClaims.get(root.cid)
+  t.is(res.length, 2)
+  testLocationClaim({ t, value: res[0].value, root, carpath, offset, signer })
+
+  const v2Index = await CARv2Index.encode(Array.from(index.values()))
+  testRelationClaim({
+    t,
+    value: res[1].value,
+    root,
+    signer,
+    parts: [
+      {
+        content: carCid,
+        includes: {
+          content: v2Index.cid
+        }
+      }
+    ]
+  })
+
+  const blockBytes = car.subarray(offset, offset + root.bytes.byteLength)
+  t.true(Bytes.equals(blockBytes, root.bytes), 'offset was correctly derived')
+})
+
+function testLocationClaim ({ t, value, root, carpath, offset, signer }) {
+  t.is(value.can, 'assert/location')
+  t.is(value.with, signer.did())
+  t.is(value.nb.content.toString(), root.cid.toString())
+  t.like(value.nb.range, { offset, length: root.bytes.byteLength })
+  const [, bucket, ...key] = carpath.split('/')
+  t.is(value.nb.location[0], `https://${bucket}.s3.amazonaws.com/${key.join('/')}`)
+}
+
+function testRelationClaim ({ t, value, root, parts, children = [], signer }) {
+  t.is(value.can, 'assert/relation')
+  t.is(value.with, signer.did())
+  t.is(value.nb.content.toString(), root.cid.toString())
+  t.deepEqual(value.nb.children, children)
+  t.deepEqual(value.nb.parts, parts)
+}

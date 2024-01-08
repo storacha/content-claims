@@ -65,6 +65,32 @@ export async function createDynamoTable (dynamo) {
   return name
 }
 
+/** @param {DynamoDBClient} dynamo */
+export async function createDynamoBlocksTable (dynamo) {
+  const name = id()
+  console.log(`Creating DynamoDB blocks table "${name}"...`)
+
+  await dynamo.send(
+    new CreateTableCommand({
+      TableName: name,
+      AttributeDefinitions: [
+        { AttributeName: 'blockmultihash', AttributeType: 'S' },
+        { AttributeName: 'carpath', AttributeType: 'S' }
+      ],
+      KeySchema: [
+        { AttributeName: 'blockmultihash', KeyType: 'HASH' },
+        { AttributeName: 'carpath', KeyType: 'RANGE' }
+      ],
+      ProvisionedThroughput: {
+        ReadCapacityUnits: 1,
+        WriteCapacityUnits: 1
+      }
+    })
+  )
+
+  return name
+}
+
 /**
  * @param {object} [opts]
  * @param {number} [opts.port]
