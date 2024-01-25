@@ -21,6 +21,10 @@ jobs:
     needs: release
     if: contains(fromJson(needs.release.outputs.paths_released), 'packages/core')
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2.2.3
@@ -33,6 +37,6 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm run build --workspace=packages/core
-      - run: npm publish --access=public --workspace=packages/core
+      - run: npm publish --access=public --workspace=packages/core --provenance
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
