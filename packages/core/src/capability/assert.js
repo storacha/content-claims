@@ -6,7 +6,7 @@ export const assert = capability({
 })
 
 /**
- * Claim that a CID is available at a URL.
+ * Claims that a CID is available at a URL.
  */
 export const location = capability({
   can: 'assert/location',
