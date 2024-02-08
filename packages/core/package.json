@@ -102,6 +102,9 @@
       "capability": [
         "types/capability/index.d.ts"
       ],
+      "capability/api": [
+        "types/capability/api.d.ts"
+      ],
       "capability/assert": [
         "types/capability/assert.d.ts"
       ]
