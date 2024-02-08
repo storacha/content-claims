@@ -31,7 +31,7 @@ jobs:
   npm-core:
     name: npm publish @web3-storage/content-claims
     needs: release
-    if: force_release_core || contains(fromJson(needs.release.outputs.paths_released), 'packages/core')
+    if: contains(fromJson(needs.release.outputs.paths_released), 'packages/core') || force_release_core
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -51,7 +51,7 @@ jobs:
   npm-cli:
     name: npm publish @web3-storage/content-claims-cli
     needs: release
-    if: force_release_cli || contains(fromJson(needs.release.outputs.paths_released), 'packages/cli')
+    if: contains(fromJson(needs.release.outputs.paths_released), 'packages/cli') || force_release_cli
     runs-on: ubuntu-latest
     permissions:
       id-token: write
