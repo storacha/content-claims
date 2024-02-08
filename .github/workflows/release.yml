@@ -5,16 +5,32 @@ on:
       - main
   workflow_dispatch:
     inputs:
-      force_release_cli:
+      release_cli:
         type: boolean
         description: release packages/cli even if it normally wouldn't (e.g. due to release-please checks)
         default: false
-      force_release_core:
+      release_core:
         type: boolean
         description: release packages/core even if it normally wouldn't (e.g. due to release-please checks)
         default: false
 
 jobs:
+  env-setup:
+    runs-on: ubuntu-latest
+    outputs:
+      release_cli: ${{ steps.set-output-defaults.outputs.release_cli }}
+      release_core: ${{ steps.set-output-defaults.outputs.release_core }}
+    steps:
+      - name: set release_cli with default value
+        id: set-release_cli-defaults
+        run: |    
+          # If workflow_dispatch, use inputs (left), if other trigger, use default env (right)
+          echo "::set-output name=release_cli::${{ github.event.inputs.release_cli || contains(fromJson(needs.release.outputs.paths_released), 'packages/cli') }}"
+      - name: set release_core with default value
+        id: set-release_core-defaults
+        run: |    
+          # If workflow_dispatch, use inputs (left), if other trigger, use default env (right)
+          echo "::set-output name=release_core::${{ github.event.inputs.release_core || contains(fromJson(needs.release.outputs.paths_released), 'packages/core') }}"
   release:
     runs-on: ubuntu-latest
     outputs:
@@ -31,7 +47,7 @@ jobs:
   npm-core:
     name: npm publish @web3-storage/content-claims
     needs: release
-    if: contains(fromJson(needs.release.outputs.paths_released), 'packages/core') || force_release_core
+    if: release_core
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -51,7 +67,7 @@ jobs:
   npm-cli:
     name: npm publish @web3-storage/content-claims-cli
     needs: release
-    if: contains(fromJson(needs.release.outputs.paths_released), 'packages/cli') || force_release_cli
+    if: release_cli
     runs-on: ubuntu-latest
     permissions:
       id-token: write
