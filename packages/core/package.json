@@ -70,6 +70,10 @@
       "import": "./types/capability/index.js",
       "types": "./types/capability/index.d.ts"
     },
+    "./capability/api": {
+      "import": "./types/capability/api.js",
+      "types": "./types/capability/api.d.ts"
+    },
     "./capability/assert": {
       "import": "./types/capability/assert.js",
       "types": "./types/capability/assert.d.ts"
@@ -97,6 +101,9 @@
       ],
       "capability": [
         "types/capability/index.d.ts"
+      ],
+      "capability/api": [
+        "types/capability/api.d.ts"
       ],
       "capability/assert": [
         "types/capability/assert.d.ts"
