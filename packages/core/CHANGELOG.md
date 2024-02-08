@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.0.2](https://github.com/web3-storage/content-claims/compare/content-claims-v4.0.1...content-claims-v4.0.2) (2024-02-08)
+
+
+### Bug Fixes
+
+* export capability api in types ([#48](https://github.com/web3-storage/content-claims/issues/48)) ([6c8e5c9](https://github.com/web3-storage/content-claims/commit/6c8e5c915b0075b2bd19bb0839fb20e11850644b))
+* trigger release to fix type exports ([#49](https://github.com/web3-storage/content-claims/issues/49)) ([f410f48](https://github.com/web3-storage/content-claims/commit/f410f486c29b2b4d51fa3b4675cc10c2956f6a2a))
+
 ## [4.0.1](https://github.com/web3-storage/content-claims/compare/content-claims-v4.0.0...content-claims-v4.0.1) (2023-12-13)
 
 
