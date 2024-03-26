@@ -1,13 +1,11 @@
-/* global ReadableStream, WritableStream */
+/* global WritableStream */
 import * as Sentry from '@sentry/serverless'
-import { createServer } from '@web3-storage/content-claims/server'
+import { createServer, walkClaims } from '@web3-storage/content-claims/server'
 import * as CAR from '@ucanto/transport/car'
-import * as Delegation from '@ucanto/core/delegation'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { S3Client } from '@aws-sdk/client-s3'
 import { Config } from 'sst/node/config'
 import * as Link from 'multiformats/link'
-import { sha256 } from 'multiformats/hashes/sha2'
 import { CARWriterStream } from 'carstream'
 import { getServiceSigner, notNully } from './lib/config.js'
 import { DynamoTable } from './lib/store/dynamo-table.js'
@@ -151,64 +149,9 @@ export const getClaims = async event => {
   const walk = new Set(walkcsv ? walkcsv.split(',') : [])
   const content = Link.parse(event.rawPath.split('/')[2])
 
-  const queue = [content]
-  /** @type {ReadableStream<import('carstream/api').Block>} */
-  const readable = new ReadableStream({
-    async pull (controller) {
-      const content = queue.shift()
-      if (!content) return controller.close()
-
-      const results = await claimFetcher.get(content)
-      if (!results.length) return
-
-      for (const result of results) {
-        controller.enqueue({
-          cid: Link.create(0x0202, await sha256.digest(result.bytes)),
-          bytes: result.bytes
-        })
-
-        if (walk.size) {
-          const claim = await Delegation.extract(result.bytes)
-          if (claim.error) {
-            console.error(claim.error)
-            continue
-          }
-
-          const nb = claim.ok.capabilities[0].nb
-          if (!nb) continue
-
-          /** @param {object} obj */
-          const walkKeys = obj => {
-            for (const key of Object.keys(obj).filter(k => k !== 'content')) {
-              // @ts-expect-error
-              const content = obj[key]
-              if (walk.has(key)) {
-                if (Array.isArray(content)) {
-                  for (const c of content) {
-                    if (Link.isLink(c)) {
-                      queue.push(c)
-                    } else if (content && typeof content === 'object') {
-                      walkKeys(content)
-                    }
-                  }
-                } else if (Link.isLink(content)) {
-                  queue.push(content)
-                } else if (content && typeof content === 'object') {
-                  walkKeys(content)
-                }
-              }
-            }
-          }
-
-          walkKeys(nb)
-        }
-      }
-    }
-  })
-
   /** @type {Uint8Array[]} */
   const chunks = []
-  await readable
+  await walkClaims({ claimFetcher }, content, walk)
     .pipeThrough(new CARWriterStream())
     // TODO: stream response
     .pipeTo(new WritableStream({ write: chunk => { chunks.push(chunk) } }))
