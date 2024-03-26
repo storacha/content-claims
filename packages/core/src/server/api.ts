@@ -2,6 +2,8 @@ import { MultihashDigest } from 'multiformats/hashes/digest'
 import { UnknownLink, Link } from 'multiformats/link'
 import { AnyAssertCap } from './service/api.js'
 
+export { AnyAssertCap }
+
 export interface Claim {
   claim: Link
   bytes: Uint8Array
