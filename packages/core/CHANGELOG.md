@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.0.3](https://github.com/web3-storage/content-claims/compare/content-claims-v4.0.2...content-claims-v4.0.3) (2024-03-26)
+
+
+### Bug Fixes
+
+* re-export AnyAssertCap ([51d1f69](https://github.com/web3-storage/content-claims/commit/51d1f69aa2c9a97d9b90a581650f2adf6d29a526))
+
 ## [4.0.2](https://github.com/web3-storage/content-claims/compare/content-claims-v4.0.1...content-claims-v4.0.2) (2024-02-08)
 
 
