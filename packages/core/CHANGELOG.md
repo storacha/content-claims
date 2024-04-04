@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.0.4](https://github.com/web3-storage/content-claims/compare/content-claims-v4.0.3...content-claims-v4.0.4) (2024-04-04)
+
+
+### Bug Fixes
+
+* upgrade ucanto libs ([#55](https://github.com/web3-storage/content-claims/issues/55)) ([a8b4546](https://github.com/web3-storage/content-claims/commit/a8b4546c69a656e965cf39b1008b75eb6a006bf1))
+
 ## [4.0.3](https://github.com/web3-storage/content-claims/compare/content-claims-v4.0.2...content-claims-v4.0.3) (2024-03-26)
 
 
