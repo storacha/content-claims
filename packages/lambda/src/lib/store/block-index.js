@@ -3,13 +3,13 @@ import { QueryCommand } from '@aws-sdk/client-dynamodb'
 import { unmarshall } from '@aws-sdk/util-dynamodb'
 import * as Link from 'multiformats/link'
 import { base58btc } from 'multiformats/bases/base58'
+import { base32 } from 'multiformats/bases/base32'
 import { sha256 } from 'multiformats/hashes/sha2'
 import * as Digest from 'multiformats/hashes/digest'
 import varint from 'varint'
 import retry from 'p-retry'
 import { MultihashIndexSortedWriter } from 'cardex/multihash-index-sorted'
 import { Assert } from '@web3-storage/content-claims/capability'
-import { fromString } from 'uint8arrays'
 import { DynamoTable } from './dynamo-table.js'
 
 /**
@@ -184,7 +184,7 @@ const bucketKeyToPartCID = key => {
   } catch (err) {
     // older buckets base32 encode a CAR multihash <base32(car-multihash)>.car
     try {
-      const digestBytes = fromString(hash, 'base32')
+      const digestBytes = base32.baseDecode(hash)
       const digest = Digest.decode(digestBytes)
       return Link.create(CAR_CODE, digest)
     } catch {}
