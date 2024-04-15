@@ -20,7 +20,6 @@
     "carstream": "^1.1.1",
     "multiformats": "^12.0.1",
     "p-retry": "^5.1.2",
-    "uint8arrays": "^4.0.4",
     "varint": "^6.0.0"
   },
   "devDependencies": {
