@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.0.5](https://github.com/w3s-project/content-claims/compare/content-claims-v4.0.4...content-claims-v4.0.5) (2024-04-23)
+
+
+### Bug Fixes
+
+* migrate repo ([#58](https://github.com/w3s-project/content-claims/issues/58)) ([d18a371](https://github.com/w3s-project/content-claims/commit/d18a371d27579ff41784c9a901bfff63f73a20a8))
+
 ## [4.0.4](https://github.com/web3-storage/content-claims/compare/content-claims-v4.0.3...content-claims-v4.0.4) (2024-04-04)
 
 
