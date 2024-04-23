@@ -22,7 +22,9 @@ export const encode = async items => {
   return { cid: Link.create(MultihashIndexSortedWriter.codec, digest), bytes }
 }
 
-/** @param {Uint8Array} bytes */
+/**
+ * @param {Uint8Array} bytes
+ */
 export const decode = async bytes => {
   const readable = new ReadableStream({
     pull (controller) {
