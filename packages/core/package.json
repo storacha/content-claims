@@ -15,12 +15,12 @@
   "license": "Apache-2.0 OR MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/web3-storage/content-claims.git"
+    "url": "git+https://github.com/w3s-project/content-claims.git"
   },
   "bugs": {
-    "url": "https://github.com/web3-storage/content-claims/issues"
+    "url": "https://github.com/w3s-project/content-claims/issues"
   },
-  "homepage": "https://github.com/web3-storage/content-claims/tree/main/packages/core",
+  "homepage": "https://github.com/w3s-project/content-claims/tree/main/packages/core",
   "keywords": [
     "claims",
     "content",
