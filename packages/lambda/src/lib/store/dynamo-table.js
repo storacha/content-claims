@@ -13,10 +13,16 @@ export class DynamoTable {
     this.#tableName = tableName
   }
 
+  /**
+   *
+   */
   get dynamoClient () {
     return this.#dynamoClient
   }
 
+  /**
+   *
+   */
   get tableName () {
     return this.#tableName
   }
