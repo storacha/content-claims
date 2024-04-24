@@ -61,7 +61,9 @@ export const handler = Sentry.AWSLambda.wrapHandler(_handler)
  */
 export const getVersion = () => {
   const { NAME: name, VERSION: version, COMMIT: commit, STAGE: env, REPO: repo } = process.env
-  const body = JSON.stringify({ name, version, repo, commit, env })
+  const did = signer.did()
+  const publicKey = signer.toDIDKey()
+  const body = JSON.stringify({ name, version, did, publicKey, repo, commit, env })
   return { statusCode: 200, headers: { 'Content-Type': json }, body }
 }
 
@@ -71,7 +73,9 @@ export const getVersion = () => {
 export const getHome = () => {
   const { NAME, VERSION, STAGE, REPO } = process.env
   const env = STAGE === 'prod' ? '' : `(${STAGE})`
-  const body = `⁂ ${NAME} v${VERSION} ${env}\n- ${REPO}`
+  const did = signer.did()
+  const publicKey = signer.toDIDKey()
+  const body = `⁂ ${NAME} v${VERSION} ${env}\n- ${REPO}\n- ${did}\n- ${publicKey}`
   return { statusCode: 200, headers: { 'Content-Type': text }, body }
 }
 
