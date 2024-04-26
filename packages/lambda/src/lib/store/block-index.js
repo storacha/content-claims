@@ -1,14 +1,7 @@
-/* global WritableStream, TransformStream */
 import { QueryCommand } from '@aws-sdk/client-dynamodb'
 import { unmarshall } from '@aws-sdk/util-dynamodb'
-import * as Link from 'multiformats/link'
 import { base58btc } from 'multiformats/bases/base58'
-import { base32 } from 'multiformats/bases/base32'
-import { sha256 } from 'multiformats/hashes/sha2'
-import * as Digest from 'multiformats/hashes/digest'
-import varint from 'varint'
 import retry from 'p-retry'
-import { MultihashIndexSortedWriter } from 'cardex/multihash-index-sorted'
 import { Assert } from '@web3-storage/content-claims/capability'
 import { DynamoTable } from './dynamo-table.js'
 
@@ -16,7 +9,6 @@ import { DynamoTable } from './dynamo-table.js'
  * @typedef {import('@web3-storage/content-claims/server/api').ClaimFetcher} ClaimFetcher
  */
 
-const CAR_CODE = 0x0202
 const LIMIT = 10
 
 /**
@@ -37,7 +29,7 @@ export class BlockIndexClaimFetcher extends DynamoTable {
     this.#signer = signer
   }
 
-  /** @param {import('@ucanto/server').UnknownLink} content */
+  /** @param {import('@ucanto/server').MultihashDigest} content */
   async get (content) {
     const command = new QueryCommand({
       TableName: this.tableName,
@@ -45,7 +37,7 @@ export class BlockIndexClaimFetcher extends DynamoTable {
       KeyConditions: {
         blockmultihash: {
           ComparisonOperator: 'EQ',
-          AttributeValueList: [{ S: base58btc.encode(content.multihash.bytes) }]
+          AttributeValueList: [{ S: base58btc.encode(content.bytes) }]
         }
       },
       AttributesToGet: ['carpath', 'length', 'offset']
@@ -70,21 +62,16 @@ export class BlockIndexClaimFetcher extends DynamoTable {
     item = item ?? items[0]
     if (!item) return []
 
-    // can derive car cid from /raw keys. not for /complete keys
-    const part = bucketKeyToPartCID(item.key)
     const location = [new URL(`https://${item.bucket}.s3.amazonaws.com/${item.key}`)]
     const expiration = Math.ceil((Date.now() / 1000) + (60 * 60)) // expire in an hour
-    const claims = [
-      buildLocationClaim(this.#signer, { content, location, ...item }, expiration),
-      ...(part ? [buildRelationClaim(this.#signer, { content, part, ...item }, expiration)] : [])
-    ]
+    const claims = [buildLocationClaim(this.#signer, { content, location, ...item }, expiration)]
     return Promise.all(claims)
   }
 }
 
 /**
  * @param {import('@ucanto/server').Signer} signer
- * @param {{ content: import('@ucanto/server').UnknownLink, location: URL[], offset: number, length: number }} data
+ * @param {{ content: import('@ucanto/server').MultihashDigest, location: URL[], offset: number, length: number }} data
  * @param {number} [expiration]
  */
 const buildLocationClaim = (signer, { content, location, offset, length }, expiration) =>
@@ -93,7 +80,7 @@ const buildLocationClaim = (signer, { content, location, offset, length }, expir
     audience: signer,
     with: signer.did(),
     nb: {
-      content,
+      content: { digest: content.bytes },
       // @ts-ignore
       location: location.map(l => l.toString()),
       range: {
@@ -105,35 +92,7 @@ const buildLocationClaim = (signer, { content, location, offset, length }, expir
   }))
 
 /**
- * @param {import('@ucanto/server').Signer} signer
- * @param {{ content: import('multiformats').UnknownLink, part: import('multiformats').Link, offset: number, length: number }} data
- * @param {number} [expiration]
- */
-const buildRelationClaim = async (signer, { content, part, offset, length }, expiration) => {
-  const carOffset = offset - (varint.encodingLength(content.bytes.length + length) + content.bytes.length)
-  const index = await encodeIndex(content, carOffset)
-  const invocation = Assert.relation.invoke({
-    issuer: signer,
-    audience: signer,
-    with: signer.did(),
-    nb: {
-      content,
-      children: [],
-      parts: [{
-        content: part,
-        includes: {
-          content: index.cid
-        }
-      }]
-    },
-    expiration
-  })
-  invocation.attach(index)
-  return buildClaim(content, invocation)
-}
-
-/**
- * @param {import('@ucanto/server').UnknownLink} content
+ * @param {import('@ucanto/server').MultihashDigest} content
  * @param {import('@ucanto/server').IssuedInvocationView<import('@web3-storage/content-claims/server/service/api').AnyAssertCap>} invocation
  */
 const buildClaim = async (content, invocation) => {
@@ -143,50 +102,8 @@ const buildClaim = async (content, invocation) => {
   return {
     claim: ipldView.cid,
     bytes: archive.ok,
-    content: content.multihash,
+    content,
     expiration: ipldView.expiration,
     value: invocation.capabilities[0]
-  }
-}
-
-/**
- * @param {import('@ucanto/server').UnknownLink} content
- * @param {number} offset
- */
-const encodeIndex = async (content, offset) => {
-  const { writable, readable } = new TransformStream()
-  const writer = MultihashIndexSortedWriter.createWriter({ writer: writable.getWriter() })
-  writer.add(content, offset)
-  writer.close()
-
-  /** @type {Uint8Array[]} */
-  const chunks = []
-  await readable.pipeTo(new WritableStream({ write: chunk => { chunks.push(chunk) } }))
-
-  const bytes = Buffer.concat(chunks)
-  const digest = await sha256.digest(bytes)
-  return { cid: Link.create(MultihashIndexSortedWriter.codec, digest), bytes }
-}
-
-/**
- * Attempts to extract a CAR CID from a bucket key.
- *
- * @param {string} key
- */
-const bucketKeyToPartCID = key => {
-  const filename = String(key.split('/').at(-1))
-  const [hash] = filename.split('.')
-  try {
-    // recent buckets encode CAR CID in filename
-    const cid = Link.parse(hash).toV1()
-    if (cid.code === CAR_CODE) return cid
-    throw new Error('not a CAR CID')
-  } catch (err) {
-    // older buckets base32 encode a CAR multihash <base32(car-multihash)>.car
-    try {
-      const digestBytes = base32.baseDecode(hash)
-      const digest = Digest.decode(digestBytes)
-      return Link.create(CAR_CODE, digest)
-    } catch {}
   }
 }

@@ -4,25 +4,25 @@ import assert from 'node:assert'
 import * as CAR from '@ucanto/transport/car'
 import * as ed25519 from '@ucanto/principal/ed25519'
 import * as Delegation from '@ucanto/core/delegation'
-import { encode as encodeCAR, link as linkCAR } from '@ucanto/core/car'
+import { encode as encodeCAR } from '@ucanto/core/car'
 import { mock } from 'node:test'
 import * as Block from 'multiformats/block'
 import { sha256, sha512 } from 'multiformats/hashes/sha2'
+import * as Digest from 'multiformats/hashes/digest'
 import { base58btc } from 'multiformats/bases/base58'
-import { base32 } from 'multiformats/bases/base32'
 import * as Bytes from 'multiformats/bytes'
+import { CarIndexer } from '@ipld/car/indexer'
 import * as dagCBOR from '@ipld/dag-cbor'
-import * as dagPB from '@ipld/dag-pb'
 import * as Client from '@web3-storage/content-claims/client'
 import * as Server from '@web3-storage/content-claims/server'
 import { Assert } from '@web3-storage/content-claims/capability'
+import { PutItemCommand } from '@aws-sdk/client-dynamodb'
+import { convertToAttr } from '@aws-sdk/util-dynamodb'
 import { DynamoTable } from '../src/lib/store/dynamo-table.js'
 import { S3Bucket } from '../src/lib/store/s3-bucket.js'
 import { ClaimStorage, BlockIndexClaimFetcher } from '../src/lib/store/index.js'
 import { createDynamo, createDynamoTable, createDynamoBlocksTable, createS3, createS3Bucket } from './helpers/aws.js'
-import * as CARv2Index from './helpers/carv2-index.js'
-import { PutItemCommand } from '@aws-sdk/client-dynamodb'
-import { CarIndexer } from '@ipld/car/indexer'
+import { assertDigestEquals } from './helpers/assertions.js'
 
 /**
  * @typedef {{
@@ -35,6 +35,9 @@ import { CarIndexer } from '@ipld/car/indexer'
  */
 
 const test = /** @type {import('ava').TestFn<TestContext>} */ (anyTest)
+
+/** @param {import('multiformats').UnknownLink|{ digest: Uint8Array }} content */
+const toDigest = content => 'digest' in content ? Digest.decode(content.digest) : content.multihash
 
 test.before(async t => {
   t.context.dynamo = await createDynamo()
@@ -57,119 +60,6 @@ test.beforeEach(async t => {
 
 test.after(async t => {
   await t.context.dynamo.container.stop()
-})
-
-test('should claim relation', async t => {
-  const child = await Block.encode({ value: 'children are great', hasher: sha256, codec: dagCBOR })
-  const root = await Block.encode({ value: { child: child.cid }, hasher: sha256, codec: dagCBOR })
-  const part = await linkCAR(encodeCAR({ roots: [root], blocks: new Map([[root.toString(), root], [child.toString(), child]]) }))
-  const index = await CARv2Index.encode([{ cid: root.cid, offset: 1 }, { cid: child.cid, offset: 2 }])
-
-  const claimPut = mock.method(t.context.claimStore, 'put')
-
-  const connection = Client.connect({
-    id: t.context.signer,
-    codec: CAR.outbound,
-    channel: t.context.server
-  })
-
-  const result = await Assert.relation
-    .invoke({
-      issuer: t.context.signer,
-      audience: t.context.signer,
-      with: t.context.signer.did(),
-      nb: {
-        content: root.cid,
-        children: [child.cid],
-        parts: [{
-          content: part,
-          includes: {
-            content: index.cid
-          }
-        }]
-      }
-    })
-    .execute(connection)
-
-  t.falsy(result.out.error)
-  t.truthy(result.out.ok)
-
-  t.is(claimPut.mock.callCount(), 1)
-
-  const [claim] = await t.context.claimStore.get(root.cid)
-  assert(claim)
-
-  t.true(Bytes.equals(claim.content.bytes, root.cid.multihash.bytes))
-  assert(claim.claim)
-
-  const delegation = await Delegation.extract(claim.bytes)
-
-  /** @type {Assert.AssertRelation|undefined} */
-  // @ts-expect-error
-  const cap = delegation?.ok?.capabilities[0]
-
-  t.truthy(cap)
-  assert(cap)
-  t.is(cap.nb.children.length, 1)
-  t.is(cap.nb.children[0].toString(), child.cid.toString())
-})
-
-test('should be CID version agnostic', async t => {
-  const root = await Block.encode({ value: dagPB.prepare(''), hasher: sha256, codec: dagPB })
-  const part = await linkCAR(encodeCAR({ roots: [root], blocks: new Map([[root.toString(), root]]) }))
-
-  const claimPut = mock.method(t.context.claimStore, 'put')
-
-  const connection = Client.connect({
-    id: t.context.signer,
-    codec: CAR.outbound,
-    channel: t.context.server
-  })
-
-  const result = await Assert.partition
-    .invoke({
-      issuer: t.context.signer,
-      audience: t.context.signer,
-      with: t.context.signer.did(),
-      nb: {
-        content: root.cid.toV0(),
-        parts: [part]
-      }
-    })
-    .execute(connection)
-
-  t.falsy(result.out.error)
-  t.truthy(result.out.ok)
-
-  t.is(claimPut.mock.callCount(), 1)
-
-  /**
-   * Ensure passed claim matches created claim.
-   * @param {import('@web3-storage/content-claims/server/api').Claim} claim
-   */
-  const assertClaim = async claim => {
-    t.true(Bytes.equals(claim.content.bytes, root.cid.multihash.bytes))
-    assert(claim.claim)
-
-    // ensure `content` in claim is V0 (as created)
-    const delegation0 = await Delegation.extract(claim.bytes)
-
-    /** @type {Assert.AssertPartition|undefined} */
-    // @ts-expect-error
-    const cap0 = delegation0?.ok?.capabilities[0]
-    t.is(cap0?.nb.content.version, 0)
-    t.is(cap0?.nb.content.toString(), root.cid.toV0().toString())
-  }
-
-  // get claim via V1 CID
-  const [claim0] = await t.context.claimStore.get(root.cid)
-  assert(claim0)
-  await assertClaim(claim0)
-
-  // get claim via V0 CID
-  const [claim1] = await t.context.claimStore.get(root.cid.toV0())
-  assert(claim1)
-  await assertClaim(claim1)
 })
 
 test('should return equivalence claim for either cid', async t => {
@@ -200,20 +90,19 @@ test('should return equivalence claim for either cid', async t => {
 
   t.is(claimPut.mock.callCount(), 1)
 
-  const [claim] = await t.context.claimStore.get(content.cid)
+  const [claim] = await t.context.claimStore.get(content.cid.multihash)
 
   const delegation = await Delegation.extract(claim.bytes)
 
-  /** @type {Assert.AssertEquals|undefined} */
-  // @ts-expect-error
-  const cap = delegation?.ok?.capabilities[0]
+  const cap =
+    /** @type {import('@web3-storage/content-claims/capability/api').AssertEquals} */
+    (delegation?.ok?.capabilities[0])
 
   t.truthy(cap)
-  assert(cap)
   t.is(cap.nb.content.toString(), content.cid.toString())
   t.is(cap.nb.equals.toString(), equals.cid.toString())
 
-  const [equivalentClaim] = await t.context.claimStore.get(equals.cid)
+  const [equivalentClaim] = await t.context.claimStore.get(equals.cid.multihash)
 
   t.true(Bytes.equals(claim.bytes, equivalentClaim.bytes))
 })
@@ -234,81 +123,25 @@ test('should materialize location claim from block index', async t => {
   await dynamo.send(new PutItemCommand({
     TableName: blocksTable,
     Item: {
-      blockmultihash: { S: base58btc.encode(root.cid.multihash.bytes) },
-      carpath: { S: carpath },
-      offset: { N: offset },
-      length: { N: root.bytes.byteLength }
+      blockmultihash: convertToAttr(base58btc.encode(root.cid.multihash.bytes)),
+      carpath: convertToAttr(carpath),
+      offset: convertToAttr(offset),
+      length: convertToAttr(root.bytes.byteLength)
     }
   }))
 
   const blockClaims = new BlockIndexClaimFetcher(dynamo, blocksTable, signer)
-  const res = await blockClaims.get(root.cid)
+  const res = await blockClaims.get(root.cid.multihash)
   t.is(res.length, 1)
-  testLocationClaim({ t, value: res[0].value, root, carpath, offset, signer })
-})
 
-test('should materialize location and relation claim from /raw block index', async t => {
-  const { signer } = t.context
-  const dynamo = t.context.dynamo.client
-  const root = await Block.encode({ value: 'go go go', hasher: sha256, codec: dagCBOR })
-  const car = encodeCAR({ roots: [root], blocks: new Map([[root.cid.toString(), root]]) })
-  const carCid = await linkCAR(car)
-  const carpath = `region/bucket/raw/root/uid/${base32.baseEncode(carCid.multihash.bytes)}.car`
-  const indexer = await CarIndexer.fromBytes(car)
-  const index = new Map()
-  for await (const { cid, offset, blockOffset, blockLength } of indexer) {
-    index.set(cid.toString(), { cid, offset, blockOffset, blockLength })
-  }
-  const offset = index.get(root.cid.toString()).blockOffset
-  const blocksTable = await createDynamoBlocksTable(dynamo)
-  await dynamo.send(new PutItemCommand({
-    TableName: blocksTable,
-    Item: {
-      blockmultihash: { S: base58btc.encode(root.cid.multihash.bytes) },
-      carpath: { S: carpath },
-      offset: { N: offset },
-      length: { N: root.bytes.byteLength }
-    }
-  }))
+  const value =
+    /** @type {import('@web3-storage/content-claims/capability/api').AssertLocation} */
+    (res[0].value)
 
-  const blockClaims = new BlockIndexClaimFetcher(dynamo, blocksTable, signer)
-  const res = await blockClaims.get(root.cid)
-  t.is(res.length, 2)
-  testLocationClaim({ t, value: res[0].value, root, carpath, offset, signer })
-
-  const v2Index = await CARv2Index.encode(Array.from(index.values()))
-  testRelationClaim({
-    t,
-    value: res[1].value,
-    root,
-    signer,
-    parts: [
-      {
-        content: carCid,
-        includes: {
-          content: v2Index.cid
-        }
-      }
-    ]
-  })
-
-  const blockBytes = car.subarray(offset, offset + root.bytes.byteLength)
-  t.true(Bytes.equals(blockBytes, root.bytes), 'offset was correctly derived')
-})
-
-function testLocationClaim ({ t, value, root, carpath, offset, signer }) {
   t.is(value.can, 'assert/location')
   t.is(value.with, signer.did())
-  t.is(value.nb.content.toString(), root.cid.toString())
+  assertDigestEquals(toDigest(value.nb.content), root.cid.multihash)
   t.like(value.nb.range, { offset, length: root.bytes.byteLength })
   const [, bucket, ...key] = carpath.split('/')
-  t.is(value.nb.location[0], `https://${bucket}.s3.amazonaws.com/${key.join('/')}`)
-}
-
-function testRelationClaim ({ t, value, root, parts, children = [], signer }) {
-  t.is(value.can, 'assert/relation')
-  t.is(value.with, signer.did())
-  t.is(value.nb.content.toString(), root.cid.toString())
-  t.deepEqual(value.nb.children, children)
-  t.deepEqual(value.nb.parts, parts)
-}
+  assert.equal(value.nb.location[0], `https://${bucket}.s3.amazonaws.com/${key.join('/')}`)
+})

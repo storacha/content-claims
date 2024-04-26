@@ -27,7 +27,6 @@
     "location",
     "inclusion",
     "partition",
-    "relation",
     "UCAN",
     "IPLD",
     "IPFS"
@@ -112,11 +111,11 @@
   },
   "dependencies": {
     "@ucanto/client": "^9.0.1",
+    "@ucanto/interface": "^10.0.0",
     "@ucanto/server": "^10.0.0",
     "@ucanto/transport": "^9.1.1",
-    "@ucanto/interface": "^10.0.0",
-    "carstream": "^1.0.2",
-    "multiformats": "^12.0.1"
+    "carstream": "^2.0.0",
+    "multiformats": "^13.1.0"
   },
   "devDependencies": {
     "@ipld/dag-cbor": "^9.0.3",

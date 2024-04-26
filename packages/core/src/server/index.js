@@ -30,7 +30,7 @@ export const createServer = ({ id, codec, errorReporter: errorHandler, validateA
  * returning a stream of content claims.
  *
  * @param {{ claimFetcher: import('./api.js').ClaimFetcher }} context
- * @param {import('multiformats').UnknownLink} content
+ * @param {import('multiformats').MultihashDigest} content
  * @param {Set<string>} walk
  */
 export const walkClaims = (context, content, walk) => {
@@ -69,13 +69,13 @@ export const walkClaims = (context, content, walk) => {
                 if (Array.isArray(content)) {
                   for (const c of content) {
                     if (Link.isLink(c)) {
-                      queue.push(c)
+                      queue.push(c.multihash)
                     } else if (content && typeof content === 'object') {
                       walkKeys(content)
                     }
                   }
                 } else if (Link.isLink(content)) {
-                  queue.push(content)
+                  queue.push(content.multihash)
                 } else if (content && typeof content === 'object') {
                   walkKeys(content)
                 }

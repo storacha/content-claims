@@ -1,4 +1,5 @@
 import * as Server from '@ucanto/server'
+import * as Digest from 'multiformats/hashes/digest'
 import * as Assert from '../../capability/assert.js'
 
 /**
@@ -10,7 +11,6 @@ export function createService (context) {
     inclusion: Server.provide(Assert.inclusion, input => handler(input, context)),
     location: Server.provide(Assert.location, input => handler(input, context)),
     partition: Server.provide(Assert.partition, input => handler(input, context)),
-    relation: Server.provide(Assert.relation, input => handler(input, context)),
     equals: Server.provide(Assert.equals, input => handler(input, context))
   }
 }
@@ -29,7 +29,9 @@ export const handler = async ({ capability, invocation }, { claimStore }) => {
   const claim = {
     claim: invocation.cid,
     bytes: archive.ok,
-    content: content.multihash,
+    content: 'digest' in content
+      ? Digest.decode(content.digest)
+      : content.multihash,
     expiration: invocation.expiration,
     value: capability
   }

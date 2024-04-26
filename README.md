@@ -83,39 +83,6 @@ Input:
 }
 ```
 
-#### Relation claim 🆕
-
-Claims that a CID links to other CIDs. Like a [partition claim](#partition-claim) crossed with an [inclusion claim](#inclusion-claim), a relation claim asserts that a block of content links to other blocks, and that the block and it's links may be found in the specified parts. Furthermore, for each part you can optionally specify an inline inclusion claim (specifying what is included in the part) and for each inclusion an optional inline partition claim (specifying parts in which the inclusion CID may be found).
-
-Capability: `assert/relation`
-
-Input:
-
-```js
-{
-  content: CID /* Block CID */,
-  children: [
-    CID /* Linked block CID */,
-    CID /* Linked block CID */,
-    ...
-  ],
-  parts: [
-    {
-      content: CID /* CAR CID */,
-      includes?: {
-        content: CID /* CARv2 Index CID */,
-        parts?: [
-          CID /* CAR CID */,
-          ...
-        ]
-      }
-    },
-    ...
-  ]
-}
-```
-
-
 ## Usage
 
 ### Client libraries
@@ -128,13 +95,17 @@ Client libraries make reading and writing claims easier.
 
 The production deployment is at https://claims.web3.storage.
 
-#### `GET /claims/:cid`
+#### `GET /claims/multihash/:multihash`
 
-Fetch a CAR full of content claims for the content CID in the URL path.
+Fetch a CAR full of content claims for the base58 encoded (Multibase `base58btc`) content hash in the URL path.
 
 Query parameters:
 
 * `?walk=` - a CSV list of properties in claims to walk in order to return additional claims about the related CIDs. Any property that is a CID can be walked. e.g. `?walk=parts,includes`.
+
+#### `GET /claims/cid/:cid`
+
+As above, except passing a CID instead of multihash.
 
 ### CLI
 

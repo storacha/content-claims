@@ -189,7 +189,7 @@ prog
   .action(async (contentArg, opts) => {
     const content = Link.parse(contentArg)
     const walk = Array.isArray(opts.walk) ? opts.walk : opts.walk?.split(',')
-    const res = await Client.fetch(content, { walk, serviceURL })
+    const res = await Client.fetch(content.multihash, { walk, serviceURL })
     if (!res.ok) throw new Error(`unexpected service status: ${res.status}`, { cause: await res.text() })
     if (!res.body) throw new Error('missing response body')
 
