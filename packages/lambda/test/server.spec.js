@@ -247,7 +247,7 @@ test('should materialize location claim from block index', async t => {
   testLocationClaim({ t, value: res[0].value, root, carpath, offset, signer })
 })
 
-test('should materialize location and relation claim from /raw block index', async t => {
+test('should materialize location claim from /raw block index', async t => {
   const { signer } = t.context
   const dynamo = t.context.dynamo.client
   const root = await Block.encode({ value: 'go go go', hasher: sha256, codec: dagCBOR })
@@ -273,24 +273,8 @@ test('should materialize location and relation claim from /raw block index', asy
 
   const blockClaims = new BlockIndexClaimFetcher(dynamo, blocksTable, signer)
   const res = await blockClaims.get(root.cid)
-  t.is(res.length, 2)
+  t.is(res.length, 1)
   testLocationClaim({ t, value: res[0].value, root, carpath, offset, signer })
-
-  const v2Index = await CARv2Index.encode(Array.from(index.values()))
-  testRelationClaim({
-    t,
-    value: res[1].value,
-    root,
-    signer,
-    parts: [
-      {
-        content: carCid,
-        includes: {
-          content: v2Index.cid
-        }
-      }
-    ]
-  })
 
   const blockBytes = car.subarray(offset, offset + root.bytes.byteLength)
   t.true(Bytes.equals(blockBytes, root.bytes), 'offset was correctly derived')
@@ -302,13 +286,5 @@ function testLocationClaim ({ t, value, root, carpath, offset, signer }) {
   t.is(value.nb.content.toString(), root.cid.toString())
   t.like(value.nb.range, { offset, length: root.bytes.byteLength })
   const [, bucket, ...key] = carpath.split('/')
-  t.is(value.nb.location[0], `https://${bucket}.s3.amazonaws.com/${key.join('/')}`)
-}
-
-function testRelationClaim ({ t, value, root, parts, children = [], signer }) {
-  t.is(value.can, 'assert/relation')
-  t.is(value.with, signer.did())
-  t.is(value.nb.content.toString(), root.cid.toString())
-  t.deepEqual(value.nb.children, children)
-  t.deepEqual(value.nb.parts, parts)
+  t.true(value.nb.location.includes(`https://${bucket}.s3.amazonaws.com/${key.join('/')}`))
 }

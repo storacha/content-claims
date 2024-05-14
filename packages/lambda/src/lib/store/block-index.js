@@ -1,14 +1,10 @@
-/* global WritableStream, TransformStream */
 import { QueryCommand } from '@aws-sdk/client-dynamodb'
 import { unmarshall } from '@aws-sdk/util-dynamodb'
 import * as Link from 'multiformats/link'
 import { base58btc } from 'multiformats/bases/base58'
 import { base32 } from 'multiformats/bases/base32'
-import { sha256 } from 'multiformats/hashes/sha2'
 import * as Digest from 'multiformats/hashes/digest'
-import varint from 'varint'
 import retry from 'p-retry'
-import { MultihashIndexSortedWriter } from 'cardex/multihash-index-sorted'
 import { Assert } from '@web3-storage/content-claims/capability'
 import { DynamoTable } from './dynamo-table.js'
 
@@ -59,25 +55,32 @@ export class BlockIndexClaimFetcher extends DynamoTable {
     const items = (result.Items ?? [])
       .map(item => {
         const { carpath, offset, length } = unmarshall(item)
-        const [region, bucket, ...rest] = carpath.split('/')
-        return { region, bucket, key: rest.join('/'), offset, length }
+        let location
+        try {
+          location = [new URL(carpath)]
+        } catch {
+          // non-URL is legacy region/bucket/key format
+          // e.g. us-west-2/dotstorage-prod-1/raw/bafy...
+          const [, bucket, ...rest] = carpath.split('/')
+          const key = rest.join('/')
+          const part = bucketKeyToPartCID(key)
+          const origin = encodeURIComponent('r2://auto/carpark-prod-0')
+
+          // derive location URL(s) from the key
+          location = [
+            ...(part ? [new URL(`https://w3s.link/ipfs/${part}?format=raw&origin=${origin}`)] : []),
+            new URL(`https://${bucket}.s3.amazonaws.com/${key}`)
+          ]
+        }
+        return { location, offset, length, derived: true }
       })
 
-    // TODO: remove when all content is copied over to R2
-    let item = items.find(({ bucket }) => bucket === 'carpark-prod-0')
-    item = item ?? items.find(({ bucket, key }) => bucket === 'dotstorage-prod-1' && key.startsWith('raw'))
-    item = item ?? items.find(({ bucket, key }) => bucket === 'dotstorage-prod-0' && key.startsWith('raw'))
-    item = item ?? items[0]
-    if (!item) return []
+    // prefer items with non derived location URLs
+    let locs = new Map(items.filter(i => !i.derived).map(i => [String(i.location[0]), i]))
+    locs = locs.size ? locs : new Map(items.filter(i => i.derived).map(i => [String(i.location[0]), i]))
 
-    // can derive car cid from /raw keys. not for /complete keys
-    const part = bucketKeyToPartCID(item.key)
-    const location = [new URL(`https://${item.bucket}.s3.amazonaws.com/${item.key}`)]
     const expiration = Math.ceil((Date.now() / 1000) + (60 * 60)) // expire in an hour
-    const claims = [
-      buildLocationClaim(this.#signer, { content, location, ...item }, expiration),
-      ...(part ? [buildRelationClaim(this.#signer, { content, part, ...item }, expiration)] : [])
-    ]
+    const claims = [...locs.values()].map(l => buildLocationClaim(this.#signer, { content, ...l }, expiration))
     return Promise.all(claims)
   }
 }
@@ -105,34 +108,6 @@ const buildLocationClaim = (signer, { content, location, offset, length }, expir
   }))
 
 /**
- * @param {import('@ucanto/server').Signer} signer
- * @param {{ content: import('multiformats').UnknownLink, part: import('multiformats').Link, offset: number, length: number }} data
- * @param {number} [expiration]
- */
-const buildRelationClaim = async (signer, { content, part, offset, length }, expiration) => {
-  const carOffset = offset - (varint.encodingLength(content.bytes.length + length) + content.bytes.length)
-  const index = await encodeIndex(content, carOffset)
-  const invocation = Assert.relation.invoke({
-    issuer: signer,
-    audience: signer,
-    with: signer.did(),
-    nb: {
-      content,
-      children: [],
-      parts: [{
-        content: part,
-        includes: {
-          content: index.cid
-        }
-      }]
-    },
-    expiration
-  })
-  invocation.attach(index)
-  return buildClaim(content, invocation)
-}
-
-/**
  * @param {import('@ucanto/server').UnknownLink} content
  * @param {import('@ucanto/server').IssuedInvocationView<import('@web3-storage/content-claims/server/service/api').AnyAssertCap>} invocation
  */
@@ -147,25 +122,6 @@ const buildClaim = async (content, invocation) => {
     expiration: ipldView.expiration,
     value: invocation.capabilities[0]
   }
-}
-
-/**
- * @param {import('@ucanto/server').UnknownLink} content
- * @param {number} offset
- */
-const encodeIndex = async (content, offset) => {
-  const { writable, readable } = new TransformStream()
-  const writer = MultihashIndexSortedWriter.createWriter({ writer: writable.getWriter() })
-  writer.add(content, offset)
-  writer.close()
-
-  /** @type {Uint8Array[]} */
-  const chunks = []
-  await readable.pipeTo(new WritableStream({ write: chunk => { chunks.push(chunk) } }))
-
-  const bytes = Buffer.concat(chunks)
-  const digest = await sha256.digest(bytes)
-  return { cid: Link.create(MultihashIndexSortedWriter.codec, digest), bytes }
 }
 
 /**
