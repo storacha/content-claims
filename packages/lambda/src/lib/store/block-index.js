@@ -64,11 +64,10 @@ export class BlockIndexClaimFetcher extends DynamoTable {
           const [, bucket, ...rest] = carpath.split('/')
           const key = rest.join('/')
           const part = bucketKeyToPartCID(key)
-          const origin = encodeURIComponent('r2://auto/carpark-prod-0')
 
           // derive location URL(s) from the key
           location = [
-            ...(part ? [new URL(`https://w3s.link/ipfs/${part}?format=raw&origin=${origin}`)] : []),
+            ...(part ? [new URL(`https://carpark-prod-0.r2.w3s.link/${part}/${part}.car`)] : []),
             new URL(`https://${bucket}.s3.amazonaws.com/${key}`)
           ]
         }
