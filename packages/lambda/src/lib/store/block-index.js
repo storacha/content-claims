@@ -67,7 +67,7 @@ export class BlockIndexClaimFetcher extends DynamoTable {
 
           // derive location URL(s) from the key
           location = [
-            ...(part ? [new URL(`https://carpark.w3s.link/${part}/${part}.car`)] : []),
+            ...(part ? [new URL(`https://carpark-prod-0.r2.w3s.link/${part}/${part}.car`)] : []),
             new URL(`https://${bucket}.s3.amazonaws.com/${key}`)
           ]
         }
