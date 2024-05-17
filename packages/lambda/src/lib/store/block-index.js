@@ -14,6 +14,7 @@ import { DynamoTable } from './dynamo-table.js'
 
 const CAR_CODE = 0x0202
 const LIMIT = 10
+const BUCKET_URL = `https://carpark-${process.env.STAGE ?? 'dev'}-0.r2.w3s.link`
 
 /**
  * Materializes claims on demand using block indexes stored in DynamoDB.
@@ -67,7 +68,7 @@ export class BlockIndexClaimFetcher extends DynamoTable {
 
           // derive location URL(s) from the key
           location = [
-            ...(part ? [new URL(`https://carpark-prod-0.r2.w3s.link/${part}/${part}.car`)] : []),
+            ...(part ? [new URL(`/${part}/${part}.car`, BUCKET_URL)] : []),
             new URL(`https://${bucket}.s3.amazonaws.com/${key}`)
           ]
         }
