@@ -62,18 +62,16 @@ export class BlockIndexClaimFetcher extends DynamoTable {
         } catch {
           // non-URL is legacy region/bucket/key format
           // e.g. us-west-2/dotstorage-prod-1/raw/bafy...
-          const [, bucket, ...rest] = carpath.split('/')
+          const [, , ...rest] = carpath.split('/')
           const key = rest.join('/')
           const part = bucketKeyToPartCID(key)
 
           // derive location URL(s) from the key
-          location = [
-            ...(part ? [new URL(`/${part}/${part}.car`, BUCKET_URL)] : []),
-            new URL(`https://${bucket}.s3.amazonaws.com/${key}`)
-          ]
+          location = part ? [new URL(`/${part}/${part}.car`, BUCKET_URL)] : []
         }
         return { location, offset, length, derived: true }
       })
+      .filter(item => item.location.length)
 
     // prefer items with non derived location URLs
     let locs = new Map(items.filter(i => !i.derived).map(i => [String(i.location[0]), i]))
