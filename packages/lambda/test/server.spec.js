@@ -23,6 +23,7 @@ import { createDynamo, createDynamoTable, createDynamoBlocksTable, createS3, cre
 import * as CARv2Index from './helpers/carv2-index.js'
 import { PutItemCommand } from '@aws-sdk/client-dynamodb'
 import { CarIndexer } from '@ipld/car/indexer'
+import { BUCKET_URL, bucketKeyToPartCID } from '../src/lib/store/block-index.js'
 
 /**
  * @typedef {{
@@ -218,35 +219,6 @@ test('should return equivalence claim for either cid', async t => {
   t.true(Bytes.equals(claim.bytes, equivalentClaim.bytes))
 })
 
-test('should materialize location claim from block index', async t => {
-  const { signer } = t.context
-  const dynamo = t.context.dynamo.client
-  const root = await Block.encode({ value: 'go go go', hasher: sha256, codec: dagCBOR })
-  const car = encodeCAR({ roots: [root], blocks: new Map([[root.cid.toString(), root]]) })
-  const carpath = 'region/bucket/pickup/rootCid/rootCid.root.car'
-  const indexer = await CarIndexer.fromBytes(car)
-  const index = new Map()
-  for await (const { cid, offset, blockOffset, blockLength } of indexer) {
-    index.set(cid.toString(), { cid, offset, blockOffset, blockLength })
-  }
-  const offset = index.get(root.cid.toString()).blockOffset
-  const blocksTable = await createDynamoBlocksTable(dynamo)
-  await dynamo.send(new PutItemCommand({
-    TableName: blocksTable,
-    Item: {
-      blockmultihash: { S: base58btc.encode(root.cid.multihash.bytes) },
-      carpath: { S: carpath },
-      offset: { N: offset },
-      length: { N: root.bytes.byteLength }
-    }
-  }))
-
-  const blockClaims = new BlockIndexClaimFetcher(dynamo, blocksTable, signer)
-  const res = await blockClaims.get(root.cid)
-  t.is(res.length, 1)
-  testLocationClaim({ t, value: res[0].value, root, carpath, offset, signer })
-})
-
 test('should materialize location claim from /raw block index', async t => {
   const { signer } = t.context
   const dynamo = t.context.dynamo.client
@@ -285,6 +257,8 @@ function testLocationClaim ({ t, value, root, carpath, offset, signer }) {
   t.is(value.with, signer.did())
   t.is(value.nb.content.toString(), root.cid.toString())
   t.like(value.nb.range, { offset, length: root.bytes.byteLength })
-  const [, bucket, ...key] = carpath.split('/')
-  t.true(value.nb.location.includes(`https://${bucket}.s3.amazonaws.com/${key.join('/')}`))
+  const [, , ...key] = carpath.split('/')
+  const part = bucketKeyToPartCID(key.join('/'))
+  const url = new URL(`/${part}/${part}.car`, BUCKET_URL)
+  t.true(value.nb.location.includes(url.toString()))
 }

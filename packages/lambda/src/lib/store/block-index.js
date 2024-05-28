@@ -14,7 +14,7 @@ import { DynamoTable } from './dynamo-table.js'
 
 const CAR_CODE = 0x0202
 const LIMIT = 25
-const BUCKET_URL = `https://carpark-${process.env.STAGE ?? 'dev'}-0.r2.w3s.link`
+export const BUCKET_URL = `https://carpark-${process.env.STAGE ?? 'dev'}-0.r2.w3s.link`
 
 /**
  * Materializes claims on demand using block indexes stored in DynamoDB.
@@ -127,7 +127,7 @@ const buildClaim = async (content, invocation) => {
  *
  * @param {string} key
  */
-const bucketKeyToPartCID = key => {
+export const bucketKeyToPartCID = key => {
   const filename = String(key.split('/').at(-1))
   const [hash] = filename.split('.')
   try {
