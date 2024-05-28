@@ -1,5 +1,7 @@
 import { DID } from '@ucanto/server'
 import * as ed25519 from '@ucanto/principal/ed25519'
+import { S3Client } from '@aws-sdk/client-s3'
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 
 /**
  * Given a config, return a ucanto Signer object representing the service
@@ -27,4 +29,26 @@ export function notNully (key, obj) {
   const value = obj[key]
   if (value == null) throw new Error(`unexpected null/undefined key in object: ${key}`)
   return value
+}
+
+/** @type {Record<string, import('@aws-sdk/client-dynamodb').DynamoDBClient>} */
+const dynamoClients = {}
+
+/** @param {string} region */
+export function getDynamoClient (region) {
+  if (!dynamoClients[region]) {
+    dynamoClients[region] = new DynamoDBClient({ region })
+  }
+  return dynamoClients[region]
+}
+
+/** @type {Record<string, import('@aws-sdk/client-s3').S3Client>} */
+const s3Clients = {}
+
+/** @param {string} region */
+export function getS3Client (region) {
+  if (!s3Clients[region]) {
+    s3Clients[region] = new S3Client({ region })
+  }
+  return s3Clients[region]
 }
