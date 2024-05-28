@@ -13,7 +13,7 @@ import { DynamoTable } from './dynamo-table.js'
  */
 
 const CAR_CODE = 0x0202
-const LIMIT = 10
+const LIMIT = 25
 const BUCKET_URL = `https://carpark-${process.env.STAGE ?? 'dev'}-0.r2.w3s.link`
 
 /**
