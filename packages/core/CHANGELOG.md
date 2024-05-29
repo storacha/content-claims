@@ -1,5 +1,16 @@
 # Changelog
 
+## [5.0.0](https://github.com/w3s-project/content-claims/compare/content-claims-v4.0.5...content-claims-v5.0.0) (2024-05-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* Client read interface and client claim types now use multihashes. Relation claim has been removed in favour of upcoming dag-index claim.
+
+### Features
+
+* publish content claims by multihash ([#61](https://github.com/w3s-project/content-claims/issues/61)) ([151f4a1](https://github.com/w3s-project/content-claims/commit/151f4a1461b8060fe33f6e5c1622bc6b02165c28))
+
 ## [4.0.5](https://github.com/w3s-project/content-claims/compare/content-claims-v4.0.4...content-claims-v4.0.5) (2024-04-23)
 
 
