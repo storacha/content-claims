@@ -20,6 +20,7 @@ import { PutItemCommand } from '@aws-sdk/client-dynamodb'
 import { convertToAttr } from '@aws-sdk/util-dynamodb'
 import { DynamoTable } from '../src/lib/store/dynamo-table.js'
 import { S3Bucket } from '../src/lib/store/s3-bucket.js'
+import { BUCKET_URL, bucketKeyToPartCID } from '../src/lib/store/block-index.js'
 import { ClaimStorage, BlockIndexClaimFetcher } from '../src/lib/store/index.js'
 import { createDynamo, createDynamoTable, createDynamoBlocksTable, createS3, createS3Bucket } from './helpers/aws.js'
 import * as CARv2Index from './helpers/carv2-index.js'
@@ -163,12 +164,13 @@ test('should return equivalence claim for either cid', async t => {
   t.true(Bytes.equals(claim.bytes, equivalentClaim.bytes))
 })
 
-test('should materialize location claim from block index', async t => {
+test('should materialize location claim from /raw block index', async t => {
   const { signer } = t.context
   const dynamo = t.context.dynamo.client
   const root = await Block.encode({ value: 'go go go', hasher: sha256, codec: dagCBOR })
   const car = encodeCAR({ roots: [root], blocks: new Map([[root.cid.toString(), root]]) })
-  const carpath = 'region/bucket/pickup/rootCid/rootCid.root.car'
+  const carCid = await linkCAR(car)
+  const carpath = `region/bucket/raw/root/uid/${base32.baseEncode(carCid.multihash.bytes)}.car`
   const indexer = await CarIndexer.fromBytes(car)
   const index = new Map()
   for await (const { cid, offset, blockOffset, blockLength } of indexer) {
@@ -198,6 +200,11 @@ test('should materialize location claim from block index', async t => {
   t.is(value.with, signer.did())
   assertDigestEquals(toDigest(value.nb.content), root.cid.multihash)
   t.like(value.nb.range, { offset, length: root.bytes.byteLength })
-  const [, bucket, ...key] = carpath.split('/')
-  assert.equal(value.nb.location[0], `https://${bucket}.s3.amazonaws.com/${key.join('/')}`)
-})
+  const [, , ...key] = carpath.split('/')
+  const part = bucketKeyToPartCID(key.join('/'))
+  const url = new URL(`/${part}/${part}.car`, BUCKET_URL)
+  t.true(value.nb.location.includes(url.toString()))
+
+  const blockBytes = car.subarray(offset, offset + root.bytes.byteLength)
+  t.true(Bytes.equals(blockBytes, root.bytes), 'offset was correctly derived')
+}

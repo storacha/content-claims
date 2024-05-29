@@ -2,14 +2,12 @@
 import * as Sentry from '@sentry/serverless'
 import { createServer, walkClaims } from '@web3-storage/content-claims/server'
 import * as CAR from '@ucanto/transport/car'
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { S3Client } from '@aws-sdk/client-s3'
 import { Config } from 'sst/node/config'
 import * as Link from 'multiformats/link'
 import * as Digest from 'multiformats/hashes/digest'
 import { base58btc } from 'multiformats/bases/base58'
 import { CARWriterStream } from 'carstream'
-import { getServiceSigner, notNully } from './lib/config.js'
+import { getDynamoClient, getS3Client, getServiceSigner, notNully } from './lib/config.js'
 import { DynamoTable } from './lib/store/dynamo-table.js'
 import { S3Bucket } from './lib/store/s3-bucket.js'
 import { ClaimStorage, TieredClaimFetcher, BlockIndexClaimFetcher } from './lib/store/index.js'
@@ -95,11 +93,11 @@ export const postUcanInvocation = async event => {
   }
 
   const dynamoRegion = notNully('CLAIM_TABLE_REGION', process.env)
-  const dynamoClient = new DynamoDBClient({ region: dynamoRegion })
+  const dynamoClient = getDynamoClient(dynamoRegion)
   const table = new DynamoTable(dynamoClient, notNully('CLAIM_TABLE', process.env))
 
   const bucketRegion = notNully('CLAIM_BUCKET_REGION', process.env)
-  const bucketClient = new S3Client({ region: bucketRegion })
+  const bucketClient = getS3Client(bucketRegion)
   const bucket = new S3Bucket(bucketClient, notNully('CLAIM_BUCKET', process.env))
 
   const claimStore = new ClaimStorage({ table, bucket })
@@ -136,11 +134,11 @@ export const postUcanInvocation = async event => {
  */
 export const getClaims = async event => {
   const dynamoRegion = notNully('CLAIM_TABLE_REGION', process.env)
-  const dynamoClient = new DynamoDBClient({ region: dynamoRegion })
+  const dynamoClient = getDynamoClient(dynamoRegion)
   const table = new DynamoTable(dynamoClient, notNully('CLAIM_TABLE', process.env))
 
   const bucketRegion = notNully('CLAIM_BUCKET_REGION', process.env)
-  const bucketClient = new S3Client({ region: bucketRegion })
+  const bucketClient = getS3Client(bucketRegion)
   const bucket = new S3Bucket(bucketClient, notNully('CLAIM_BUCKET', process.env))
 
   /** @type {import('@web3-storage/content-claims/server/api').ClaimFetcher} */
@@ -149,7 +147,7 @@ export const getClaims = async event => {
   if (process.env.BLOCK_INDEX_TABLE) {
     const blkIdxTable = process.env.BLOCK_INDEX_TABLE
     const blkIdxRegion = process.env.BLOCK_INDEX_REGION ?? dynamoRegion
-    const blkIdxDynamo = new DynamoDBClient({ region: blkIdxRegion })
+    const blkIdxDynamo = getDynamoClient(blkIdxRegion)
     const blkIdxClaimFetcher = new BlockIndexClaimFetcher(blkIdxDynamo, blkIdxTable, signer)
     claimFetcher = new TieredClaimFetcher([claimFetcher, blkIdxClaimFetcher])
   }
