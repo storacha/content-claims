@@ -55,6 +55,29 @@ export const partition = capability({
 })
 
 /**
+ * Claims that a CID links to other CIDs.
+ */
+export const relation = capability({
+  can: 'assert/relation',
+  with: URI.match({ protocol: 'did:' }),
+  nb: Schema.struct({
+    content: linkOrDigest(),
+    /** CIDs this content links to directly. */
+    children: Schema.array(Schema.link()),
+    /** Parts this content and it's children can be read from. */
+    parts: Schema.array(Schema.struct({
+      content: Schema.link({ version: 1 }),
+      /** CID of contents (CARv2 index) included in this part. */
+      includes: Schema.struct({
+        content: Schema.link({ version: 1 }),
+        /** CIDs of parts this index may be found in. */
+        parts: Schema.array(Schema.link({ version: 1 })).optional()
+      }).optional()
+    }))
+  })
+})
+
+/**
  * Claim data is referred to by another CID and/or multihash. e.g CAR CID & CommP CID
  */
 export const equals = capability({

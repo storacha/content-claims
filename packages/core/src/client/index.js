@@ -27,6 +27,7 @@ const assertCapNames = [
   Assert.location.can,
   Assert.partition.can,
   Assert.inclusion.can,
+  Assert.relation.can,
   Assert.equals.can
 ]
 

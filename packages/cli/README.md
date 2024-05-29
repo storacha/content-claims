@@ -42,6 +42,10 @@ bafkindex
 claim inclusion bagycar bafkindex -o inclusion.claim
 bafkinclusion
 
+# generate relation claims
+claim relation bafyroot --child bafyblock0 --child bafyblock1 --part bagycar -o relation.claim
+bafkrelation
+
 # Write claims to `claims.web3.storage`
 claim write *.claim
 ```

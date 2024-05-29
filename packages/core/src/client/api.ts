@@ -43,6 +43,29 @@ export interface InclusionClaim extends ContentClaim<typeof Assert.inclusion.can
   readonly proof?: Link
 }
 
+/** A claim that a CID links to other CIDs. */
+export interface RelationClaim extends ContentClaim<typeof Assert.relation.can> {
+  /** CIDs of blocks this content directly links to. */
+  readonly children: UnknownLink[]
+  /** List of archives (CAR CIDs) containing the blocks. */
+  readonly parts: RelationPart[]
+}
+
+/** Part this content and it's children can be read from. */
+export interface RelationPart {
+  /** Part CID. */
+  content: Link
+  /** CID of contents (CARv2 index) included in this part. */
+  includes?: RelationPartInclusion
+}
+
+export interface RelationPartInclusion {
+  /** Inclusion CID (CARv2 index) */
+  content: Link
+  /** CIDs of parts this index may be found in. */
+  parts?: Link[]
+}
+
 /** A claim that the same data is referred to by another CID and/or multihash */
 export interface EqualsClaim extends ContentClaim<typeof Assert.equals.can> {
   /** A CID that is equivalent to the content CID e.g the Piece CID for that CAR CID */
@@ -54,6 +77,7 @@ export type KnownClaimTypes =
   | typeof Assert.location.can
   | typeof Assert.partition.can
   | typeof Assert.inclusion.can
+  | typeof Assert.relation.can
   | typeof Assert.equals.can
 
 /** A verifiable claim about data. */
@@ -61,6 +85,7 @@ export type Claim =
   | LocationClaim
   | PartitionClaim
   | InclusionClaim
+  | RelationClaim
   | EqualsClaim
   | UnknownClaim
 
