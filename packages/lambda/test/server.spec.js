@@ -10,6 +10,7 @@ import * as Block from 'multiformats/block'
 import { sha256, sha512 } from 'multiformats/hashes/sha2'
 import * as Digest from 'multiformats/hashes/digest'
 import { base58btc } from 'multiformats/bases/base58'
+import { base32 } from 'multiformats/bases/base32'
 import * as Bytes from 'multiformats/bytes'
 import { CarIndexer } from '@ipld/car/indexer'
 import * as dagCBOR from '@ipld/dag-cbor'
@@ -202,9 +203,11 @@ test('should materialize location claim from /raw block index', async t => {
   t.like(value.nb.range, { offset, length: root.bytes.byteLength })
   const [, , ...key] = carpath.split('/')
   const part = bucketKeyToPartCID(key.join('/'))
-  const url = new URL(`/${part}/${part}.car`, BUCKET_URL)
-  t.true(value.nb.location.includes(url.toString()))
+  t.true(value.nb.location.includes(
+    /** @type {import('@ucanto/interface').URI} */
+    (new URL(`/${part}/${part}.car`, BUCKET_URL).toString())
+  ))
 
   const blockBytes = car.subarray(offset, offset + root.bytes.byteLength)
   t.true(Bytes.equals(blockBytes, root.bytes), 'offset was correctly derived')
-}
+})
