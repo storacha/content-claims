@@ -1,10 +1,10 @@
-import { Link, URI, UnknownLink, Block } from '@ucanto/client'
+import { Link, URI, UnknownLink, Block, MultihashDigest } from '@ucanto/client'
 import * as Assert from '../capability/assert.js'
 
 /** A verifiable claim about data. */
 export interface ContentClaim<T extends string> {
-  /** Subject of the claim e.g. CAR CID, DAG root CID etc. */
-  readonly content: UnknownLink
+  /** Subject of the claim e.g. CAR, DAG root etc. */
+  readonly content: MultihashDigest
   /** Discriminator for different types of claims. */
   readonly type: T
   /**
@@ -68,8 +68,6 @@ export interface RelationPartInclusion {
 
 /** A claim that the same data is referred to by another CID and/or multihash */
 export interface EqualsClaim extends ContentClaim<typeof Assert.equals.can> {
-  /** Any CID e.g a CAR CID */
-  readonly content: UnknownLink
   /** A CID that is equivalent to the content CID e.g the Piece CID for that CAR CID */
   readonly equals: UnknownLink
 }

@@ -1,5 +1,5 @@
-import { MultihashDigest } from 'multiformats/hashes/digest'
-import { UnknownLink, Link } from 'multiformats/link'
+import { MultihashDigest } from 'multiformats'
+import { Link } from 'multiformats/link'
 import { AnyAssertCap } from './service/api.js'
 
 export { AnyAssertCap }
@@ -13,7 +13,7 @@ export interface Claim {
 }
 
 export interface ClaimFetcher {
-  get (content: UnknownLink): Promise<Claim[]>
+  get (content: MultihashDigest): Promise<Claim[]>
 }
 
 export interface ClaimStore extends ClaimFetcher {

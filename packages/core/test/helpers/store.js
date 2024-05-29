@@ -11,9 +11,9 @@ export class ClaimStorage {
     this.data.set(base58btc.encode(claim.content.bytes), claim)
   }
 
-  /** @param {import('@ucanto/server').UnknownLink} content */
+  /** @param {import('@ucanto/server').MultihashDigest} content */
   async get (content) {
-    const claim = this.data.get(base58btc.encode(content.multihash.bytes))
+    const claim = this.data.get(base58btc.encode(content.bytes))
     return claim ? [claim] : []
   }
 }

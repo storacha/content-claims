@@ -115,7 +115,6 @@ Input:
 }
 ```
 
-
 ## Usage
 
 ### Client libraries
@@ -128,13 +127,17 @@ Client libraries make reading and writing claims easier.
 
 The production deployment is at https://claims.web3.storage.
 
-#### `GET /claims/:cid`
+#### `GET /claims/multihash/:multihash`
 
-Fetch a CAR full of content claims for the content CID in the URL path.
+Fetch a CAR full of content claims for the base58 encoded (Multibase `base58btc`) content hash in the URL path.
 
 Query parameters:
 
 * `?walk=` - a CSV list of properties in claims to walk in order to return additional claims about the related CIDs. Any property that is a CID can be walked. e.g. `?walk=parts,includes`.
+
+#### `GET /claims/cid/:cid`
+
+As above, except passing a CID instead of multihash.
 
 ### CLI
 

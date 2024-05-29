@@ -1,4 +1,6 @@
-import { capability, URI, Link, Schema } from '@ucanto/server'
+import { capability, URI, Schema } from '@ucanto/server'
+
+const linkOrDigest = () => Schema.link().or(Schema.struct({ digest: Schema.bytes() }))
 
 export const assert = capability({
   can: 'assert/*',
@@ -13,7 +15,7 @@ export const location = capability({
   with: URI.match({ protocol: 'did:' }),
   nb: Schema.struct({
     /** CAR CID */
-    content: Link,
+    content: linkOrDigest(),
     location: Schema.array(URI),
     range: Schema.struct({
       offset: Schema.integer(),
@@ -30,10 +32,10 @@ export const inclusion = capability({
   with: URI.match({ protocol: 'did:' }),
   nb: Schema.struct({
     /** CAR CID */
-    content: Link,
+    content: linkOrDigest(),
     /** CARv2 index CID */
-    includes: Link.match({ version: 1 }),
-    proof: Link.match({ version: 1 }).optional()
+    includes: Schema.link({ version: 1 }),
+    proof: Schema.link({ version: 1 }).optional()
   })
 })
 
@@ -45,10 +47,10 @@ export const partition = capability({
   with: URI.match({ protocol: 'did:' }),
   nb: Schema.struct({
     /** Content root CID */
-    content: Link,
+    content: linkOrDigest(),
     /** CIDs CID */
-    blocks: Link.match({ version: 1 }).optional(),
-    parts: Schema.array(Link.match({ version: 1 }))
+    blocks: Schema.link({ version: 1 }).optional(),
+    parts: Schema.array(Schema.link({ version: 1 }))
   })
 })
 
@@ -59,17 +61,17 @@ export const relation = capability({
   can: 'assert/relation',
   with: URI.match({ protocol: 'did:' }),
   nb: Schema.struct({
-    content: Link,
+    content: linkOrDigest(),
     /** CIDs this content links to directly. */
-    children: Schema.array(Link),
+    children: Schema.array(Schema.link()),
     /** Parts this content and it's children can be read from. */
     parts: Schema.array(Schema.struct({
-      content: Link.match({ version: 1 }),
+      content: Schema.link({ version: 1 }),
       /** CID of contents (CARv2 index) included in this part. */
       includes: Schema.struct({
-        content: Link.match({ version: 1 }),
+        content: Schema.link({ version: 1 }),
         /** CIDs of parts this index may be found in. */
-        parts: Schema.array(Link.match({ version: 1 })).optional()
+        parts: Schema.array(Schema.link({ version: 1 })).optional()
       }).optional()
     }))
   })
@@ -82,7 +84,7 @@ export const equals = capability({
   can: 'assert/equals',
   with: URI.match({ protocol: 'did:' }),
   nb: Schema.struct({
-    content: Link,
-    equals: Link
+    content: linkOrDigest(),
+    equals: Schema.link()
   })
 })

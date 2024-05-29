@@ -1,4 +1,5 @@
 import * as Server from '@ucanto/server'
+import * as Digest from 'multiformats/hashes/digest'
 import * as Assert from '../../capability/assert.js'
 
 /**
@@ -29,7 +30,9 @@ export const handler = async ({ capability, invocation }, { claimStore }) => {
   const claim = {
     claim: invocation.cid,
     bytes: archive.ok,
-    content: content.multihash,
+    content: 'digest' in content
+      ? Digest.decode(content.digest)
+      : content.multihash,
     expiration: invocation.expiration,
     value: capability
   }

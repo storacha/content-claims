@@ -1,9 +1,9 @@
 import { QueryCommand } from '@aws-sdk/client-dynamodb'
 import { unmarshall } from '@aws-sdk/util-dynamodb'
-import * as Link from 'multiformats/link'
 import { base58btc } from 'multiformats/bases/base58'
 import { base32 } from 'multiformats/bases/base32'
 import * as Digest from 'multiformats/hashes/digest'
+import * as Link from 'multiformats/link'
 import retry from 'p-retry'
 import { Assert } from '@web3-storage/content-claims/capability'
 import { DynamoTable } from './dynamo-table.js'
@@ -34,7 +34,7 @@ export class BlockIndexClaimFetcher extends DynamoTable {
     this.#signer = signer
   }
 
-  /** @param {import('@ucanto/server').UnknownLink} content */
+  /** @param {import('@ucanto/server').MultihashDigest} content */
   async get (content) {
     const command = new QueryCommand({
       TableName: this.tableName,
@@ -42,7 +42,7 @@ export class BlockIndexClaimFetcher extends DynamoTable {
       KeyConditions: {
         blockmultihash: {
           ComparisonOperator: 'EQ',
-          AttributeValueList: [{ S: base58btc.encode(content.multihash.bytes) }]
+          AttributeValueList: [{ S: base58btc.encode(content.bytes) }]
         }
       },
       AttributesToGet: ['carpath', 'length', 'offset']
@@ -79,13 +79,14 @@ export class BlockIndexClaimFetcher extends DynamoTable {
 
     const expiration = Math.ceil((Date.now() / 1000) + (60 * 60)) // expire in an hour
     const claims = [...locs.values()].map(l => buildLocationClaim(this.#signer, { content, ...l }, expiration))
+
     return Promise.all(claims)
   }
 }
 
 /**
  * @param {import('@ucanto/server').Signer} signer
- * @param {{ content: import('@ucanto/server').UnknownLink, location: URL[], offset: number, length: number }} data
+ * @param {{ content: import('@ucanto/server').MultihashDigest, location: URL[], offset: number, length: number }} data
  * @param {number} [expiration]
  */
 const buildLocationClaim = (signer, { content, location, offset, length }, expiration) =>
@@ -94,7 +95,7 @@ const buildLocationClaim = (signer, { content, location, offset, length }, expir
     audience: signer,
     with: signer.did(),
     nb: {
-      content,
+      content: { digest: content.bytes },
       // @ts-ignore
       location: location.map(l => l.toString()),
       range: {
@@ -106,7 +107,7 @@ const buildLocationClaim = (signer, { content, location, offset, length }, expir
   }))
 
 /**
- * @param {import('@ucanto/server').UnknownLink} content
+ * @param {import('@ucanto/server').MultihashDigest} content
  * @param {import('@ucanto/server').IssuedInvocationView<import('@web3-storage/content-claims/server/service/api').AnyAssertCap>} invocation
  */
 const buildClaim = async (content, invocation) => {
@@ -116,7 +117,7 @@ const buildClaim = async (content, invocation) => {
   return {
     claim: ipldView.cid,
     bytes: archive.ok,
-    content: content.multihash,
+    content,
     expiration: ipldView.expiration,
     value: invocation.capabilities[0]
   }

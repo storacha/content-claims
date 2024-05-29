@@ -4,6 +4,8 @@ import { createServer, walkClaims } from '@web3-storage/content-claims/server'
 import * as CAR from '@ucanto/transport/car'
 import { Config } from 'sst/node/config'
 import * as Link from 'multiformats/link'
+import * as Digest from 'multiformats/hashes/digest'
+import { base58btc } from 'multiformats/bases/base58'
 import { CARWriterStream } from 'carstream'
 import { getDynamoClient, getS3Client, getServiceSigner, notNully } from './lib/config.js'
 import { DynamoTable } from './lib/store/dynamo-table.js'
@@ -125,6 +127,9 @@ export const postUcanInvocation = async event => {
 }
 
 /**
+ * /claims/multihash/:multihash
+ * /claims/cid/:cid
+ * /claims/:cid - DEPRECATED
  * @param {import('aws-lambda').APIGatewayProxyEventV2} event
  */
 export const getClaims = async event => {
@@ -149,11 +154,22 @@ export const getClaims = async event => {
 
   const walkcsv = new URL(`http://localhost${event.rawPath}?${event.rawQueryString}`).searchParams.get('walk')
   const walk = new Set(walkcsv ? walkcsv.split(',') : [])
-  const content = Link.parse(event.rawPath.split('/')[2])
+
+  const pathParts = event.rawPath.split('/')
+  const idType = pathParts[2]
+  let digest
+  if (idType === 'multihash') {
+    digest = Digest.decode(base58btc.decode(pathParts[3]))
+  } else if (idType === 'cid') {
+    digest = Link.parse(pathParts[3]).multihash
+  } else {
+    // DEPRECATED /claims/:cid
+    digest = Link.parse(idType).multihash
+  }
 
   /** @type {Uint8Array[]} */
   const chunks = []
-  await walkClaims({ claimFetcher }, content, walk)
+  await walkClaims({ claimFetcher }, digest, walk)
     .pipeThrough(new CARWriterStream())
     // TODO: stream response
     .pipeTo(new WritableStream({ write: chunk => { chunks.push(chunk) } }))

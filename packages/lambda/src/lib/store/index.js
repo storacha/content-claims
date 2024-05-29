@@ -43,14 +43,14 @@ export class ClaimStorage {
     ])
   }
 
-  /** @param {import('@ucanto/server').UnknownLink} content */
+  /** @param {import('@ucanto/server').MultihashDigest} content */
   async get (content) {
     const cmd = new QueryCommand({
       TableName: this.#table.tableName,
       KeyConditions: {
         content: {
           ComparisonOperator: 'EQ',
-          AttributeValueList: [{ S: base58btc.encode(content.multihash.bytes) }]
+          AttributeValueList: [{ S: base58btc.encode(content.bytes) }]
         }
       },
       Limit: 100
