@@ -10,7 +10,8 @@ import { CARWriterStream } from 'carstream'
 import { getDynamoClient, getS3Client, getServiceSigner, notNully } from './lib/config.js'
 import { DynamoTable } from './lib/store/dynamo-table.js'
 import { S3Bucket } from './lib/store/s3-bucket.js'
-import { ClaimStorage, TieredClaimFetcher, BlockIndexClaimFetcher } from './lib/store/index.js'
+import { ClaimStorage, BlockIndexClaimFetcher } from './lib/store/index.js'
+import * as ClaimStorageUtil from './lib/store/util.js'
 
 Sentry.AWSLambda.init({
   environment: process.env.SST_STAGE,
@@ -149,7 +150,7 @@ export const getClaims = async event => {
     const blkIdxRegion = process.env.BLOCK_INDEX_REGION ?? dynamoRegion
     const blkIdxDynamo = getDynamoClient(blkIdxRegion)
     const blkIdxClaimFetcher = new BlockIndexClaimFetcher(blkIdxDynamo, blkIdxTable, signer)
-    claimFetcher = new TieredClaimFetcher([claimFetcher, blkIdxClaimFetcher])
+    claimFetcher = ClaimStorageUtil.combine([claimFetcher, blkIdxClaimFetcher])
   }
 
   const walkcsv = new URL(`http://localhost${event.rawPath}?${event.rawQueryString}`).searchParams.get('walk')

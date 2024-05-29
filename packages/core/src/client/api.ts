@@ -43,6 +43,19 @@ export interface InclusionClaim extends ContentClaim<typeof Assert.inclusion.can
   readonly proof?: Link
 }
 
+/**
+ * A claim that a content graph can be found in blob(s) that are identified and
+ * indexed in the given index CID.
+ */
+export interface IndexClaim extends ContentClaim<typeof Assert.index.can> {
+  /**
+   * Link to a Content Archive that contains the index.
+   * e.g. `index/sharded/dag@0.1`
+   * @see https://github.com/w3s-project/specs/blob/main/w3-index.md
+   */
+  readonly index: Link
+}
+
 /** A claim that a CID links to other CIDs. */
 export interface RelationClaim extends ContentClaim<typeof Assert.relation.can> {
   /** CIDs of blocks this content directly links to. */
@@ -77,6 +90,7 @@ export type KnownClaimTypes =
   | typeof Assert.location.can
   | typeof Assert.partition.can
   | typeof Assert.inclusion.can
+  | typeof Assert.index.can
   | typeof Assert.relation.can
   | typeof Assert.equals.can
 
@@ -85,6 +99,7 @@ export type Claim =
   | LocationClaim
   | PartitionClaim
   | InclusionClaim
+  | IndexClaim
   | RelationClaim
   | EqualsClaim
   | UnknownClaim

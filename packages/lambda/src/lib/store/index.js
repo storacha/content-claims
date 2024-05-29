@@ -13,7 +13,6 @@ import retry from 'p-retry'
  * @typedef {import('@web3-storage/content-claims/server/api').ClaimStore} ClaimStore
  */
 
-export { TieredClaimFetcher } from './tiered.js'
 export { BlockIndexClaimFetcher } from './block-index.js'
 
 /** @implements {ClaimStore} */
