@@ -48,6 +48,26 @@ Input:
 }
 ```
 
+#### Index claim
+
+Claims that a content graph can be found in blob(s) that are identified and indexed in the given index CID.
+
+Capability: `assert/index`
+
+Input:
+
+```js
+{
+  content: CID /* CAR CID */,
+  /**
+   * Link to a Content Archive that contains the index.
+   * e.g. `index/sharded/dag@0.1`:
+   * @see https://github.com/w3s-project/specs/blob/main/w3-index.md
+   */
+  index: CID
+}
+```
+
 #### Partition claim
 
 Claims that a CID's graph can be read from the blocks found in parts.

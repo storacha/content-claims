@@ -7,10 +7,13 @@ import { mock } from 'node:test'
 import * as Block from 'multiformats/block'
 import { sha256, sha512 } from 'multiformats/hashes/sha2'
 import * as Bytes from 'multiformats/bytes'
+import * as Link from 'multiformats/link'
 import * as dagCBOR from '@ipld/dag-cbor'
+import * as BlobIndexUtil from '@web3-storage/blob-index/util'
 import { Server } from '../src/index.js'
 import * as Assert from '../src/capability/assert.js'
 import { ClaimStorage } from './helpers/store.js'
+import * as Result from './helpers/result.js'
 
 const beforeEach = async () => {
   const claimStore = new ClaimStorage()
@@ -70,5 +73,52 @@ export const test = {
 
     assert.ok(cap)
     assert.equal(cap.nb.equals.toString(), equals.cid.toString())
+  },
+
+  'should claim index': async (/** @type {import('entail').assert} */ assert) => {
+    const { claimStore, signer, server } = await beforeEach()
+
+    const content = await Block.encode({ value: 'index me', hasher: sha256, codec: dagCBOR })
+    const car = CAR.codec.encode({ roots: [content] })
+
+    const index = await BlobIndexUtil.fromShardArchives(content.cid, [car])
+    const indexBytes = Result.unwrap(await index.archive())
+    const indexLink = Link.create(CAR.codec.code, await sha256.digest(indexBytes))
+
+    const connection = connect({
+      id: signer,
+      codec: CAR.outbound,
+      channel: server
+    })
+
+    const result = await Assert.index
+      .invoke({
+        issuer: signer,
+        audience: signer,
+        with: signer.did(),
+        nb: {
+          content: content.cid,
+          index: indexLink
+        }
+      })
+      .execute(connection)
+
+    assert.ok(!result.out.error)
+    assert.ok(result.out.ok)
+
+    const [claim] = await claimStore.get(content.cid.multihash)
+    assert.ok(claim)
+
+    assert.ok(Bytes.equals(claim.content.bytes, content.cid.multihash.bytes))
+    assert.ok(claim.claim)
+
+    const delegation = await Delegation.extract(claim.bytes)
+
+    const cap =
+      /** @type {import('../types/capability/api.js').AssertIndex} */
+      (delegation?.ok?.capabilities[0])
+
+    assert.ok(cap)
+    assert.equal(cap.nb.index.toString(), indexLink.toString())
   }
 }

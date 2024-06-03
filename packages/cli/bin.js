@@ -96,6 +96,25 @@ prog
     })
     await archiveClaim(invocation, opts.output)
   })
+  .command('index <content> <index>')
+  .describe('Generate an index claim that asserts a content graph can be found in blob(s) that are identified and indexed in the given index CID.')
+  .option('-o, --output', 'Write output to this file.')
+  .option('-e, --expire', 'Duration after which claim expires e.g \'1min\' or \'1hr\'', '30s')
+  .example('index bafyreib7pboydxne2smyrq2lhtgw6y3jcvutzsyhoti7qs3ci6q45x7cky bagbaiera7hndiywftjuayz44kxl2l3skjquhizgnycykc2lhzbhuxtribwaq -o index.claim')
+  .action(async (contentArg, includesArg, opts) => {
+    const content = Link.parse(contentArg)
+    const index = Link.parse(includesArg).toV1()
+    const signer = getSigner()
+
+    const invocation = Assert.index.invoke({
+      issuer: signer,
+      audience: servicePrincipal,
+      with: signer.did(),
+      nb: { content, index },
+      expiration: toUcanExpiration(opts.expire)
+    })
+    await archiveClaim(invocation, opts.output)
+  })
   .command('relation <content>')
   .describe('Generate a relation claim that asserts the content (block CID) links directly to the child (block CID).')
   .option('-c, --child', 'One or more child CIDs that this content links to.')

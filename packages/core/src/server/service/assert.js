@@ -9,6 +9,7 @@ import * as Assert from '../../capability/assert.js'
 export function createService (context) {
   return {
     inclusion: Server.provide(Assert.inclusion, input => handler(input, context)),
+    index: Server.provide(Assert.index, input => handler(input, context)),
     location: Server.provide(Assert.location, input => handler(input, context)),
     partition: Server.provide(Assert.partition, input => handler(input, context)),
     relation: Server.provide(Assert.relation, input => handler(input, context)),

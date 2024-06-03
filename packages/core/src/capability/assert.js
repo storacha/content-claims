@@ -40,6 +40,25 @@ export const inclusion = capability({
 })
 
 /**
+ * Claims that a content graph can be found in blob(s) that are identified and
+ * indexed in the given index CID.
+ */
+export const index = capability({
+  can: 'assert/index',
+  with: URI.match({ protocol: 'did:' }),
+  nb: Schema.struct({
+    /** DAG root CID */
+    content: Schema.link(),
+    /**
+     * Link to a Content Archive that contains the index.
+     * e.g. `index/sharded/dag@0.1`
+     * @see https://github.com/w3s-project/specs/blob/main/w3-index.md
+     */
+    index: Schema.link({ version: 1 })
+  })
+})
+
+/**
  * Claims that a CID's graph can be read from the blocks found in parts.
  */
 export const partition = capability({
