@@ -114,13 +114,13 @@
     "@ucanto/interface": "^10.0.0",
     "@ucanto/server": "^10.0.0",
     "@ucanto/transport": "^9.1.1",
-    "@web3-storage/blob-index": "^1.0.2",
     "carstream": "^2.0.0",
     "multiformats": "^13.1.0"
   },
   "devDependencies": {
     "@ipld/dag-cbor": "^9.0.3",
     "@ucanto/principal": "^9.0.1",
+    "@web3-storage/blob-index": "^1.0.2",
     "cardex": "^2.3.0",
     "entail": "^2.1.1",
     "lnmap": "^1.0.1",
