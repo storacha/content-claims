@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.0](https://github.com/w3s-project/content-claims/compare/content-claims-v5.0.0...content-claims-v5.1.0) (2024-06-03)
+
+
+### Features
+
+* add index claim ([#66](https://github.com/w3s-project/content-claims/issues/66)) ([0bc19c9](https://github.com/w3s-project/content-claims/commit/0bc19c9108cf43d7c45390d6a1257eced81420ed))
+
 ## [5.0.0](https://github.com/w3s-project/content-claims/compare/content-claims-v4.0.5...content-claims-v5.0.0) (2024-05-29)
 
 
