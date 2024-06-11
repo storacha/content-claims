@@ -17,6 +17,17 @@ import retry from 'p-retry'
 
 export { BlockIndexClaimFetcher } from './block-index.js'
 
+/** Properties for DynamoDB claims table. */
+export const tableProps = {
+  fields: {
+    claim: 'string',
+    content: 'string',
+    expiration: 'number'
+  },
+  primaryIndex: { partitionKey: 'content', sortKey: 'claim' },
+  timeToLiveAttribute: 'expiration'
+}
+
 /** @implements {ClaimStore} */
 export class ClaimStorage {
   /** @type {Table} */
