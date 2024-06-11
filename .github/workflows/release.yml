@@ -13,6 +13,10 @@ on:
         type: boolean
         description: release packages/core even if it normally wouldn't (e.g. due to release-please checks)
         default: false
+      force_release_infra:
+        type: boolean
+        description: release packages/infra even if it normally wouldn't (e.g. due to release-please checks)
+        default: false
 
 jobs:
   release:
@@ -77,5 +81,29 @@ jobs:
       - run: npm ci
       - run: npm run build --workspace=packages/cli
       - run: npm publish --access=public --workspace=packages/cli --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+  npm-infra:
+    name: npm publish @web3-storage/content-claims-infra
+    needs: release
+    if: contains(fromJson(needs.release.outputs.paths_released), 'packages/infra') || inputs.force_release_infra
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2.4.0
+        with:
+          version: 8
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build --workspace=packages/infra
+      - run: npm publish --access=public --workspace=packages/infra --provenance
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

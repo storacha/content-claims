@@ -1,11 +1,43 @@
 {
-  "name": "@web3-storage/content-claims-lambda",
+  "name": "@web3-storage/content-claims-infra",
   "version": "0.0.0",
   "type": "module",
-  "private": true,
   "scripts": {
+    "build": "tsc --build",
     "lint": "standard && tsc",
     "test": "ava --verbose --timeout=5m --no-worker-threads --serial"
+  },
+  "files": [
+    "src",
+    "tsconfig.json",
+    "types"
+  ],
+  "exports": {
+    ".": {
+      "import": "./types/content-claims.js",
+      "types": "./types/content-claims.d.ts"
+    },
+    "./lib/config": {
+      "import": "./types/lib/config.js",
+      "types": "./types/lib/config.d.ts"
+    },
+    "./lib/store": {
+      "import": "./types/lib/store/index.js",
+      "types": "./types/lib/store/index.d.ts"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "types/*"
+      ],
+      "lib/config": [
+        "types/lib/config.d.ts"
+      ],
+      "lib/store": [
+        "types/lib/store/index.d.ts"
+      ]
+    }
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.563.0",
@@ -16,6 +48,7 @@
     "@ucanto/principal": "^9.0.1",
     "@ucanto/server": "^10.0.0",
     "@ucanto/transport": "^9.1.1",
+    "@web3-storage/content-claims": "^5.1.0",
     "cardex": "^3.0.2",
     "carstream": "^2.0.0",
     "multiformats": "^13.1.0",

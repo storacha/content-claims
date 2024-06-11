@@ -184,7 +184,7 @@ For more CLI Usage instructions, see the [content-claims-cli README](./packages/
 The repo contains the infra deployment code and the service implementation.
 
 ```
-├── packages   - content-claims core and lambda wrapper
+├── packages   - content-claims core, CLI and AWS infra
 └── stacks     - sst and AWS CDK code to deploy all the things
 ```
 
