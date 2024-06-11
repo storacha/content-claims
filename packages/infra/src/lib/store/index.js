@@ -9,6 +9,8 @@ import * as Bytes from 'multiformats/bytes'
 import retry from 'p-retry'
 
 /**
+ * @typedef {{ dynamoClient: import('@aws-sdk/client-dynamodb').DynamoDBClient, tableName: string }} Table
+ * @typedef {{ s3Client: import('@aws-sdk/client-s3').S3Client, bucketName: string }} Bucket
  * @typedef {import('@web3-storage/content-claims/server/api').ClaimFetcher} ClaimFetcher
  * @typedef {import('@web3-storage/content-claims/server/api').ClaimStore} ClaimStore
  */
@@ -17,17 +19,12 @@ export { BlockIndexClaimFetcher } from './block-index.js'
 
 /** @implements {ClaimStore} */
 export class ClaimStorage {
-  /** @type {import('./dynamo-table.js').DynamoTable} */
+  /** @type {Table} */
   #table
-  /** @type {import('./s3-bucket.js').S3Bucket} */
+  /** @type {Bucket} */
   #bucket
 
-  /**
-   * @param {{
-   *   table: import('./dynamo-table.js').DynamoTable
-   *   bucket: import('./s3-bucket.js').S3Bucket
-   * }} config
-   */
+  /** @param {{ table: Table, bucket: Bucket }} config */
   constructor ({ table, bucket }) {
     this.#table = table
     this.#bucket = bucket
@@ -84,7 +81,7 @@ export class ClaimStorage {
 
 /**
  * @param {import('@web3-storage/content-claims/server/api').Claim} claim
- * @param {import('./s3-bucket.js').S3Bucket} s3
+ * @param {Bucket} s3
  **/
 async function storeClaimBytes ({ claim, bytes }, { bucketName, s3Client }) {
   const cidstr = claim.toString(base32)
@@ -104,7 +101,7 @@ async function storeClaimBytes ({ claim, bytes }, { bucketName, s3Client }) {
 
 /**
  * @param {import('@web3-storage/content-claims/server/api').Claim} claim
- * @param {import('./dynamo-table.js').DynamoTable} dynamo
+ * @param {Table} dynamo
  */
 async function upsertClaim ({ claim, content, expiration }, { tableName, dynamoClient }) {
   const hasExpiration = expiration && isFinite(expiration)
@@ -128,7 +125,7 @@ async function upsertClaim ({ claim, content, expiration }, { tableName, dynamoC
 
 /**
  * @param {import('@web3-storage/content-claims/server/api').Claim} claim
- * @param {import('./dynamo-table.js').DynamoTable} dynamo
+ * @param {Table} dynamo
  */
 async function maybeUpsertEquivalentClaim (claim, dynamo) {
   const { content, value } = claim
