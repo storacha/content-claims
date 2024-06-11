@@ -13,6 +13,10 @@ on:
         type: boolean
         description: release packages/core even if it normally wouldn't (e.g. due to release-please checks)
         default: false
+      force_release_infra:
+        type: boolean
+        description: release packages/infra even if it normally wouldn't (e.g. due to release-please checks)
+        default: false
 
 jobs:
   release:
@@ -82,7 +86,7 @@ jobs:
   npm-infra:
     name: npm publish @web3-storage/content-claims-infra
     needs: release
-    if: contains(fromJson(needs.release.outputs.paths_released), 'packages/infra') || inputs.force_release_cli
+    if: contains(fromJson(needs.release.outputs.paths_released), 'packages/infra') || inputs.force_release_infra
     runs-on: ubuntu-latest
     permissions:
       id-token: write
