@@ -38,7 +38,7 @@ export function API ({ stack }) {
   const { claimsBucket } = use(Bucket)
 
   const fun = new Function(stack, 'fn', {
-    handler: 'packages/lambda/src/content-claims.handler',
+    handler: 'packages/infra/src/content-claims.handler',
     url: {
       cors: true,
       authorizer: 'none'

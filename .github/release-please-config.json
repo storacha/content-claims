@@ -2,6 +2,7 @@
   "separate-pull-requests": true,
   "packages": {
     "packages/cli": {},
-    "packages/core": {}
+    "packages/core": {},
+    "packages/infra": {}
   }
 }
