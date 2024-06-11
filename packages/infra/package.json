@@ -49,6 +49,7 @@
     "@ucanto/principal": "^9.0.1",
     "@ucanto/server": "^10.0.0",
     "@ucanto/transport": "^9.1.1",
+    "@web3-storage/content-claims": "^5.1.0",
     "cardex": "^3.0.2",
     "carstream": "^2.0.0",
     "multiformats": "^13.1.0",
