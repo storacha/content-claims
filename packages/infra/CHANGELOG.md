@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/w3s-project/content-claims/compare/content-claims-infra-v1.2.0...content-claims-infra-v1.2.1) (2024-06-11)
+
+
+### Bug Fixes
+
+* add type for tableProps ([b69c71d](https://github.com/w3s-project/content-claims/commit/b69c71d38adfc90b9eb94658bf8e05d56c53df4c))
+
 ## [1.2.0](https://github.com/w3s-project/content-claims/compare/content-claims-infra-v1.1.0...content-claims-infra-v1.2.0) (2024-06-11)
 
 
