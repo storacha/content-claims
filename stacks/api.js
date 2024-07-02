@@ -26,12 +26,13 @@ export function API ({ stack }) {
   const privateKey = new Config.Secret(stack, 'PRIVATE_KEY')
   const pkg = getApiPackageJson()
   const git = getGitInfo()
-
+  
   stack.setDefaultFunctionProps({
     memorySize: '1 GB',
     runtime: 'nodejs18.x',
     architecture: 'arm_64',
-    timeout: '15 minutes'
+    timeout: '15 minutes',
+    tracing: stack.stage === 'prod' ? 'disabled' : 'active'
   })
 
   const { claimsTable } = use(DB)
