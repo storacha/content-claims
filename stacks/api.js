@@ -26,7 +26,7 @@ export function API ({ stack }) {
   const privateKey = new Config.Secret(stack, 'PRIVATE_KEY')
   const pkg = getApiPackageJson()
   const git = getGitInfo()
-  
+
   stack.setDefaultFunctionProps({
     memorySize: '1 GB',
     runtime: 'nodejs18.x',
