@@ -120,5 +120,49 @@ export const test = {
 
     assert.ok(cap)
     assert.equal(cap.nb.index.toString(), indexLink.toString())
+  },
+
+  'should claim location': async (/** @type {import('entail').assert} */ assert) => {
+    const { claimStore, signer, server } = await beforeEach()
+
+    const content = await Block.encode({ value: 'find me', hasher: sha256, codec: dagCBOR })
+    const car = CAR.codec.encode({ roots: [content] })
+    const carBlock = await Block.encode({ value: car, hasher: sha256, codec: CAR.codec })
+
+    const connection = connect({
+      id: signer,
+      codec: CAR.outbound,
+      channel: server
+    })
+
+    const result = await Assert.location
+      .invoke({
+        issuer: signer,
+        audience: signer,
+        with: signer.did(),
+        nb: {
+          content: { digest: carBlock.cid.multihash.bytes },
+          location: ['http://localhost:3000/']
+        }
+      })
+      .execute(connection)
+
+    assert.ok(!result.out.error)
+    assert.ok(result.out.ok)
+
+    const [claim] = await claimStore.get(carBlock.cid.multihash)
+    assert.ok(claim)
+
+    assert.ok(Bytes.equals(claim.content.bytes, carBlock.cid.multihash.bytes))
+    assert.ok(claim.claim)
+
+    const delegation = await Delegation.extract(claim.bytes)
+
+    const cap =
+      /** @type {import('../types/capability/api.js').AssertLocation} */
+      (delegation?.ok?.capabilities[0])
+
+    assert.ok(cap)
+    assert.equal(cap.nb.location.toString(), 'http://localhost:3000/')
   }
 }
