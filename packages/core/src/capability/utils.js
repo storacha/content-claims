@@ -1,4 +1,4 @@
-import { Schema, fail, ok } from '@ucanto/validator'
+import { fail, ok } from '@ucanto/validator'
 import * as Bytes from 'multiformats/bytes'
 import { base58btc } from 'multiformats/bases/base58'
 
@@ -12,7 +12,7 @@ import { base58btc } from 'multiformats/bases/base58'
  * @param {API.ParsedCapability} claimed
  * @param {API.ParsedCapability} delegated
  */
-export function equalWith(claimed, delegated) {
+export const equalWith = (claimed, delegated) => {
   if (delegated.with.endsWith('*')) {
     if (!claimed.with.startsWith(delegated.with.slice(0, -1))) {
       return fail(`Resource ${claimed.with} does not match delegated ${delegated.with}`)

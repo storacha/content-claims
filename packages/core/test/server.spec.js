@@ -256,7 +256,6 @@ export const test = {
 
     const content = await Block.encode({ value: 'find me', hasher: sha256, codec: dagCBOR })
     const car = CAR.codec.encode({ roots: [content] })
-    const carBlock = await Block.encode({ value: car, hasher: sha256, codec: CAR.codec })
 
     const index = await BlobIndexUtil.fromShardArchives(content.cid, [car])
     const indexBytes = Result.unwrap(await index.archive())
