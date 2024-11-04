@@ -108,7 +108,7 @@ export const postUcanInvocation = async event => {
     codec: CAR.inbound,
     claimStore,
     // TODO: wire into revocations
-    // https://github.com/web3-storage/content-claims/issues/32
+    // https://github.com/storacha/content-claims/issues/32
     validateAuthorization: () => ({ ok: {} })
   })
 

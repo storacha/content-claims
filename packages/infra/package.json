@@ -66,10 +66,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/w3s-project/content-claims.git"
+    "url": "git+https://github.com/storacha/content-claims.git"
   },
   "bugs": {
-    "url": "https://github.com/w3s-project/content-claims/issues"
+    "url": "https://github.com/storacha/content-claims/issues"
   },
-  "homepage": "https://github.com/w3s-project/content-claims/tree/main/packages/infra"
+  "homepage": "https://github.com/storacha/content-claims/tree/main/packages/infra"
 }

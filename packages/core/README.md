@@ -101,8 +101,8 @@ http.createServer(async (request, response) => {
 
 ## Contributing
 
-Feel free to join in. All welcome. Please [open an issue](https://github.com/web3-storage/content-claims/issues)!
+Feel free to join in. All welcome. Please [open an issue](https://github.com/storacha/content-claims/issues)!
 
 ## License
 
-Dual-licensed under [MIT + Apache 2.0](https://github.com/web3-storage/content-claims/blob/main/LICENSE.md)
+Dual-licensed under [MIT + Apache 2.0](https://github.com/storacha/content-claims/blob/main/LICENSE.md)

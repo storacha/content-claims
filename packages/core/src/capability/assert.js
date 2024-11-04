@@ -61,7 +61,7 @@ export const index = capability({
     /**
      * Link to a Content Archive that contains the index.
      * e.g. `index/sharded/dag@0.1`
-     * @see https://github.com/w3s-project/specs/blob/main/w3-index.md
+     * @see https://github.com/storacha/specs/blob/main/w3-index.md
      */
     index: Schema.link({ version: 1 })
   }),

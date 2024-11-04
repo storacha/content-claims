@@ -51,7 +51,7 @@ export interface IndexClaim extends ContentClaim<typeof Assert.index.can> {
   /**
    * Link to a Content Archive that contains the index.
    * e.g. `index/sharded/dag@0.1`
-   * @see https://github.com/w3s-project/specs/blob/main/w3-index.md
+   * @see https://github.com/storacha/specs/blob/main/w3-index.md
    */
   readonly index: Link
 }

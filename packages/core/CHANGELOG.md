@@ -7,14 +7,14 @@
 
 * content claims derives ([#74](https://github.com/storacha/content-claims/issues/74)) ([6791016](https://github.com/storacha/content-claims/commit/6791016b3c320e68ee764e788528dfd4323cd90a))
 
-## [5.1.0](https://github.com/w3s-project/content-claims/compare/content-claims-v5.0.0...content-claims-v5.1.0) (2024-06-03)
+## [5.1.0](https://github.com/storacha/content-claims/compare/content-claims-v5.0.0...content-claims-v5.1.0) (2024-06-03)
 
 
 ### Features
 
-* add index claim ([#66](https://github.com/w3s-project/content-claims/issues/66)) ([0bc19c9](https://github.com/w3s-project/content-claims/commit/0bc19c9108cf43d7c45390d6a1257eced81420ed))
+* add index claim ([#66](https://github.com/storacha/content-claims/issues/66)) ([0bc19c9](https://github.com/storacha/content-claims/commit/0bc19c9108cf43d7c45390d6a1257eced81420ed))
 
-## [5.0.0](https://github.com/w3s-project/content-claims/compare/content-claims-v4.0.5...content-claims-v5.0.0) (2024-05-29)
+## [5.0.0](https://github.com/storacha/content-claims/compare/content-claims-v4.0.5...content-claims-v5.0.0) (2024-05-29)
 
 
 ### ⚠ BREAKING CHANGES
@@ -23,14 +23,14 @@
 
 ### Features
 
-* publish content claims by multihash ([#61](https://github.com/w3s-project/content-claims/issues/61)) ([151f4a1](https://github.com/w3s-project/content-claims/commit/151f4a1461b8060fe33f6e5c1622bc6b02165c28))
+* publish content claims by multihash ([#61](https://github.com/storacha/content-claims/issues/61)) ([151f4a1](https://github.com/storacha/content-claims/commit/151f4a1461b8060fe33f6e5c1622bc6b02165c28))
 
-## [4.0.5](https://github.com/w3s-project/content-claims/compare/content-claims-v4.0.4...content-claims-v4.0.5) (2024-04-23)
+## [4.0.5](https://github.com/storacha/content-claims/compare/content-claims-v4.0.4...content-claims-v4.0.5) (2024-04-23)
 
 
 ### Bug Fixes
 
-* migrate repo ([#58](https://github.com/w3s-project/content-claims/issues/58)) ([d18a371](https://github.com/w3s-project/content-claims/commit/d18a371d27579ff41784c9a901bfff63f73a20a8))
+* migrate repo ([#58](https://github.com/storacha/content-claims/issues/58)) ([d18a371](https://github.com/storacha/content-claims/commit/d18a371d27579ff41784c9a901bfff63f73a20a8))
 
 ## [4.0.4](https://github.com/web3-storage/content-claims/compare/content-claims-v4.0.3...content-claims-v4.0.4) (2024-04-04)
 
