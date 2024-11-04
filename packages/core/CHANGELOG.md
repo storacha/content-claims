@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.2](https://github.com/storacha/content-claims/compare/content-claims-v5.1.1...content-claims-v5.1.2) (2024-11-04)
+
+
+### Bug Fixes
+
+* eample ([9ce4b16](https://github.com/storacha/content-claims/commit/9ce4b166c607b045dbebc6608cde21a91286688e))
+
 ## [5.1.1](https://github.com/storacha/content-claims/compare/content-claims-v5.1.0...content-claims-v5.1.1) (2024-11-04)
 
 
