@@ -88,12 +88,12 @@ http.createServer(async (request, response) => {
     chunks.push(chunk)
   }
 
-  const { headers, body } = await server.request({
+  const { status, headers, body } = await server.request({
     headers: request.headers,
     body: Buffer.concat(chunks),
   })
 
-  response.writeHead(200, headers)
+  response.writeHead(status ?? 200, headers)
   response.write(body)
   response.end()
 }).listen(3000)
