@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.2](https://github.com/storacha/content-claims/compare/content-claims-infra-v1.2.1...content-claims-infra-v1.2.2) (2024-11-04)
+
+
+### Bug Fixes
+
+* repo references ([ba845ad](https://github.com/storacha/content-claims/commit/ba845ad1d40c158d9f1a5c0e2640284bfbf6dc97))
+
 ## [1.2.1](https://github.com/storacha/content-claims/compare/content-claims-infra-v1.2.0...content-claims-infra-v1.2.1) (2024-06-11)
 
 
