@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.3](https://github.com/storacha/content-claims/compare/content-claims-v5.1.2...content-claims-v5.1.3) (2024-11-04)
+
+
+### Bug Fixes
+
+* repo references ([ba845ad](https://github.com/storacha/content-claims/commit/ba845ad1d40c158d9f1a5c0e2640284bfbf6dc97))
+
 ## [5.1.2](https://github.com/storacha/content-claims/compare/content-claims-v5.1.1...content-claims-v5.1.2) (2024-11-04)
 
 
