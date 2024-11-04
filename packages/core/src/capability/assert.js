@@ -1,4 +1,5 @@
-import { capability, URI, Schema } from '@ucanto/server'
+import { capability, URI, Schema, ok } from '@ucanto/server'
+import { and, equal, equalLinkOrDigestContent, equalWith } from './utils.js'
 
 const linkOrDigest = () => Schema.link().or(Schema.struct({ digest: Schema.bytes() }))
 
@@ -21,7 +22,15 @@ export const location = capability({
       offset: Schema.integer(),
       length: Schema.integer().optional()
     }).optional()
-  })
+  }),
+  derives: (claimed, delegated) => (
+    and(equalWith(claimed, delegated)) ||
+    and(equalLinkOrDigestContent(claimed, delegated)) ||
+    and(equal(claimed.nb.location, delegated.nb.location, 'location')) ||
+    and(equal(claimed.nb.range?.offset, delegated.nb.range?.offset, 'offset')) ||
+    and(equal(claimed.nb.range?.length, delegated.nb.range?.length, 'length')) ||
+    ok({})
+  )
 })
 
 /**
@@ -55,7 +64,13 @@ export const index = capability({
      * @see https://github.com/w3s-project/specs/blob/main/w3-index.md
      */
     index: Schema.link({ version: 1 })
-  })
+  }),
+  derives: (claimed, delegated) => (
+    and(equalWith(claimed, delegated)) ||
+    and(equal(claimed.nb.content, delegated.nb.content, 'content')) ||
+    and(equal(claimed.nb.index, delegated.nb.index, 'index')) ||
+    ok({})
+  )
 })
 
 /**
@@ -105,5 +120,11 @@ export const equals = capability({
   nb: Schema.struct({
     content: linkOrDigest(),
     equals: Schema.link()
-  })
+  }),
+  derives: (claimed, delegated) => (
+    and(equalWith(claimed, delegated)) ||
+    and(equalLinkOrDigestContent(claimed, delegated)) ||
+    and(equal(claimed.nb.equals, delegated.nb.equals, 'equals')) ||
+    ok({})
+  )
 })
