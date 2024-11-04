@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.1](https://github.com/storacha/content-claims/compare/content-claims-v5.1.0...content-claims-v5.1.1) (2024-11-04)
+
+
+### Bug Fixes
+
+* content claims derives ([#74](https://github.com/storacha/content-claims/issues/74)) ([6791016](https://github.com/storacha/content-claims/commit/6791016b3c320e68ee764e788528dfd4323cd90a))
+
 ## [5.1.0](https://github.com/w3s-project/content-claims/compare/content-claims-v5.0.0...content-claims-v5.1.0) (2024-06-03)
 
 
