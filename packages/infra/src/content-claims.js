@@ -16,7 +16,8 @@ import * as ClaimStorageUtil from './lib/store/util.js'
 Sentry.AWSLambda.init({
   environment: process.env.SST_STAGE,
   dsn: process.env.SENTRY_DSN,
-  tracesSampleRate: 1.0
+  // turn off traces for now because we are consuming our entire Sentry supply
+  tracesSampleRate: 0
 })
 
 // @ts-expect-error
