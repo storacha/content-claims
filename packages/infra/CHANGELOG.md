@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.2](https://github.com/storacha/content-claims/compare/content-claims-infra-v1.2.1...content-claims-infra-v1.2.2) (2024-11-22)
+
+
+### Bug Fixes
+
+* disable tracing for now ([#80](https://github.com/storacha/content-claims/issues/80)) ([98b4fed](https://github.com/storacha/content-claims/commit/98b4fedc7f2071e10777720bc074f177ec78811f))
+* repo references ([ba845ad](https://github.com/storacha/content-claims/commit/ba845ad1d40c158d9f1a5c0e2640284bfbf6dc97))
+
 ## [1.2.1](https://github.com/storacha/content-claims/compare/content-claims-infra-v1.2.0...content-claims-infra-v1.2.1) (2024-06-11)
 
 
