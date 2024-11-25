@@ -1,6 +1,6 @@
 {
   "name": "@web3-storage/content-claims-infra",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "type": "module",
   "scripts": {
     "build": "tsc --build",
