@@ -14,7 +14,7 @@ export function Bucket ({ stack }) {
           ignorePublicAcls: true,
           // allow public read access
           blockPublicPolicy: false,
-          restrictPublicBuckets: false,
+          restrictPublicBuckets: false
         }
       }
     }
