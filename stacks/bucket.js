@@ -20,13 +20,13 @@ export function Bucket ({ stack }) {
       }
     }
   })
-  // Add policy to bucket public for `s3:GetObject` command
+  // Add policy to bucket for `s3:GetObject` command
   claimsBucket.cdk.bucket.addToResourcePolicy(
     new PolicyStatement({
       actions: ['s3:GetObject'],
       effect: Effect.ALLOW,
       principals: [new StarPrincipal()],
-      resources: [claimsBucket.cdk.bucket.arnForObjects('*')],
+      resources: [claimsBucket.cdk.bucket.arnForObjects('*')]
     })
   )
   return { claimsBucket }
