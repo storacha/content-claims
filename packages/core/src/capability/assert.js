@@ -21,7 +21,8 @@ export const location = capability({
     range: Schema.struct({
       offset: Schema.integer(),
       length: Schema.integer().optional()
-    }).optional()
+    }).optional(),
+    space: Schema.did().optional()
   }),
   derives: (claimed, delegated) => (
     and(equalWith(claimed, delegated)) ||
@@ -29,6 +30,7 @@ export const location = capability({
     and(equal(claimed.nb.location, delegated.nb.location, 'location')) ||
     and(equal(claimed.nb.range?.offset, delegated.nb.range?.offset, 'offset')) ||
     and(equal(claimed.nb.range?.length, delegated.nb.range?.length, 'length')) ||
+    and(equal(claimed.nb.space, delegated.nb.space, 'space')) ||
     ok({})
   )
 })
