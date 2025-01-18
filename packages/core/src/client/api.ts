@@ -66,8 +66,3 @@ export type Claim =
   | RelationClaim
   | EqualsClaim
   | UnknownClaim
-
-export interface ByteRange {
-  readonly offset: number
-  readonly length?: number
-}

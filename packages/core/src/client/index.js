@@ -7,6 +7,7 @@ import { equals } from 'multiformats/bytes'
 import { base58btc } from 'multiformats/bases/base58'
 import { CARReaderStream } from 'carstream/reader'
 import * as Assert from '../capability/assert.js'
+import { decode as decodeDigest } from 'multiformats/hashes/digest'
 
 export const serviceURL = new URL('https://claims.web3.storage')
 
@@ -116,4 +117,13 @@ export const read = async (content, options) => {
   }
 
   return claims
+}
+
+/**
+ *
+ * @param {import('./api.js').Claim} claim
+ * @returns
+ */
+export const contentMultihash = (claim) => {
+  return 'digest' in claim.content ? decodeDigest(claim.content.digest) : claim.content.multihash
 }
