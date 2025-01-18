@@ -22,7 +22,7 @@ export const location = capability({
       offset: Schema.integer(),
       length: Schema.integer().optional()
     }).optional(),
-    space: Schema.did().optional()
+    space: Schema.didBytes().optional()
   }),
   derives: (claimed, delegated) => (
     and(equalWith(claimed, delegated)) ||
@@ -59,7 +59,7 @@ export const index = capability({
   with: URI.match({ protocol: 'did:' }),
   nb: Schema.struct({
     /** DAG root CID */
-    content: Schema.link(),
+    content: linkOrDigest(),
     /**
      * Link to a Content Archive that contains the index.
      * e.g. `index/sharded/dag@0.1`

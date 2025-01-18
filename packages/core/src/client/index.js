@@ -3,7 +3,6 @@ import { extract as extractDelegation } from '@ucanto/core/delegation'
 import { connect, invoke, delegate } from '@ucanto/client'
 import { CAR, HTTP } from '@ucanto/transport'
 import { sha256 } from 'multiformats/hashes/sha2'
-import { decode as decodeDigest } from 'multiformats/hashes/digest'
 import { equals } from 'multiformats/bytes'
 import { base58btc } from 'multiformats/bases/base58'
 import { CARReaderStream } from 'carstream/reader'
@@ -59,10 +58,8 @@ export const decode = async bytes => {
   // @ts-expect-error
   return {
     ...cap.nb,
-    content: 'digest' in cap.nb.content ? decodeDigest(cap.nb.content.digest) : cap.nb.content.multihash,
     type: cap.can,
-    export: () => delegation.ok.export(),
-    archive: async () => bytes
+    delegation: () => delegation.ok
   }
 }
 
