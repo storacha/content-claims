@@ -52,7 +52,15 @@ export const decode = async bytes => {
   if (delegation.error) {
     throw new Error('failed to decode claim', { cause: delegation.error })
   }
-  const cap = delegation.ok.capabilities[0]
+  return decodeDelegation(delegation.ok)
+}
+
+/**
+ * @param {import('@ucanto/interface').Delegation} delegation
+ * @returns {Promise<import('./api.js').Claim>}
+ */
+export const decodeDelegation = async delegation => {
+  const cap = delegation.capabilities[0]
   if (!isAssertCap(cap)) {
     throw new Error('invalid claim')
   }
@@ -60,7 +68,7 @@ export const decode = async bytes => {
   return {
     ...cap.nb,
     type: cap.can,
-    delegation: () => delegation.ok
+    delegation: () => delegation
   }
 }
 
