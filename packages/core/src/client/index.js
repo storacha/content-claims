@@ -23,22 +23,21 @@ export const connection = connect({
 
 export { connect, invoke, delegate, CAR, HTTP }
 
-const assertCapNames = [
-  Assert.location.can,
-  Assert.partition.can,
-  Assert.inclusion.can,
-  Assert.index.can,
-  Assert.relation.can,
-  Assert.equals.can
-]
+const assertCapMap = {
+  [Assert.location.can]: Assert.location,
+  [Assert.partition.can]: Assert.partition,
+  [Assert.inclusion.can]: Assert.inclusion,
+  [Assert.index.can]: Assert.index,
+  [Assert.relation.can]: Assert.relation,
+  [Assert.equals.can]: Assert.equals
+}
 
 /**
  * @param {import('@ucanto/interface').Capability} cap
  * @returns {cap is import('../server/api.js').AnyAssertCap}
  */
 const isAssertCap = cap =>
-  // @ts-expect-error
-  assertCapNames.includes(cap.can) &&
+  Object.keys(assertCapMap).includes(cap.can) &&
   'nb' in cap &&
   typeof cap.nb === 'object' &&
   'content' in cap.nb
@@ -65,9 +64,11 @@ export const decodeDelegation = async delegation => {
     throw new Error('invalid claim')
   }
   // @ts-expect-error
+  const parsedCap = assertCapMap[cap.can].create({ with: cap.with, nb: cap.nb })
+  // @ts-expect-error
   return {
-    ...cap.nb,
-    type: cap.can,
+    ...parsedCap.nb,
+    type: parsedCap.can,
     delegation: () => delegation
   }
 }
