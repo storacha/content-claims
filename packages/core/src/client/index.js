@@ -3,11 +3,11 @@ import { extract as extractDelegation } from '@ucanto/core/delegation'
 import { connect, invoke, delegate } from '@ucanto/client'
 import { CAR, HTTP } from '@ucanto/transport'
 import { sha256 } from 'multiformats/hashes/sha2'
-import { decode as decodeDigest } from 'multiformats/hashes/digest'
 import { equals } from 'multiformats/bytes'
 import { base58btc } from 'multiformats/bases/base58'
 import { CARReaderStream } from 'carstream/reader'
 import * as Assert from '../capability/assert.js'
+import { decode as decodeDigest } from 'multiformats/hashes/digest'
 
 export const serviceURL = new URL('https://claims.web3.storage')
 
@@ -23,22 +23,21 @@ export const connection = connect({
 
 export { connect, invoke, delegate, CAR, HTTP }
 
-const assertCapNames = [
-  Assert.location.can,
-  Assert.partition.can,
-  Assert.inclusion.can,
-  Assert.index.can,
-  Assert.relation.can,
-  Assert.equals.can
-]
+const assertCapMap = {
+  [Assert.location.can]: Assert.location,
+  [Assert.partition.can]: Assert.partition,
+  [Assert.inclusion.can]: Assert.inclusion,
+  [Assert.index.can]: Assert.index,
+  [Assert.relation.can]: Assert.relation,
+  [Assert.equals.can]: Assert.equals
+}
 
 /**
  * @param {import('@ucanto/interface').Capability} cap
  * @returns {cap is import('../server/api.js').AnyAssertCap}
  */
 const isAssertCap = cap =>
-  // @ts-expect-error
-  assertCapNames.includes(cap.can) &&
+  Object.keys(assertCapMap).includes(cap.can) &&
   'nb' in cap &&
   typeof cap.nb === 'object' &&
   'content' in cap.nb
@@ -52,17 +51,25 @@ export const decode = async bytes => {
   if (delegation.error) {
     throw new Error('failed to decode claim', { cause: delegation.error })
   }
-  const cap = delegation.ok.capabilities[0]
+  return decodeDelegation(delegation.ok)
+}
+
+/**
+ * @param {import('@ucanto/interface').Delegation} delegation
+ * @returns {Promise<import('./api.js').Claim>}
+ */
+export const decodeDelegation = async delegation => {
+  const cap = delegation.capabilities[0]
   if (!isAssertCap(cap)) {
     throw new Error('invalid claim')
   }
   // @ts-expect-error
+  const parsedCap = assertCapMap[cap.can].create({ with: cap.with, nb: cap.nb })
+  // @ts-expect-error
   return {
-    ...cap.nb,
-    content: 'digest' in cap.nb.content ? decodeDigest(cap.nb.content.digest) : cap.nb.content.multihash,
-    type: cap.can,
-    export: () => delegation.ok.export(),
-    archive: async () => bytes
+    ...parsedCap.nb,
+    type: parsedCap.can,
+    delegation: () => delegation
   }
 }
 
@@ -119,4 +126,13 @@ export const read = async (content, options) => {
   }
 
   return claims
+}
+
+/**
+ *
+ * @param {import('./api.js').Claim} claim
+ * @returns
+ */
+export const contentMultihash = (claim) => {
+  return 'digest' in claim.content ? decodeDigest(claim.content.digest) : claim.content.multihash
 }
