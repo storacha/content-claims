@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.2.0](https://github.com/storacha/content-claims/compare/content-claims-v5.1.3...content-claims-v5.2.0) (2025-01-30)
+
+
+### Features
+
+* **capability:** add space to location assertion ([#84](https://github.com/storacha/content-claims/issues/84)) ([5212b1a](https://github.com/storacha/content-claims/commit/5212b1af03880fc7eb055ca0339003119b0cec60))
+
 ## [5.1.3](https://github.com/storacha/content-claims/compare/content-claims-v5.1.2...content-claims-v5.1.3) (2024-11-04)
 
 
