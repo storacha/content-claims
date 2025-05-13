@@ -7,7 +7,10 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { inspect } from 'node:util'
 import { Writable } from 'node:stream'
+import { base58btc } from 'multiformats/bases/base58'
+import * as raw from 'multiformats/codecs/raw'
 import * as Link from 'multiformats/link'
+import * as Digest from 'multiformats/hashes/digest'
 import * as ed25519 from '@ucanto/principal/ed25519'
 import { DID, UCAN } from '@ucanto/core'
 import * as Delegation from '@ucanto/core/delegation'
@@ -206,7 +209,12 @@ prog
   .option('--verbose', 'Write claim information to stderr.')
   .option('-o, --output', 'Write output to this file.')
   .action(async (contentArg, opts) => {
-    const content = Link.parse(contentArg)
+    let content
+    try {
+      content = Link.parse(contentArg)
+    } catch {
+      content = Link.create(raw.code, Digest.decode(base58btc.decode(contentArg)))
+    }
     const walk = Array.isArray(opts.walk) ? opts.walk : opts.walk?.split(',')
     const res = await Client.fetch(content.multihash, { walk, serviceURL })
     if (!res.ok) throw new Error(`unexpected service status: ${res.status}`, { cause: await res.text() })
