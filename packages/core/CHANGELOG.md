@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.2.1](https://github.com/storacha/content-claims/compare/content-claims-v5.2.0...content-claims-v5.2.1) (2025-05-13)
+
+
+### Bug Fixes
+
+* use Schema.principal() to allow byte encoded space DID in location claim ([34a835c](https://github.com/storacha/content-claims/commit/34a835ce163fe17263a8ed88124ce95c4aa68e65))
+
 ## [5.2.0](https://github.com/storacha/content-claims/compare/content-claims-v5.1.3...content-claims-v5.2.0) (2025-01-30)
 
 
