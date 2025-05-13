@@ -22,7 +22,7 @@ export const location = capability({
       offset: Schema.integer(),
       length: Schema.integer().optional()
     }).optional(),
-    space: Schema.didBytes().optional()
+    space: Schema.principal().optional()
   }),
   derives: (claimed, delegated) => (
     and(equalWith(claimed, delegated)) ||

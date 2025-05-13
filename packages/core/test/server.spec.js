@@ -1,6 +1,7 @@
 /* eslint-env browser */
 import * as CAR from '@ucanto/transport/car'
-import * as ed25519 from '@ucanto/principal/ed25519'
+import { ed25519 } from '@ucanto/principal'
+import { DID } from '@ucanto/core'
 import * as Delegation from '@ucanto/core/delegation'
 import { connect } from '@ucanto/client'
 import { mock } from 'node:test'
@@ -126,6 +127,7 @@ export const test = {
   'should claim location': async (/** @type {import('entail').assert} */ assert) => {
     const { claimStore, signer, server } = await beforeEach()
     const alice = await ed25519.generate()
+    const space = DID.parse((await ed25519.generate()).did())
 
     const content = await Block.encode({ value: 'find me', hasher: sha256, codec: dagCBOR })
     const car = CAR.codec.encode({ roots: [content] })
@@ -150,7 +152,8 @@ export const test = {
         with: signer.did(),
         nb: {
           content: { digest: carBlock.cid.multihash.bytes },
-          location: ['http://localhost:3000/']
+          location: ['http://localhost:3000/'],
+          space
         },
         proofs: [proof]
       })
@@ -173,6 +176,7 @@ export const test = {
 
     assert.ok(cap)
     assert.equal(cap.nb.location.toString(), 'http://localhost:3000/')
+    assert.ok(Bytes.equals(cap.nb.space, space))
   },
 
   'should not authorize resource (with) constraint violation': async (/** @type {import('entail').assert} */ assert) => {

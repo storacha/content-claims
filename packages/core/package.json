@@ -111,12 +111,12 @@
   },
   "dependencies": {
     "@ucanto/client": "^9.0.1",
-    "@ucanto/core": "^10.1.1",
-    "@ucanto/interface": "^10.0.0",
-    "@ucanto/server": "^10.0.2",
-    "@ucanto/transport": "^9.1.1",
-    "carstream": "^2.0.0",
-    "multiformats": "^13.1.0"
+    "@ucanto/core": "^10.4.0",
+    "@ucanto/interface": "^10.3.0",
+    "@ucanto/server": "^10.2.0",
+    "@ucanto/transport": "^9.2.0",
+    "carstream": "^2.3.0",
+    "multiformats": "^13.3.3"
   },
   "devDependencies": {
     "@ipld/dag-cbor": "^9.0.3",
