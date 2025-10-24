@@ -14,9 +14,9 @@
   "author": "Alan Shaw",
   "license": "Apache-2.0 OR MIT",
   "dependencies": {
-    "@ucanto/core": "^10.0.0",
-    "@ucanto/principal": "^9.0.1",
-    "@ucanto/transport": "^9.1.1",
+    "@ucanto/core": "^10.4.5",
+    "@ucanto/principal": "^9.0.3",
+    "@ucanto/transport": "^9.2.1",
     "@web3-storage/content-claims": "file:../core",
     "carstream": "^2.0.0",
     "dotenv": "^16.3.1",
