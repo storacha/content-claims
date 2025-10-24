@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.2.2](https://github.com/storacha/content-claims/compare/content-claims-v5.2.1...content-claims-v5.2.2) (2025-10-24)
+
+
+### Bug Fixes
+
+* update dependencies ([#87](https://github.com/storacha/content-claims/issues/87)) ([e1d74ab](https://github.com/storacha/content-claims/commit/e1d74abd5de87719fc20dff868d5939dad5af4ef))
+
 ## [5.2.1](https://github.com/storacha/content-claims/compare/content-claims-v5.2.0...content-claims-v5.2.1) (2025-05-13)
 
 
