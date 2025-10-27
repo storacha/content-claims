@@ -54,8 +54,6 @@ jobs:
       - run: npm ci
       - run: npm run build --workspace=packages/core
       - run: npm publish --access=public --workspace=packages/core --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
   npm-cli:
     name: npm publish @web3-storage/content-claims-cli
     needs: release
@@ -75,8 +73,6 @@ jobs:
       - run: npm ci
       - run: npm run build --workspace=packages/cli
       - run: npm publish --access=public --workspace=packages/cli --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
   npm-infra:
     name: npm publish @web3-storage/content-claims-infra
     needs: release
@@ -96,5 +92,3 @@ jobs:
       - run: npm ci
       - run: npm run build --workspace=packages/infra
       - run: npm publish --access=public --workspace=packages/infra --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
