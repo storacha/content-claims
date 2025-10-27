@@ -1,4 +1,5 @@
 {
   "packages/core": "5.2.2",
-  "packages/infra": "1.2.2"
+  "packages/infra": "1.2.2",
+  "packages/cli": "1.0.0"
 }
