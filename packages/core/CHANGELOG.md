@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.2.3](https://github.com/storacha/content-claims/compare/content-claims-v5.2.2...content-claims-v5.2.3) (2025-10-27)
+
+
+### Bug Fixes
+
+* tweaks for oidc trusted publishing ([#90](https://github.com/storacha/content-claims/issues/90)) ([eefc864](https://github.com/storacha/content-claims/commit/eefc864db75e33658f0ffafcfceb10607c84b763))
+
 ## [5.2.2](https://github.com/storacha/content-claims/compare/content-claims-v5.2.1...content-claims-v5.2.2) (2025-10-24)
 
 
