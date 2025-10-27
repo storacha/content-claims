@@ -106,4 +106,3 @@ Feel free to join in. All welcome. Please [open an issue](https://github.com/sto
 ## License
 
 Dual-licensed under [MIT + Apache 2.0](https://github.com/storacha/content-claims/blob/main/LICENSE.md)
-
