@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.3](https://github.com/storacha/content-claims/compare/content-claims-infra-v1.2.2...content-claims-infra-v1.2.3) (2025-10-27)
+
+
+### Bug Fixes
+
+* update dependencies ([#87](https://github.com/storacha/content-claims/issues/87)) ([e1d74ab](https://github.com/storacha/content-claims/commit/e1d74abd5de87719fc20dff868d5939dad5af4ef))
+
 ## [1.2.2](https://github.com/storacha/content-claims/compare/content-claims-infra-v1.2.1...content-claims-infra-v1.2.2) (2024-11-22)
 
 
