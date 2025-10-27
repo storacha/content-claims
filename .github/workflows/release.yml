@@ -24,6 +24,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      id-token: write  # Required for OIDC
     outputs:
       paths_released: ${{ steps.release.outputs.paths_released }}
     steps:
@@ -96,5 +97,3 @@ jobs:
       - run: npm ci
       - run: npm run build --workspace=packages/infra
       - run: npm publish --access=public --workspace=packages/infra --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
